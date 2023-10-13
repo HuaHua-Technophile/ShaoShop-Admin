@@ -111,7 +111,7 @@
       userName: form.userName,
       password: form.password,
     });
-    console.log("获取到了登陆数据=>", loginInfo);
+    console.log("getLoginInfo获取到了登陆数据=>", loginInfo);
     if (loginInfo.data) {
       tokenStore.token = loginInfo.data?.authentication;
       let authMenuList = await getAuthMenuList();

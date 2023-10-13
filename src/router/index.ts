@@ -15,10 +15,10 @@ const router = createRouter({
       beforeEnter: (to, from, next) => {
         const store = useUserInfoStore();
         if (store.isLogged) {
-          console.log("已登录");
+          console.log("beforeEnter路由守卫:已登录");
           next();
         } else {
-          console.log("未登录");
+          console.log("beforeEnter路由守卫:未登录");
           next({
             name: "login",
           });
