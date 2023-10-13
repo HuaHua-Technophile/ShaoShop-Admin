@@ -1,0 +1,8 @@
+@forward "element-plus/theme-chalk/src/dark/var.scss" with (
+  $colors: (
+    //这里定义在暗黑模式下 primary 的颜色，其他同理
+    "primary": ("base": #f3400d),
+  )
+); //forward必须写在最开始
+@use "element-plus/theme-chalk/src/dark/css-vars.scss";
+// 然后在任意部位全局引入(不是像非暗色模式时按需引入需要去vite.config.ts修改配置项)

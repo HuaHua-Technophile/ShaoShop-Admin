@@ -1,0 +1,10 @@
+@forward "element-plus/theme-chalk/src/common/var.scss" with (
+  $colors: (
+    "primary": (
+      "base": #f3400d,
+    ),
+  )
+); //forward必须写在最开始
+
+// https://juejin.cn/post/7264952002706096164#heading-3
+// https://element-plus.org/zh-CN/guide/theming.html#%E5%A6%82%E4%BD%95%E8%A6%86%E7%9B%96%E5%AE%83%EF%BC%9F:~:text=%E5%A6%82%E6%9E%9C%E4%BD%A0%E6%AD%A3%E5%9C%A8,%E7%9A%84%E7%BB%84%E4%BB%B6%E3%80%82

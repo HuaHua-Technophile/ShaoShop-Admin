@@ -1,0 +1,10 @@
+// @use "./primaryColorDark.scss";
+@use "bootstrap-icons/font/bootstrap-icons.css"; //最先导入bootstrap icon字体图标
+@use "bootstrap/scss/bootstrap";
+
+// @use "element-plus/theme-chalk/dark/css-vars.css";只想要支持elementPlus暗色模式,导入该样式即可.
+// 想要在暗色模式下还能支持自定义主题色,则需要↓
+@use "./primaryColorDark.scss";
+// 按需导入时,需要全局引入部分特殊的message类型样式
+@use "element-plus/theme-chalk/el-message.css";
+@use "element-plus/theme-chalk/el-message-box.css";
