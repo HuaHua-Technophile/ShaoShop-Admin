@@ -27,7 +27,8 @@
             </el-sub-menu>
             <!-- 单层级菜单 -->
             <el-menu-item :index="i.menuName" v-else>
-              {{ i.menuName }}
+              <FontIcon :icon="i.icon" style="font-size: 18px"></FontIcon>
+              <span class="ms-2">{{ i.menuName }}</span>
             </el-menu-item>
           </template>
         </el-menu>
