@@ -1,4 +1,4 @@
-import { authMenuListType } from "../typeing";
+import { authMenuListType } from "../type/index";
 import instance from "./instance";
 export const login = (data: { password: string; userName: string }) => {
   return instance<{ authentication: string }>({
