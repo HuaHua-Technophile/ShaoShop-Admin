@@ -14,21 +14,19 @@
           <!-- <el-menu router> -->
           <template v-for="i in userInfoStore.authMenuList">
             <!-- 多层级菜单 -->
-            <el-sub-menu :index="i.path" v-if="i.children.length > 0">
+            <el-sub-menu :index="i.menuName" v-if="i.children.length > 0">
               <!-- 一级菜单标题 -->
               <template #title>
-                <FontIcon icon="bi bi-gear" style="font-size: 18px"></FontIcon>
-                <span class="ms-2"
-                  >{{ i.menuName }} {{ i?.children.length }}</span
-                >
+                <FontIcon :icon="i.icon" style="font-size: 18px"></FontIcon>
+                <span class="ms-2">{{ i.menuName }}</span>
               </template>
               <!-- 一级菜单内容 -->
-              <el-menu-item v-for="j in i.children" :index="j.path">{{
+              <el-menu-item v-for="j in i.children" :index="j.menuName">{{
                 j.menuName
               }}</el-menu-item>
             </el-sub-menu>
             <!-- 单层级菜单 -->
-            <el-menu-item :index="i.path" v-else>
+            <el-menu-item :index="i.menuName" v-else>
               {{ i.menuName }}
             </el-menu-item>
           </template>

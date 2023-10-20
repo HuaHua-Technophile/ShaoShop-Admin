@@ -138,8 +138,8 @@
             if (i.children.length > 0) {
               i.children.forEach((j) => {
                 router.addRoute("main", {
-                  path: `${j.path}`,
-                  name: j.path,
+                  path: j.path,
+                  name: j.menuName,
                   component: () => import(`../${j.path}/index.vue`),
                 });
               });
@@ -147,8 +147,8 @@
             // 否则是个一级菜单,直接添加路由
             else {
               router.addRoute("main", {
-                path: `${i.path}`,
-                name: i.path,
+                path: i.path,
+                name: i.menuName,
                 component: () => import(`../${i.path}/index.vue`),
               });
             }
@@ -156,7 +156,7 @@
         );
         ElMessage.success("登陆成功");
         console.log("所有路由=>", router.getRoutes());
-        router.push({ path: "/main" });
+        router.push({ name: authMenuList.data[0].children[0].menuName });
       } else ElMessage.error(authMenuList.message);
     } else ElMessage.error(loginInfo.message);
   };
