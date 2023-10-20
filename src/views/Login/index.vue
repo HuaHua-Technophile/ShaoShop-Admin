@@ -148,7 +148,7 @@
         );
         ElMessage.success("登陆成功");
         router.push({ path: "/main" });
-        console.log(router.getRoutes());
+        console.log("所有路由=》", router.getRoutes());
       } else ElMessage.error(authMenuList.message);
     } else ElMessage.error(loginInfo.message);
   };
