@@ -140,9 +140,7 @@
                 router.addRoute("main", {
                   path: `${j.path}`,
                   name: j.path,
-                  component: () => {
-                    import(`../${j.path}/index.vue`);
-                  },
+                  component: () => import(`../${j.path}/index.vue`),
                 });
               });
             }
