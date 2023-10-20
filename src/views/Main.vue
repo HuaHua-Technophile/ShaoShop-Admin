@@ -8,8 +8,8 @@
           <span style="color">S</span>hao<span>S</span>hop
         </div>
         <el-menu
-          :default-active="userInfoStore.authMenuList[0].children[0].path"
-          :default-openeds="[userInfoStore.authMenuList[0].path]"
+          :default-active="userInfoStore.authMenuList[0].children[0].menuName"
+          :default-openeds="[userInfoStore.authMenuList[0].menuName]"
           @select="selectMenu">
           <!-- <el-menu router> -->
           <template v-for="i in userInfoStore.authMenuList">
