@@ -56,6 +56,7 @@
   ) => {
     // index: 选中菜单项的 index, indexPath: 选中菜单项的 index path, item: 选中菜单项, routeResult: vue-router 的返回值（如果 router 为 true）
     console.log(`即将跳转菜单=>'${index}',`, indexPath, item);
-    router.push({ name: `${index}` });
+    // router.push({ name: `${index}` });
+    router.push({ name: "test" });
   };
 </script>

@@ -25,11 +25,11 @@ const router = createRouter({
         }
       },
       children: [
-        {
+        /* {
           path: "test",
           name: "test",
           component: () => import("../views/Test/index.vue"),
-        },
+        }, */
       ],
     },
     {

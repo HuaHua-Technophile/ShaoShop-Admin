@@ -127,6 +127,7 @@
       if (authMenuList.data) {
         authMenuList.data.forEach(
           (i: { children: any[]; path: string; menuName: string }) => {
+            // 如果有子菜单说明是个空壳二级菜单,需要遍历子菜单添加路由
             if (i.children.length > 0) {
               i.children.forEach((j) => {
                 router.addRoute("main", {
@@ -137,7 +138,9 @@
                   },
                 });
               });
-            } else {
+            }
+            // 否则是个一级菜单,直接添加路由
+            else {
               router.addRoute("main", {
                 path: `${i.path}`,
                 name: i.path,
