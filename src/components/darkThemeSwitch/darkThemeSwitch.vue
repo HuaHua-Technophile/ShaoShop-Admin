@@ -6,7 +6,7 @@
       size="large"
       :inactive-icon="renderFontIcon('bi bi-moon')"
       :active-icon="renderFontIcon('bi bi-brightness-high')"
-      inline-prompt="true" />
+      inline-prompt />
   </div>
 </template>
 

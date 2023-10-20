@@ -1,17 +1,17 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import { useUserInfoStore } from "../stores/userInfo";
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes: [
     {
       path: "/",
-      redirect: "/home",
+      redirect: "/main",
     },
     {
-      path: "/home",
-      name: "home",
-      component: () => import("../views/Home.vue"),
+      path: "/main",
+      name: "main",
+      component: () => import("../views/Main.vue"),
       beforeEnter: (to, from, next) => {
         const store = useUserInfoStore();
         if (store.isLogged) {
@@ -24,11 +24,23 @@ const router = createRouter({
           });
         }
       },
+      children: [
+        {
+          path: "test",
+          name: "test",
+          component: () => import("../views/Test/index.vue"),
+        },
+      ],
     },
     {
       path: "/login",
       name: "login",
-      component: () => import("../views/Login/Login.vue"),
+      component: () => import("../views/Login/index.vue"),
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      name: "notFound",
+      component: () => import("../views/notFound/index.vue"),
     },
   ],
 });

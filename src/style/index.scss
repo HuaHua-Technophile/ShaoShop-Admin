@@ -8,3 +8,13 @@
 // 按需导入时,需要全局引入部分特殊的message类型样式
 @use "element-plus/theme-chalk/el-message.css";
 @use "element-plus/theme-chalk/el-message-box.css";
+
+@font-face {
+  font-family: "YouSheBiaoTiHei";
+  src: url(../static/font/优设标题黑.ttf);
+}
+
+:root {
+  --theme-color-rgb: 243, 64, 13;
+  --theme-color: #f3400d;
+}

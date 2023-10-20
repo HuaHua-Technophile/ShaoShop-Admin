@@ -39,6 +39,7 @@
                 type="primary"
                 class="w-100"
                 @click="submitForm(ruleFormRef)"
+                :loading="waitLogin"
                 >登录</el-button
               >
             </el-form-item>
@@ -58,6 +59,7 @@
   import { ElMessage } from "element-plus";
   import type { FormInstance } from "element-plus";
   import router from "../../router";
+  // import { authMenuListType } from "../../type/index";
   // 获取登录图片-------------------------------------------------------
   let loginSvg = ref();
   let getImageFun = async () => {
@@ -86,6 +88,7 @@
       { min: 6, max: 12, message: "密码为6~12位", trigger: "blur" },
       {
         validator: (rule: any, value: any, callback: any) => {
+          rule; //不用一下会提示报错,看着红色就烦
           if (!/^[^\u4e00-\u9fa5 ]{6,16}$/.test(value)) {
             callback(new Error("不能含有中文与空格"));
           } else callback();
@@ -104,9 +107,11 @@
     });
   };
   // 登录--------------------------------------------------------
+  let waitLogin = ref(false);
   let tokenStore = useTokenStore();
   let userInfoStore = useUserInfoStore();
   let getLoginInfo = async () => {
+    waitLogin.value = true;
     let loginInfo = await login({
       userName: form.userName,
       password: form.password,
@@ -117,8 +122,34 @@
       let authMenuList = await getAuthMenuList();
       userInfoStore.isLogged = true;
       userInfoStore.authMenuList = authMenuList.data;
-      ElMessage.success("登陆成功");
-      router.push({ name: "home" });
+      console.log("getAuthMenuList获取到了用户菜单=>", authMenuList.data);
+      waitLogin.value = false;
+      if (authMenuList.data) {
+        authMenuList.data.forEach(
+          (i: { children: any[]; path: string; menuName: string }) => {
+            if (i.children.length > 0) {
+              i.children.forEach((j) => {
+                router.addRoute("main", {
+                  path: `${j.path}`,
+                  name: j.path,
+                  component: () => {
+                    import(`../${j.path}/index.vue`);
+                  },
+                });
+              });
+            } else {
+              router.addRoute("main", {
+                path: `${i.path}`,
+                name: i.path,
+                component: () => import(`../${i.path}/index.vue`),
+              });
+            }
+          }
+        );
+        ElMessage.success("登陆成功");
+        router.push({ path: "/main" });
+        console.log(router.getRoutes());
+      } else ElMessage.error(authMenuList.message);
     } else ElMessage.error(loginInfo.message);
   };
 </script>

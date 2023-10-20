@@ -1,3 +1,4 @@
+import { authMenuListType } from "../typeing";
 import instance from "./instance";
 export const login = (data: { password: string; userName: string }) => {
   return instance<{ authentication: string }>({
@@ -14,7 +15,7 @@ export const getImage = () => {
 };
 
 export const getAuthMenuList = () => {
-  return instance({
+  return instance<authMenuListType>({
     url: "/system/auth/list-menus",
     method: "GET",
   });
