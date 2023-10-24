@@ -12,7 +12,21 @@ const router = createRouter({
       path: "/main",
       name: "main",
       component: () => import("../views/Main.vue"),
-
+      beforeEnter: (to, from, next) => {
+        const token = localStorage.getItem("token");
+        const userInfo = useUserInfoStore();
+        if (
+          token &&
+          token != "" &&
+          userInfo.authMenuList &&
+          userInfo.authMenuList.length > 0
+        ) {
+          next();
+        } else {
+          console.log("token不存在或动态路由未写入");
+          next({ name: "login" });
+        }
+      },
       children: [
         {
           path: "test",
