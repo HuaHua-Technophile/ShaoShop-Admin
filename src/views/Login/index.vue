@@ -52,14 +52,13 @@
 
 <script lang="ts" setup>
   import { ref, reactive } from "vue";
-  import { login, getImage, getAuthMenuList } from "../../api/login";
-  import { useTokenStore } from "../../stores/token";
-  import { useUserInfoStore } from "../../stores/userInfo";
+  import { login, getImage } from "../../api/login";
+  import { addMenuRouter } from "../../utils/addMenuRouter/addMenuRouter";
   import { renderFontIcon } from "../../utils/fontIcon/renderFontIcon";
+  // import { useRouter } from "vue-router";
   import { ElMessage } from "element-plus";
   import type { FormInstance } from "element-plus";
-  import router from "../../router";
-  // import { authMenuListType } from "../../type/index";
+  // const router = useRouter();
   // 获取登录图片-------------------------------------------------------
   let loginSvg = ref();
   let getImageFun = async () => {
@@ -108,8 +107,6 @@
   };
   // 登录--------------------------------------------------------
   let waitLogin = ref(false);
-  let tokenStore = useTokenStore();
-  let userInfoStore = useUserInfoStore();
   let getLoginInfo = async () => {
     waitLogin.value = true;
     let loginInfo = await login({
@@ -118,46 +115,8 @@
     });
     console.log("getLoginInfo获取到了登陆数据=>", loginInfo);
     if (loginInfo.data) {
-      tokenStore.token = loginInfo.data?.authentication;
-      let authMenuList = await getAuthMenuList();
-      userInfoStore.isLogged = true;
-      userInfoStore.authMenuList = authMenuList.data;
-      console.log("getAuthMenuList获取到了用户菜单=>", authMenuList.data);
-      waitLogin.value = false;
-      if (authMenuList.data) {
-        // 使测试路由也是动态添加
-        router.addRoute("main", {
-          path: "test",
-          name: "test",
-          component: () => import("../Test/index.vue"),
-        });
-        // 便利路由列表
-        authMenuList.data.forEach(
-          (i: { children: any[]; path: string; menuName: string }) => {
-            // 如果有子菜单说明是个空壳二级菜单,需要遍历子菜单添加路由
-            if (i.children.length > 0) {
-              i.children.forEach((j) => {
-                router.addRoute("main", {
-                  path: j.path,
-                  name: j.menuName,
-                  component: () => import(`../${j.path}/index.vue`),
-                });
-              });
-            }
-            // 否则是个一级菜单,直接添加路由
-            else {
-              router.addRoute("main", {
-                path: i.path,
-                name: i.menuName,
-                component: () => import(`../${i.path}/index.vue`),
-              });
-            }
-          }
-        );
-        ElMessage.success("登陆成功");
-        console.log("所有路由=>", router.getRoutes());
-        router.push({ name: authMenuList.data[0].children[0].menuName });
-      } else ElMessage.error(authMenuList.message);
+      localStorage.setItem("token", loginInfo.data?.authentication);
+      addMenuRouter({name:"main"});
     } else ElMessage.error(loginInfo.message);
   };
 </script>

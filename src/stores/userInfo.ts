@@ -1,8 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { authMenuListType } from "../typeing";
+import { authMenuListType } from "../type/index";
 export const useUserInfoStore = defineStore("userInfo", () => {
-  const isLogged = ref(false);
   const authMenuList = ref<authMenuListType>([]);
-  return { isLogged, authMenuList };
+  return { authMenuList };
 });

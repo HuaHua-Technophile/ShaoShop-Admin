@@ -84,6 +84,7 @@
     let logoutResult = await logout();
     if (logoutResult.code == 200) {
       ElMessage.success("退出成功");
+      localStorage.removeItem("token");
       router.replace({ name: "login" });
     } else ElMessage.success("网络异常");
   };

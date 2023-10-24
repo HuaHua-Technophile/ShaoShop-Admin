@@ -1,7 +1,6 @@
 // 安装axios
 // $pnpm i axios -S
 import axios from "axios";
-import { useTokenStore } from "../stores/token";
 import {
   Axios,
   AxiosRequestConfig,
@@ -50,11 +49,10 @@ const instance: AxiosInstance = axios.create({
 });
 
 // request 拦截器 发送数据到后台拦截---------------------------
-const tokenStore = useTokenStore();
 instance.interceptors.request.use(
   (config) => {
     // 添加token
-    const token = tokenStore.token;
+    const token = localStorage.getItem("token");
     if (token && token != "") config.headers["token"] = token;
     return config;
   },
