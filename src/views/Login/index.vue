@@ -116,7 +116,8 @@
     console.log("getLoginInfo获取到了登陆数据=>", loginInfo);
     if (loginInfo.data) {
       localStorage.setItem("token", loginInfo.data?.authentication);
-      addMenuRouter({name:"main"});
+      // 固定写死登陆后首屏的模块
+      addMenuRouter({ path: "/main/UserManagement" });
     } else ElMessage.error(loginInfo.message);
   };
 </script>

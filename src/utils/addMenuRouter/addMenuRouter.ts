@@ -2,7 +2,7 @@ import router from "../../router/index";
 import { getAuthMenuList } from "../../api/login";
 import { useUserInfoStore } from "../../stores/userInfo";
 import { ElMessage } from "element-plus";
-export const addMenuRouter = async (to?: { name: string }) => {
+export const addMenuRouter = async (to?: { name?: string; path?: string }) => {
   const userInfoStore = useUserInfoStore();
   let authMenuList = await getAuthMenuList();
   userInfoStore.authMenuList = authMenuList.data;

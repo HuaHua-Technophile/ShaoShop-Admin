@@ -11,26 +11,26 @@
             >S</span
           >hop
         </div>
-        <el-menu
-          :default-active="userInfoStore.authMenuList[0].children[0].menuName"
-          :default-openeds="[userInfoStore.authMenuList[0].menuName]"
-          @select="selectMenu">
-          <!-- <el-menu router> -->
+        <el-menu :default-active="active" router>
           <template v-for="i in userInfoStore.authMenuList">
             <!-- 多层级菜单 -->
-            <el-sub-menu :index="i.menuName" v-if="i.children.length > 0">
+            <el-sub-menu
+              :index="'/main/' + i.path"
+              v-if="i.children.length > 0">
               <!-- 一级菜单标题 -->
               <template #title>
                 <FontIcon :icon="i.icon" style="font-size: 18px"></FontIcon>
                 <span class="ms-2">{{ i.menuName }}</span>
               </template>
               <!-- 一级菜单内容 -->
-              <el-menu-item v-for="j in i.children" :index="j.menuName">{{
-                j.menuName
-              }}</el-menu-item>
+              <el-menu-item
+                v-for="j in i.children"
+                :index="'/main/' + j.path"
+                >{{ j.menuName }}</el-menu-item
+              >
             </el-sub-menu>
             <!-- 单层级菜单 -->
-            <el-menu-item :index="i.menuName" v-else>
+            <el-menu-item :index="'/main/' + i.path" v-else>
               <FontIcon :icon="i.icon" style="font-size: 18px"></FontIcon>
               <span class="ms-2">{{ i.menuName }}</span>
             </el-menu-item>
@@ -67,18 +67,13 @@
   import { useUserInfoStore } from "../stores/userInfo";
   import { logout } from "../api/logout";
   import { ElMessage } from "element-plus";
+  import { ref } from "vue";
 
+  // 页面渲染所需数据------------------------
   let userInfoStore = useUserInfoStore();
-  // 点击跳转菜单-------------------------------
-  let selectMenu = (
-    index: string,
-    indexPath: object,
-    item: { index: string }
-  ) => {
-    // index: 选中菜单项的 index, indexPath: 选中菜单项的 index path, item: 选中菜单项, routeResult: vue-router 的返回值（如果 router 为 true）
-    console.log(`即将跳转菜单=>'${index}',`, indexPath, item);
-    router.push({ name: index });
-  };
+
+  // 自动调整左侧路由激活项为当前页面url-------------
+  let active = ref(window.location.pathname);
   //点击退出登录-------------------------------
   let logoutFun = async () => {
     let logoutResult = await logout();
