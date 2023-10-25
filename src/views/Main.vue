@@ -72,7 +72,7 @@
   // 页面渲染所需数据------------------------
   let userInfoStore = useUserInfoStore();
 
-  // 自动调整左侧路由激活项为当前页面url-------------
+  // 自动调整左侧路由激活项为当前页面url(将el-menu设置为router模式)-------------
   let active = ref(window.location.pathname);
   //点击退出登录-------------------------------
   let logoutFun = async () => {
