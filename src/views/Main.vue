@@ -11,7 +11,7 @@
             >S</span
           >hop
         </div>
-        <el-menu :default-active="active" router>
+        <el-menu :default-active="active" router @select="menuSelect">
           <template v-for="i in userInfoStore.authMenuList">
             <!-- 多层级菜单 -->
             <el-sub-menu
@@ -45,9 +45,26 @@
             <!-- 历史路由 -->
             <div class="flex-grow-1 bg-danger">1</div>
             <!-- 右侧控件 -->
-            <div class="flex-shrink-0 bg-warning d-flex align-items-center">
-              <!-- 退出登录 -->
-              <div @click="logoutFun">退出登录</div>
+            <div class="flex-shrink-0 d-flex align-items-center">
+              <!-- 用户 -->
+              <el-dropdown>
+                <div class="d-flex align-items-center me-3">
+                  <el-avatar
+                    :size="38"
+                    shape="square"
+                    src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+                  <div class="ms-1">Admin</div>
+                </div>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item @click="logoutFun">
+                      <span class="me-1">退出登录</span>
+                      <FontIcon
+                        icon="fa-solid fa-arrow-right-from-bracket"></FontIcon>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
               <!-- 暗色/亮色 -->
               <darkThemeSwitch />
             </div>
@@ -71,7 +88,12 @@
 
   // 页面渲染所需数据------------------------
   let userInfoStore = useUserInfoStore();
-
+  // 菜单点击回调(index: 选中菜单项的 index, indexPath: 选中菜单项的 index path, item: 选中菜单项, routeResult: vue-router 的返回值（如果 router 为 true）)
+  let menuSelect = (index: any) => {
+    let routerList = router.getRoutes();
+    let routerItem = routerList.find((i) => i.path == index);
+    console.log(routerItem);
+  };
   // 自动调整左侧路由激活项为当前页面url(将el-menu设置为router模式)-------------
   let active = ref(window.location.pathname);
   //点击退出登录-------------------------------

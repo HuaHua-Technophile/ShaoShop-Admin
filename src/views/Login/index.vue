@@ -39,9 +39,10 @@
                 type="primary"
                 class="w-100"
                 @click="submitForm(ruleFormRef)"
-                :loading="waitLogin"
-                >登录</el-button
-              >
+                :loading="waitLogin">
+                <span class="me-2">登录</span>
+                <FontIcon icon="fa-solid fa-arrow-right-to-bracket"></FontIcon>
+              </el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -55,10 +56,9 @@
   import { login, getImage } from "../../api/login";
   import { addMenuRouter } from "../../utils/addMenuRouter/addMenuRouter";
   import { renderFontIcon } from "../../utils/fontIcon/renderFontIcon";
-  // import { useRouter } from "vue-router";
   import { ElMessage } from "element-plus";
   import type { FormInstance } from "element-plus";
-  // const router = useRouter();
+
   // 获取登录图片-------------------------------------------------------
   let loginSvg = ref();
   let getImageFun = async () => {
