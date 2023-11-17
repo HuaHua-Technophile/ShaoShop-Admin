@@ -43,7 +43,26 @@
         <el-header>
           <div class="w-100 h-100 d-flex align-items-center">
             <!-- 历史路由 -->
-            <div class="flex-grow-1 bg-danger">1</div>
+            <div class="flex-grow-1 d-flex">
+              <div
+                v-for="(
+                  i, index
+                ) in historicalNavigationStore.historicalNavigation"
+                class="historicalNavigation border rounded-top p-1 d-flex align-items-center position-relative"
+                :class="{
+                  'me-2':
+                    index <
+                    historicalNavigationStore.historicalNavigation.length - 1,
+                  active: active == i.path,
+                }"
+                @click="historicalNavigationClick($event, i)">
+                <div>{{ i.name }}</div>
+                <!-- 历史路由关闭按钮 -->
+                <div class="historicalNavigationClose position-absolute end-0">
+                  <FontIcon icon="bi bi-x fs-5"></FontIcon>
+                </div>
+              </div>
+            </div>
             <!-- 右侧控件 -->
             <div class="flex-shrink-0 d-flex align-items-center">
               <!-- 用户 -->
@@ -73,6 +92,7 @@
         <!-- 右侧内容 -->
         <el-main class="border border-danger">
           中间
+          <!-- {{ historicalNavigation.historicalNavigation }} -->
           <router-view></router-view>
         </el-main>
       </el-container>
@@ -82,20 +102,101 @@
 <script setup lang="ts">
   import router from "../router";
   import { useUserInfoStore } from "../stores/userInfo";
+  import { useHistoricalNavigationStore } from "../stores/historicalNavigation";
   import { logout } from "../api/logout";
   import { ElMessage } from "element-plus";
   import { ref } from "vue";
-
+  // 页面加载时就检查历史路由导航条是否存在当前路由,若不存在则表明是首次进入页面,需添加进顶部历史路由导航条
+  const historicalNavigationStore = useHistoricalNavigationStore();
+  const routerList = router.getRoutes();
+  let hasThisRouter = historicalNavigationStore.historicalNavigation.some(
+    (i) => i.path == window.location.pathname
+  );
+  if (!hasThisRouter) {
+    let routerItem = routerList.find((i) => i.path == window.location.pathname);
+    historicalNavigationStore.historicalNavigation.push({
+      name: routerItem!.name,
+      path: routerItem!.path,
+    });
+  }
   // 页面渲染所需数据------------------------
   let userInfoStore = useUserInfoStore();
-  // 菜单点击回调(index: 选中菜单项的 index, indexPath: 选中菜单项的 index path, item: 选中菜单项, routeResult: vue-router 的返回值（如果 router 为 true）)
-  let menuSelect = (index: any) => {
-    let routerList = router.getRoutes();
-    let routerItem = routerList.find((i) => i.path == index);
-    console.log(routerItem);
+
+  // history.replaceState和pushState不会触发popstate事件，那么如何监听这两个行为呢。可以通过在方法里面主动的去触发popstate事件。另一种就是在方法中创建一个新的全局事件。
+  // https://segmentfault.com/a/1190000022822185
+  const _historyWrap = function (type: any) {
+    const orig = history[type];
+    const e = new Event(type) as any;
+    return function () {
+      const rv = orig.apply(this, arguments);
+      e.arguments = arguments;
+      window.dispatchEvent(e);
+      return rv;
+    };
   };
+  history.replaceState = _historyWrap("replaceState");
+
+  window.addEventListener("replaceState", (e: any) => {
+    console.log("change replaceState", e);
+    active.value = e.arguments[0].forward;
+  });
+
   // 自动调整左侧路由激活项为当前页面url(将el-menu设置为router模式)-------------
   let active = ref(window.location.pathname);
+  // 菜单点击回调(index: 选中菜单项的 index, indexPath: 选中菜单项的 index path, item: 选中菜单项, routeResult: vue-router 的返回值（如果 router 为 true）)
+  //
+  let menuSelect = (index: string) => {
+    let routerItem = routerList.find((i) => i.path == index);
+    if (
+      !historicalNavigationStore.historicalNavigation.some(
+        (i) => i.path == index
+      )
+    )
+      historicalNavigationStore.historicalNavigation.push({
+        name: routerItem!.name,
+        path: routerItem!.path,
+      });
+  };
+  // 关闭历史路由按钮
+  interface Event<T> {
+    target: T;
+    type: string;
+    // ...其他属性
+  }
+  let historicalNavigationClick = (
+    e: Event<HTMLElement>,
+    item: { path: string }
+  ) => {
+    // 如果点击了关闭按钮,就删除并且跳转第一个
+    if (
+      /.*bi-x.*/.test(e.target.className) ||
+      /.*historicalNavigationClose.*/.test(e.target.className)
+    ) {
+      historicalNavigationStore.historicalNavigation =
+        historicalNavigationStore.historicalNavigation.filter(
+          (i) => i.path != item.path
+        );
+      // 如果关闭的是当前路由
+      if (active.value == item.path) {
+        // 判断路由是否只剩一个
+        if (historicalNavigationStore.historicalNavigation.length == 1) {
+          router.replace({ path: "/main" });
+        } else {
+          // 跳转至第一个路由
+          router.replace({
+            path: historicalNavigationStore.historicalNavigation[0].path,
+          });
+        }
+        console.log(active.value);
+      }
+      // console.log(e.path, active.value);
+    }
+    // 点击的不是关闭按钮,就跳转点击项
+    else {
+      router.push({ path: item.path });
+    }
+  };
+
   //点击退出登录-------------------------------
   let logoutFun = async () => {
     let logoutResult = await logout();
@@ -106,3 +207,41 @@
     } else ElMessage.success("网络异常");
   };
 </script>
+
+<style lang="scss">
+  .historicalNavigation {
+    cursor: pointer;
+    transition: all 0.5s;
+    &::after {
+      display: block;
+      content: "";
+      width: 0%;
+      position: absolute;
+      height: 3px;
+      left: 0;
+      bottom: 0;
+      background-color: var(--theme-color);
+      transition: all 0.5s;
+    }
+    &:hover,
+    &.active {
+      padding-right: 1.25rem !important;
+      &::after {
+        width: 100%;
+      }
+      .historicalNavigationClose {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+  }
+  .historicalNavigationClose {
+    transform: scale(0);
+    opacity: 0.2;
+    transition: all 0.5s;
+    &:hover {
+      color: var(--theme-color);
+      transform: scale(1.1) rotate(90deg) !important;
+    }
+  }
+</style>

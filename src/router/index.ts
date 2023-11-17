@@ -51,8 +51,10 @@ const router = createRouter({
           next();
         } else {
           console.log("动态路由暂未添加", to, from);
-          await addMenuRouter();
-          next({ path: to.path });
+          let res = await addMenuRouter({ path: to.path });
+          console.log("异步函数测试完毕", res);
+          if (res === true) next({ path: to.path });
+          else next({ path: "/login" });
         }
       },
     },
