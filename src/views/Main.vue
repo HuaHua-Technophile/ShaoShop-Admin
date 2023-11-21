@@ -91,10 +91,14 @@
           </div>
         </el-header>
         <!-- 右侧内容 -->
-        <el-main class="border border-danger">
-          中间
-          <!-- {{ historicalNavigation.historicalNavigation }} -->
-          <router-view></router-view>
+        <el-main
+          class="border border-danger p-0 position-relative overflow-hidden">
+          <router-view v-slot="{ Component }">
+            <!-- <transition name="slide-right" mode="out-in"> -->
+            <transition name="slide-right">
+              <component :is="Component" />
+            </transition>
+          </router-view>
         </el-main>
       </el-container>
     </el-container>

@@ -1,0 +1,27 @@
+.slide-right-enter-active {
+  will-change: transform;
+  transition: all 0.7s;
+  position: absolute !important;
+}
+.slide-right-enter-from {
+  opacity: 0;
+  transform: translateX(-5%) scale(0.98);
+}
+.slide-right-enter-to {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+// ------------------------------
+.slide-right-leave-active {
+  will-change: transform;
+  transition: all 0.7s;
+  position: absolute !important;
+}
+.slide-right-leave {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translate3d(5%, 0, 0) scale(0.98);
+}
