@@ -48,6 +48,7 @@
                 v-for="(
                   i, index
                 ) in historicalNavigationStore.historicalNavigation"
+                :key="i.path"
                 class="historicalNavigation border rounded-top p-1 d-flex align-items-center position-relative"
                 :class="{
                   'me-2':
@@ -137,7 +138,7 @@
   history.replaceState = _historyWrap("replaceState");
 
   window.addEventListener("replaceState", (e: any) => {
-    console.log("change replaceState", e);
+    // console.log("change replaceState", e);
     active.value = e.arguments[0].forward;
   });
 
@@ -157,20 +158,13 @@
         path: routerItem!.path,
       });
   };
-  // 关闭历史路由按钮
-  interface Event<T> {
-    target: T;
-    type: string;
-    // ...其他属性
-  }
-  let historicalNavigationClick = (
-    e: Event<HTMLElement>,
-    item: { path: string }
-  ) => {
+
+  // 历史路由点击事件----------------------
+  let historicalNavigationClick = (e: MouseEvent, item: { path: string }) => {
     // 如果点击了关闭按钮,就删除并且跳转第一个
     if (
-      /.*bi-x.*/.test(e.target.className) ||
-      /.*historicalNavigationClose.*/.test(e.target.className)
+      /.*bi-x.*/.test((e.target as HTMLElement).className) ||
+      /.*historicalNavigationClose.*/.test((e.target as HTMLElement).className)
     ) {
       historicalNavigationStore.historicalNavigation =
         historicalNavigationStore.historicalNavigation.filter(
@@ -180,16 +174,15 @@
       if (active.value == item.path) {
         // 判断路由是否只剩一个
         if (historicalNavigationStore.historicalNavigation.length == 1) {
-          router.replace({ path: "/main" });
+          router.push({ path: "/main" });
         } else {
           // 跳转至第一个路由
-          router.replace({
+          router.push({
             path: historicalNavigationStore.historicalNavigation[0].path,
           });
         }
-        console.log(active.value);
       }
-      // console.log(e.path, active.value);
+      // console.log(item.path, active.value);
     }
     // 点击的不是关闭按钮,就跳转点击项
     else {
