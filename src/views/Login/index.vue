@@ -76,7 +76,7 @@
     userName: "admin",
     password: "123456",
   });
-  // 表单验证规则
+  // ElementPlus 表单验证规则------------------------------------------------
   const rules = reactive({
     userName: [
       { required: true, message: "请输入账号", trigger: "blur" },
@@ -87,7 +87,7 @@
       { min: 6, max: 12, message: "密码为6~12位", trigger: "blur" },
       {
         validator: (rule: any, value: any, callback: any) => {
-          rule; //不用一下会提示报错,看着红色就烦
+          rule; //不用一下会Eslint提示报错,看着红色就烦
           if (!/^[^\u4e00-\u9fa5 ]{6,16}$/.test(value)) {
             callback(new Error("不能含有中文与空格"));
           } else callback();
@@ -96,7 +96,7 @@
       },
     ],
   });
-  // 表单提交前验证,验证不通过不发送请求
+  // 表单提交前验证,验证不通过不发送请求------------------------------------
   const submitForm = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate((valid, fields) => {
@@ -106,7 +106,7 @@
     });
   };
   // 登录--------------------------------------------------------
-  let waitLogin = ref(false);
+  let waitLogin = ref(false); //是否处于等待登陆状态
   let getLoginInfo = async () => {
     waitLogin.value = true;
     let loginInfo = await login({
@@ -116,8 +116,7 @@
     console.log("getLoginInfo获取到了登陆数据=>", loginInfo);
     if (loginInfo.data) {
       localStorage.setItem("token", loginInfo.data?.authentication);
-      // 固定写死登陆后首屏的模块
-      addMenuRouter({ path: "/main/UserManagement" });
+      addMenuRouter(true);
     } else ElMessage.error(loginInfo.message);
   };
 </script>
