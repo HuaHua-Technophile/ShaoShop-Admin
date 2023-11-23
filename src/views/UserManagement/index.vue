@@ -11,3 +11,6 @@
     <h1>UserManagement</h1>
   </div>
 </template>
+<script lang="ts" setup>
+  import "@/api/UserManagementAPI";
+</script>

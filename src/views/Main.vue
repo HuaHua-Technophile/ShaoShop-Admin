@@ -94,8 +94,8 @@
         <el-main
           class="border border-danger p-0 position-relative overflow-hidden">
           <router-view v-slot="{ Component }">
-            <!-- <transition name="slide-right" mode="out-in"> -->
-            <transition name="slide-right">
+            <transition name="slide-right" mode="out-in">
+              <!-- <transition name="slide-right"> -->
               <component :is="Component" />
             </transition>
           </router-view>
