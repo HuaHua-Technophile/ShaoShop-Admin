@@ -12,5 +12,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import "@/api/UserManagementAPI";
+  import { getUserList } from "@/api/UserManagementAPI.ts";
+  let res = await getUserList();
+  console.log(res);
 </script>
