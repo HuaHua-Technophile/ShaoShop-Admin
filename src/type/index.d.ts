@@ -4,3 +4,5 @@ export type authMenuListType = Array<{
   menuName: string;
   children: authMenuListType;
 }>;
+
+export type loginInfo = { authentication: string };

@@ -27,7 +27,7 @@
             <el-form-item prop="password">
               <el-input
                 v-model="form.password"
-                placeholder="账号"
+                placeholder="密码"
                 clearable
                 show-password
                 :prefix-icon="

@@ -1,6 +1,6 @@
 import instance from "./instance";
 export const getUserList = () => {
-  return instance<{ authentication: string }>({
+  return instance({
     url: "/system/user/list",
     method: "GET",
   });
@@ -16,13 +16,13 @@ interface User {
   phoneNumber: String; //绑定手机号
   // remark: String;
   // sex: String;
-  status: Number; //该后台管理账号的状态
+  status?: Number; //该后台管理账号的状态
   // userId: Number; 查询和添加用户用不到
   userName: String; //账号
 }
 
 export const addUser = (data: User) => {
-  return instance<{ authentication: string }>({
+  return instance({
     url: "/system/user",
     method: "POST",
     data: data,
