@@ -15,13 +15,17 @@ export type userType = {
   // companyName: String; //商户名称用不到
   email: String; //绑定邮箱
   nickName: String; //部门主体名称(账号名称)
-  password: String; //密码。注册时默认填入123456
-  phoneNumber?: String; //绑定手机号
+  password?: String; //密码。注册时默认填入123456
+  phoneNumber: String; //绑定手机号
   // remark: String;
   // sex: String;
-  status?: Number; //该后台管理账号的状态
+  status?: Number | null; //该后台管理账号的状态
   userId?: Number; //查询和添加用户---用不到
   userName: String; //账号
+};
+//分页查询用户列表所需参数
+export type userListParamsType = userType & {
+  pageSize?: Number;
 };
 //字体图标
 export type iconType = {

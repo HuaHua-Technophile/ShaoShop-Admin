@@ -9,7 +9,7 @@
       <el-form-item label="用户账号" prop="userName">
         <el-input
           clearable
-          v-model="userInfoForm.userName"
+          v-model="userQueryFrom.userName"
           placeholder="每个后台主体唯一名称"
           :prefix-icon="renderFontIcon('bi bi-123')">
         </el-input>
@@ -17,7 +17,7 @@
       <el-form-item label="绑定邮箱" prop="email">
         <el-input
           clearable
-          v-model="userInfoForm.email"
+          v-model="userQueryFrom.email"
           placeholder="每个后台主体唯一邮箱"
           :prefix-icon="renderFontIcon('bi bi-envelope')">
         </el-input>
@@ -25,7 +25,7 @@
       <el-form-item label="绑定电话" prop="phoneNumber">
         <el-input
           clearable
-          v-model="userInfoForm.phoneNumber"
+          v-model="userQueryFrom.phoneNumber"
           placeholder="每个后台主体唯一手机号"
           :prefix-icon="renderFontIcon('bi bi-telephone')">
         </el-input>
@@ -33,14 +33,14 @@
       <el-form-item label="部门主体" prop="nickName">
         <el-input
           clearable
-          v-model="userInfoForm.nickName"
+          v-model="userQueryFrom.nickName"
           placeholder="运营部/物流部/..."
           :prefix-icon="renderFontIcon('bi bi-people')">
         </el-input>
       </el-form-item>
       <el-form-item label="帐号状态" prop="status">
         <el-select
-          v-model="userInfoForm.status"
+          v-model="userQueryFrom.status"
           placeholder="正常/停用"
           clearable>
           <el-option label="正常" :value="0" />
@@ -289,7 +289,7 @@
     dialogCloseConfirm.value = "确认放弃当前添加用户吗?所填内容将会被清空";
   };
   let waitAddUser = ref(false);
-  const addUserFun = async (formEl: FormInstance) => {
+  const addUserFun = async (formEl: FormInstance | undefined) => {
     // 先进行表单验证
     if (!formEl) return;
     await formEl.validate(async (valid, fields) => {
@@ -313,7 +313,7 @@
   const userQueryFrom = reactive({
     userName: "", //账号
     email: "", //绑定邮箱
-    phoneNumber: "131", //绑定手机号
+    phoneNumber: "", //绑定手机号
     nickName: "", //部门主体名称(账号名称)
     status: null, //状态
   });
@@ -330,7 +330,7 @@
     ],
   });
   const waitQueryUser = ref(false);
-  let queryUserFun = async (formEl: FormInstance) => {
+  let queryUserFun = async (formEl: FormInstance | undefined) => {
     // 先验证表单
     if (!formEl) return;
     await formEl.validate(async (valid, fields) => {
