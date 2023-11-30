@@ -5,7 +5,7 @@
       :model="form"
       ref="ruleFormRef"
       :rules="rules"
-      class="d-flex flex-nowrap align-items-center justify-content-around">
+      class="d-flex flex-nowrap align-items-center justify-content-around px-3">
       <el-form-item
         label="商户名称"
         prop="companyName"
@@ -77,9 +77,19 @@
         >
       </el-form-item>
     </el-form>
-    <!-- 用户列表 -->
-    <div class="bg-black bg-opacity-25 rounded-4 p-3">
-      <div v-for="i in allUserList">{{ i }}</div>
+    <!-- 用户列表模块 -->
+    <div class="w-100 h-100 bg-body-secondary p-3">
+      <div class="bg-body rounded p-3">
+        <!-- 数据说明顶栏 -->
+        <div class="d-flex align-items-center">
+          <div>用户编号</div>
+        </div>
+        <!-- 用户列表 -->
+        <div v-for="i in allUserList" class="d-flex align-items-center">
+          <div class="col-2">{{ i.companyName }}</div>
+          <div class="col-2">{{ i.userName }}</div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

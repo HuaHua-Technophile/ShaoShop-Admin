@@ -9,6 +9,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@better-scroll/core": "^2.5.1",
+    "@better-scroll/mouse-wheel": "^2.5.1",
+    "@better-scroll/scroll-bar": "^2.5.1",
     "axios": "^1.6.2",
     "bootstrap": "^5.3.2",
     "bootstrap-icons": "^1.11.2",
@@ -20,13 +23,13 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^20.10.0",
+    "@types/node": "^20.10.1",
     "@vitejs/plugin-vue": "^4.5.0",
     "sass": "^1.69.5",
     "typescript": "^5.3.2",
     "unplugin-auto-import": "^0.16.7",
     "unplugin-vue-components": "^0.25.2",
     "vite": "^4.5.0",
-    "vue-tsc": "^1.8.22"
+    "vue-tsc": "^1.8.24"
   }
 }

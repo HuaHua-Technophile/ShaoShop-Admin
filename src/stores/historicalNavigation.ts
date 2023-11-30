@@ -1,18 +1,11 @@
 // import { ref } from "vue";
 import { defineStore } from "pinia";
-import { RouteRecordName } from "vue-router";
-
-interface state {
-  historicalNavigation: Array<{
-    name: RouteRecordName | undefined;
-    path: string;
-  }>;
-}
+import { stateType } from "@/type/index";
 
 export const useHistoricalNavigationStore = defineStore(
   "historicalNavigation",
   {
-    state: (): state => {
+    state: (): stateType => {
       return {
         historicalNavigation: [],
       };

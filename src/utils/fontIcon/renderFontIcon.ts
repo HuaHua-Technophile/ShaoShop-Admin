@@ -1,4 +1,4 @@
-import { iconType } from "./types";
+import { iconType } from "@/type/index";
 import { h, defineComponent, Component } from "vue";
 import fontIcon from "./fontIcon";
 
