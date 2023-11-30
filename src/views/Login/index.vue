@@ -30,9 +30,7 @@
                 placeholder="密码"
                 clearable
                 show-password
-                :prefix-icon="
-                  renderFontIcon('bi bi bi-shield-lock')
-                "></el-input>
+                :prefix-icon="renderFontIcon('bi  bi-shield-lock')"></el-input>
             </el-form-item>
             <el-form-item>
               <el-button

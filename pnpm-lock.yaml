@@ -11,6 +11,9 @@ dependencies:
   '@better-scroll/mouse-wheel':
     specifier: ^2.5.1
     version: 2.5.1
+  '@better-scroll/pull-up':
+    specifier: ^2.5.1
+    version: 2.5.1
   '@better-scroll/scroll-bar':
     specifier: ^2.5.1
     version: 2.5.1
@@ -105,6 +108,12 @@ packages:
 
   /@better-scroll/mouse-wheel@2.5.1:
     resolution: {integrity: sha512-DGnrirRMY6zMM7xwgx09D/cA9A//3J1/uDkq8iBVEyE5p0sEr/keQpjEfFHGkBRa505BnbBwdbN6f5lugEDSPw==}
+    dependencies:
+      '@better-scroll/core': 2.5.1
+    dev: false
+
+  /@better-scroll/pull-up@2.5.1:
+    resolution: {integrity: sha512-1hu3xSMxdB8T391KffpNZ7g93lMwZEHjfb1F1Y4KvIkciDt8nXqkGpqrZF+YwR+EJTgYcWqUO8kgmI6XXu7Pkg==}
     dependencies:
       '@better-scroll/core': 2.5.1
     dev: false

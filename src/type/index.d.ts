@@ -12,11 +12,11 @@ export type loginInfoType = { authentication: string };
 export type userType = {
   businessId?: Number;
   companyId?: Number; //查询和添加用户---用不到
-  companyName: String; //商户名称
+  // companyName: String; //商户名称用不到
   email: String; //绑定邮箱
   nickName: String; //部门主体名称(账号名称)
   password: String; //密码。注册时默认填入123456
-  phoneNumber: String; //绑定手机号
+  phoneNumber?: String; //绑定手机号
   // remark: String;
   // sex: String;
   status?: Number; //该后台管理账号的状态
