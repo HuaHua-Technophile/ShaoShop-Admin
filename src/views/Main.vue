@@ -74,7 +74,7 @@
                             1,
                         active: active == i.path,
                       },
-                      i.path.replace('/main/', '') + 'Btn',
+                      'Btn-' + i.path.replace('/main/', ''),
                     ]"
                     @click="historicalNavigationClick($event, i)">
                     <div>{{ i.name }}</div>
@@ -135,8 +135,8 @@
   import { nextTick, onMounted, ref } from "vue";
   import BScroll from "@better-scroll/core"; //bs核心
   import MouseWheel from "@better-scroll/mouse-wheel"; //引入鼠标滚动插件
-  import ScrollBar from "@better-scroll/scroll-bar";
-  import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
+  import ScrollBar from "@better-scroll/scroll-bar"; //滚动条插件
+  import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //betterscroll的TS类型
 
   // better scroll----------------------
   const historicalNavigationScroll = ref();
@@ -206,12 +206,7 @@ https://segmentfault.com/a/1190000022822185 */
     }
     await nextTick();
     bs?.refresh();
-    bs?.scrollToElement(
-      "." + index.replace("/main/", "") + "Btn",
-      300,
-      true,
-      true
-    );
+    bs?.scrollToElement(".Btn-" + index.replace("/main/", ""), 500, true, true);
   };
 
   // 历史路由点击事件----------------------
