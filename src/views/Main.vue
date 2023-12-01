@@ -1,130 +1,127 @@
 <template>
-  <div class="vw-100 vh-100">
-    <el-container>
-      <!-- 左侧(菜单) -->
-      <el-aside width="180px" class="vh-100">
-        <div
-          class="pt-3 border-end text-center text-uppercase fs-4"
-          style="font-family: YouSheBiaoTiHei">
-          <span style="color: var(--theme-color)">S</span>hao<span
-            style="color: var(--theme-color)"
-            >S</span
-          >hop
-        </div>
-        <el-menu :default-active="active" router @select="menuSelect">
-          <template v-for="i in userInfoStore.authMenuList">
-            <!-- 多层级菜单 -->
-            <el-sub-menu
-              :index="'/main/' + i.path"
-              v-if="i.children.length > 0">
-              <!-- 一级菜单标题 -->
-              <template #title>
-                <FontIcon :icon="i.icon" style="font-size: 18px"></FontIcon>
-                <span class="ms-2">{{ i.menuName }}</span>
-              </template>
-              <!-- 一级菜单内容 -->
-              <el-menu-item
-                v-for="j in i.children"
-                :index="'/main/' + j.path"
-                >{{ j.menuName }}</el-menu-item
-              >
-            </el-sub-menu>
-            <!-- 单层级菜单 -->
-            <el-menu-item :index="'/main/' + i.path" v-else>
+  <el-container>
+    <!-- 左侧(菜单) -->
+    <el-aside width="180px" class="d-flex flex-column">
+      <div
+        class="flex-shrink-0 pt-3 border-end text-center text-uppercase fs-4"
+        style="font-family: YouSheBiaoTiHei">
+        <span style="color: var(--theme-color)">S</span>hao<span
+          style="color: var(--theme-color)"
+          >S</span
+        >hop
+      </div>
+      <el-menu
+        :default-active="active"
+        router
+        @select="menuSelect"
+        class="overflow-scroll">
+        <template v-for="i in userInfoStore.authMenuList">
+          <!-- 多层级菜单 -->
+          <el-sub-menu :index="'/main/' + i.path" v-if="i.children.length > 0">
+            <!-- 一级菜单标题 -->
+            <template #title>
               <FontIcon :icon="i.icon" style="font-size: 18px"></FontIcon>
               <span class="ms-2">{{ i.menuName }}</span>
-            </el-menu-item>
-          </template>
-        </el-menu>
-      </el-aside>
-      <!-- 右侧 -->
-      <el-container>
-        <!-- 右侧头部 -->
-        <el-header>
-          <div class="w-100 h-100 d-flex align-items-center">
-            <!-- 历史路由 -->
+            </template>
+            <!-- 一级菜单内容 -->
+            <el-menu-item v-for="j in i.children" :index="'/main/' + j.path">{{
+              j.menuName
+            }}</el-menu-item>
+          </el-sub-menu>
+          <!-- 单层级菜单 -->
+          <el-menu-item :index="'/main/' + i.path" v-else>
+            <FontIcon :icon="i.icon" style="font-size: 18px"></FontIcon>
+            <span class="ms-2">{{ i.menuName }}</span>
+          </el-menu-item>
+        </template>
+      </el-menu>
+    </el-aside>
+    <!-- 右侧 -->
+    <el-container>
+      <!-- 右侧头部 -->
+      <el-header>
+        <div class="w-100 h-100 d-flex align-items-center">
+          <!-- 历史路由 -->
+          <div
+            class="position-relative flex-grow-1 me-3 overflow-x-hidden"
+            style="padding: 7px 0">
+            <!-- BS滚动条会自动附着在最近的相对定位父元素，为了避免BS滚动条覆盖历史路由item，外面套一层 -->
             <div
-              class="position-relative flex-grow-1 me-3 overflow-x-hidden"
-              style="padding: 7px 0">
-              <!-- BS滚动条会自动附着在最近的相对定位父元素，为了避免BS滚动条覆盖历史路由item，外面套一层 -->
+              ref="historicalNavigationScroll"
+              class="scroll-wrapper"
+              style="white-space: nowrap">
+              <!-- 横向滚动必须要内容元素为inline -->
               <div
-                ref="historicalNavigationScroll"
-                class="scroll-wrapper"
-                style="white-space: nowrap">
-                <!-- 横向滚动必须要内容元素为inline -->
+                class="scroll-content d-inline-flex"
+                style="
+                  min-width: calc(100% + 1px) !important;
+                  padding: 0 1px !important;
+                ">
                 <div
-                  class="scroll-content d-inline-flex"
-                  style="
-                    min-width: calc(100% + 1px) !important;
-                    padding: 0 1px !important;
-                  ">
+                  v-for="(
+                    i, index
+                  ) in historicalNavigationStore.historicalNavigation"
+                  :key="i.path"
+                  role="button"
+                  class="historicalNavigation border rounded-top p-1 d-flex align-items-center position-relative text-nowrap"
+                  :class="[
+                    {
+                      'me-2':
+                        index <
+                        historicalNavigationStore.historicalNavigation.length -
+                          1,
+                      active: active == i.path,
+                    },
+                    'Btn-' + i.path.replace('/main/', ''),
+                  ]"
+                  @click="historicalNavigationClick($event, i)">
+                  <div>{{ i.name }}</div>
+                  <!-- 历史路由关闭按钮 -->
                   <div
-                    v-for="(
-                      i, index
-                    ) in historicalNavigationStore.historicalNavigation"
-                    :key="i.path"
-                    role="button"
-                    class="historicalNavigation border rounded-top p-1 d-flex align-items-center position-relative text-nowrap"
-                    :class="[
-                      {
-                        'me-2':
-                          index <
-                          historicalNavigationStore.historicalNavigation
-                            .length -
-                            1,
-                        active: active == i.path,
-                      },
-                      'Btn-' + i.path.replace('/main/', ''),
-                    ]"
-                    @click="historicalNavigationClick($event, i)">
-                    <div>{{ i.name }}</div>
-                    <!-- 历史路由关闭按钮 -->
-                    <div
-                      class="historicalNavigationClose position-absolute end-0">
-                      <FontIcon icon="bi bi-x fs-5"></FontIcon>
-                    </div>
+                    class="historicalNavigationClose position-absolute end-0">
+                    <FontIcon icon="bi bi-x fs-5"></FontIcon>
                   </div>
                 </div>
               </div>
             </div>
-            <!-- 右侧控件 -->
-            <div class="flex-shrink-0 d-flex align-items-center">
-              <!-- 用户 -->
-              <el-dropdown>
-                <div class="d-flex align-items-center me-3">
-                  <el-avatar
-                    :size="38"
-                    shape="square"
-                    src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
-                  <div class="ms-1">Admin</div>
-                </div>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item @click="logoutFun">
-                      <span class="me-1">退出登录</span>
-                      <FontIcon
-                        icon="fa-solid fa-arrow-right-from-bracket"></FontIcon>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
-              <!-- 暗色/亮色 -->
-              <darkThemeSwitch />
-            </div>
           </div>
-        </el-header>
-        <!-- 右侧内容 -->
-        <el-main class="px-0 py-0 position-relative overflow-hidden">
-          <router-view v-slot="{ Component }">
-            <transition name="slide-right" mode="out-in">
-              <!-- <transition name="slide-right"> -->
-              <component :is="Component" />
-            </transition>
-          </router-view>
-        </el-main>
-      </el-container>
+          <!-- 右侧控件 -->
+          <div class="flex-shrink-0 d-flex align-items-center">
+            <!-- 用户 -->
+            <el-dropdown>
+              <div class="d-flex align-items-center me-3">
+                <el-avatar
+                  :size="38"
+                  shape="square"
+                  src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
+                <div class="ms-1">Admin</div>
+              </div>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item @click="logoutFun">
+                    <span class="me-1">退出登录</span>
+                    <FontIcon
+                      icon="fa-solid fa-arrow-right-from-bracket"></FontIcon>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <!-- 暗色/亮色 -->
+            <darkThemeSwitch />
+          </div>
+        </div>
+      </el-header>
+      <!-- 右侧内容 -->
+      <el-main class="p-0 overflow-hidden">
+        <router-view v-slot="{ Component }">
+          <transition name="slide-right" mode="out-in">
+            <!-- <transition name="slide-right"> -->
+            <component :is="Component" />
+          </transition>
+        </router-view>
+      </el-main>
     </el-container>
-  </div>
+  </el-container>
 </template>
 <script setup lang="ts">
   import router from "../router";

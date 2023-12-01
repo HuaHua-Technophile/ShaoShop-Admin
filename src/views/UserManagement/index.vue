@@ -1,11 +1,11 @@
 <template>
-  <div class="w-100 h-100 overflow-hidden d-flex flex-column">
+  <div class="w-100 h-100 d-flex flex-column">
     <!-- 搜索用户/新建用户 -->
     <el-form
       :model="userQueryFrom"
       ref="userQueryFromRef"
       :rules="queryRules"
-      class="d-flex flex-nowrap align-items-center justify-content-around px-4">
+      class="flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
       <div class="flex-grow-1 d-flex align-items-center">
         <el-form-item class="col-3 pe-3" label="用户账号" prop="userName">
           <el-input
@@ -40,17 +40,17 @@
           </el-input>
         </el-form-item>
       </div>
-      <el-form-item class="flex-shrink-0 pe-3" label="帐号状态" prop="status">
+      <el-form-item class="pe-3" label="帐号状态" prop="status">
         <el-select
           v-model="userQueryFrom.status"
           placeholder="正常/停用"
           clearable
-          style="width: 115px">
+          style="width: 113px">
           <el-option label="正常" :value="0" />
           <el-option label="停用" :value="1" />
         </el-select>
       </el-form-item>
-      <el-form-item class="flex-shrink-0">
+      <el-form-item>
         <el-button
           :loading="waitQueryUser"
           @click="queryUserFun(userQueryFromRef)"
@@ -63,8 +63,7 @@
       <el-table
         :data="allUserList"
         row-class-name="bg-body"
-        class="w-100 h-100 rounded-4 overflow-hidden bg-body"
-        height="100%">
+        class="w-100 rounded-4 bg-body">
         <el-table-column prop="userName" label="账号名称" />
         <el-table-column prop="email" label="邮箱" />
         <el-table-column prop="phoneNumber" label="电话" />
@@ -152,6 +151,13 @@
             :prefix-icon="renderFontIcon('bi-shield-lock')">
           </el-input>
         </el-form-item>
+        <el-form-item label="商户(可空)" prop="businessId">
+          <el-input
+            clearable
+            v-model="userInfoForm.password"
+            placeholder="留空则表示为系统管理员"
+            :prefix-icon="renderFontIcon('bi bi-shop-window')"></el-input>
+        </el-form-item>
       </el-form>
       <template #footer>
         <span>
@@ -186,18 +192,17 @@
   getUserListFun();
 
   // better scroll-------------------------
-  /* BScroll.use(Pullup);
+  BScroll.use(Pullup);
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
-  const userListDom = ref();
   let bs = null;
   onMounted(() => {
-    bs = new BScroll(userListDom.value, {
-      pullUpLoad: true,
-      scrollbar: true,
+    bs = new BScroll(".el-scrollbar__wrap", {
+      // pullUpLoad: true,
+      // scrollbar: true,
       mouseWheel: true,
     });
-  }); */
+  });
 
   //dialog弹出框--------------------
   const dialogVisible = ref(false);
@@ -229,6 +234,7 @@
   // 添加/修改-------------
   const dialogFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const userInfoForm = reactive({
+    businessId: "", //商户
     userName: "", //账号
     email: "", //绑定邮箱
     phoneNumber: "", //绑定手机号
@@ -292,6 +298,14 @@
             callback(new Error("不能含有中文或空格"));
           } else callback();
         },
+        trigger: "blur",
+      },
+    ],
+    businessId: [
+      {
+        min: 0,
+        max: 12,
+        message: "长度在12位以内",
         trigger: "blur",
       },
     ],
