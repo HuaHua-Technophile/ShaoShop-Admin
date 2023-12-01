@@ -5,49 +5,52 @@
       :model="userQueryFrom"
       ref="userQueryFromRef"
       :rules="queryRules"
-      class="d-flex flex-nowrap align-items-center justify-content-around px-3">
-      <el-form-item label="用户账号" prop="userName">
-        <el-input
-          clearable
-          v-model="userQueryFrom.userName"
-          placeholder="每个后台主体唯一名称"
-          :prefix-icon="renderFontIcon('bi bi-123')">
-        </el-input>
-      </el-form-item>
-      <el-form-item label="绑定邮箱" prop="email">
-        <el-input
-          clearable
-          v-model="userQueryFrom.email"
-          placeholder="每个后台主体唯一邮箱"
-          :prefix-icon="renderFontIcon('bi bi-envelope')">
-        </el-input>
-      </el-form-item>
-      <el-form-item label="绑定电话" prop="phoneNumber">
-        <el-input
-          clearable
-          v-model="userQueryFrom.phoneNumber"
-          placeholder="每个后台主体唯一手机号"
-          :prefix-icon="renderFontIcon('bi bi-telephone')">
-        </el-input>
-      </el-form-item>
-      <el-form-item label="部门主体" prop="nickName">
-        <el-input
-          clearable
-          v-model="userQueryFrom.nickName"
-          placeholder="运营部/物流部/..."
-          :prefix-icon="renderFontIcon('bi bi-people')">
-        </el-input>
-      </el-form-item>
-      <el-form-item label="帐号状态" prop="status">
+      class="d-flex flex-nowrap align-items-center justify-content-around px-4">
+      <div class="flex-grow-1 d-flex align-items-center">
+        <el-form-item class="col-3 pe-3" label="用户账号" prop="userName">
+          <el-input
+            clearable
+            v-model="userQueryFrom.userName"
+            placeholder="每个后台主体唯一名称"
+            :prefix-icon="renderFontIcon('bi bi-123')">
+          </el-input>
+        </el-form-item>
+        <el-form-item class="col-3 pe-3" label="绑定邮箱" prop="email">
+          <el-input
+            clearable
+            v-model="userQueryFrom.email"
+            placeholder="每个后台主体唯一邮箱"
+            :prefix-icon="renderFontIcon('bi bi-envelope')">
+          </el-input>
+        </el-form-item>
+        <el-form-item class="col-3 pe-3" label="绑定电话" prop="phoneNumber">
+          <el-input
+            clearable
+            v-model="userQueryFrom.phoneNumber"
+            placeholder="每个后台主体唯一手机号"
+            :prefix-icon="renderFontIcon('bi bi-telephone')">
+          </el-input>
+        </el-form-item>
+        <el-form-item class="col-3 pe-3" label="部门主体" prop="nickName">
+          <el-input
+            clearable
+            v-model="userQueryFrom.nickName"
+            placeholder="运营部/物流部/..."
+            :prefix-icon="renderFontIcon('bi bi-people')">
+          </el-input>
+        </el-form-item>
+      </div>
+      <el-form-item class="flex-shrink-0 pe-3" label="帐号状态" prop="status">
         <el-select
           v-model="userQueryFrom.status"
           placeholder="正常/停用"
-          clearable>
+          clearable
+          style="width: 115px">
           <el-option label="正常" :value="0" />
           <el-option label="停用" :value="1" />
         </el-select>
       </el-form-item>
-      <el-form-item>
+      <el-form-item class="flex-shrink-0">
         <el-button
           :loading="waitQueryUser"
           @click="queryUserFun(userQueryFromRef)"
@@ -57,50 +60,57 @@
     </el-form>
     <!-- 用户列表模块 -->
     <div class="flex-grow-1 overflow-hidden bg-body-secondary p-3">
-      <div class="bg-body rounded px-3 py-2 w-100 h-100 d-flex flex-column">
-        <!-- 数据说明顶栏 -->
-        <div class="d-flex align-items-center">
-          <div>用户编号</div>
-          <div>
+      <el-table
+        :data="allUserList"
+        row-class-name="bg-body"
+        class="w-100 h-100 rounded-4 overflow-hidden bg-body"
+        height="100%">
+        <el-table-column prop="userName" label="账号名称" />
+        <el-table-column prop="email" label="邮箱" />
+        <el-table-column prop="phoneNumber" label="电话" />
+        <el-table-column prop="nickName" label="部门主体" />
+        <el-table-column prop="createTime" label="创建时间" />
+        <el-table-column prop="status" label="状态">
+          <template #default="scope">
+            <span
+              :class="[
+                'rounded-1 border px-1',
+                scope.row.status == 0
+                  ? 'border-success text-success'
+                  : 'border-danger text-danger',
+              ]">
+              {{ scope.row.status == 0 ? "正常" : "停用" }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column>
+          <template #header>
             <el-button :loading="waitAddUser" @click="addUserDialog"
               >添加账号</el-button
             >
-          </div>
-        </div>
-        <!-- 用户列表 -->
-        <div
-          class="pullup-wrapper flex-grow-1 overflow-hidden position-relative"
-          ref="userListDom">
-          <div
-            class="pullup-content"
-            style="
-              min-height: calc(100% + 1px) !important;
-              padding: 1px 0 !important;
-            ">
-            <div v-for="i in allUserList" class="d-flex align-items-center">
-              <div class="flex-grow-1">{{ i.userId }}</div>
-              <div class="flex-grow-1">{{ i.userName }}</div>
-              <div class="flex-grow-1">{{ i.email }}</div>
-              <div class="flex-grow-1">{{ i.phoneNumber }}</div>
-              <div class="flex-grow-1">{{ i.nickName }}</div>
-              <div class="flex-grow-1">{{ i.createTime }}</div>
-              <div class="flex-shrink-0">
+          </template>
+          <template #default>
+            <div class="d-flex">
+              <div>
                 <fontIcon icon="bi bi-pencil-square  fs-4 me-2"></fontIcon>
               </div>
-              <div class="flex-shrink-0">
+              <div>
                 <fontIcon icon="bi bi-trash fs-4 text-danger"></fontIcon>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
     <!-- 弹出对话框 -->
     <el-dialog
       v-model="dialogVisible"
       :title="dialogTitle"
       width="450px"
-      :before-close="closeConfirm">
+      :before-close="closeConfirm"
+      class="rounded-4"
+      draggable
+      center>
       <el-form :model="userInfoForm" ref="dialogFromRef" :rules="rules">
         <el-form-item label="用户账号" prop="userName">
           <el-input
@@ -142,15 +152,18 @@
             :prefix-icon="renderFontIcon('bi-shield-lock')">
           </el-input>
         </el-form-item>
-        <div class="d-flex justify-content-center">
+      </el-form>
+      <template #footer>
+        <span>
           <el-button
             v-if="dialogTitle == '添加用户'"
             @click="addUserFun(dialogFromRef)"
+            :loading="waitAddUser"
             >确认添加</el-button
           >
           <el-button v-else>确认修改</el-button>
-        </div>
-      </el-form>
+        </span>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -167,13 +180,13 @@
   let allUserList = ref();
   const getUserListFun = async () => {
     let res = await getUserList();
-    // console.log(res.data);
+    console.log("用户列表=>", res);
     allUserList.value = res.data.records;
   };
   getUserListFun();
 
   // better scroll-------------------------
-  BScroll.use(Pullup);
+  /* BScroll.use(Pullup);
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
   const userListDom = ref();
@@ -184,7 +197,7 @@
       scrollbar: true,
       mouseWheel: true,
     });
-  });
+  }); */
 
   //dialog弹出框--------------------
   const dialogVisible = ref(false);
@@ -195,6 +208,8 @@
       confirmButtonText: "是的",
       cancelButtonText: "取消",
       type: "warning",
+      draggable: true,
+      customClass: "rounded",
     })
       .then(() => {
         done();
@@ -299,8 +314,8 @@
         if (res.code === 200) {
           ElMessage.success("添加成功");
           getUserListFun(); //重新请求数据进行用户列表渲染
-          dialogVisible.value = false; //隐藏弹出框
-          formEl.resetFields(); //重置表单
+          // dialogVisible.value = false; //隐藏弹出框
+          // formEl.resetFields(); //重置表单
         } else ElMessage.error(res.message);
         waitAddUser.value = false;
       } else console.log("error submit!", fields);
