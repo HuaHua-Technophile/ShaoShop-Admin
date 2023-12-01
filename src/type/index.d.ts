@@ -18,6 +18,7 @@ export type userType = {
   phoneNumber: string; //绑定手机号
   status?: number | null; //该后台管理账号的状态
   userName: string; //账号
+  userId?: number; //
 };
 //分页查询用户列表所需参数
 export type userListParamsType = userType & {
