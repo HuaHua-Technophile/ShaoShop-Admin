@@ -390,8 +390,8 @@
     cell: any,
     event: { target: HTMLElement }
   ) => {
-    console.log(column, cell, event, event.target.className);
-
+    column;
+    cell;
     if (event.target.className.includes("bi-pencil-square"))
       editUserDialog(row);
     if (event.target.className.includes("bi-trash")) console.log("删除");
