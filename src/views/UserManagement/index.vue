@@ -40,7 +40,7 @@
           </el-input>
         </el-form-item>
       </div>
-      <el-form-item class="pe-3" label="帐号状态" prop="status">
+      <el-form-item class="flex-shrink-0 pe-3" label="帐号状态" prop="status">
         <el-select
           v-model="userQueryFrom.status"
           placeholder="正常/停用"
@@ -60,46 +60,54 @@
     </el-form>
     <!-- 用户列表模块 -->
     <div class="flex-grow-1 overflow-hidden bg-body-secondary p-3">
-      <el-table
-        :data="allUserList"
-        row-class-name="bg-body"
-        class="w-100 rounded-4 bg-body">
-        <el-table-column prop="userName" label="账号名称" />
-        <el-table-column prop="email" label="邮箱" />
-        <el-table-column prop="phoneNumber" label="电话" />
-        <el-table-column prop="nickName" label="部门主体" />
-        <el-table-column prop="createTime" label="创建时间" />
-        <el-table-column prop="status" label="状态">
-          <template #default="scope">
-            <span
-              :class="[
-                'rounded-1 border px-1',
-                scope.row.status == 0
-                  ? 'border-success text-success'
-                  : 'border-danger text-danger',
-              ]">
-              {{ scope.row.status == 0 ? "正常" : "停用" }}
-            </span>
-          </template>
-        </el-table-column>
-        <el-table-column>
-          <template #header>
-            <el-button :loading="waitAddUser" @click="addUserDialog"
-              >添加账号</el-button
-            >
-          </template>
-          <template #default>
-            <div class="d-flex">
-              <div>
-                <fontIcon icon="bi bi-pencil-square  fs-4 me-2"></fontIcon>
-              </div>
-              <div>
-                <fontIcon icon="bi bi-trash fs-4 text-danger"></fontIcon>
-              </div>
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
+      <div
+        ref="userListWrapper"
+        class="userListWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
+        <el-table
+          :data="allUserList"
+          header-cell-class-name="text-center"
+          row-class-name="bg-body"
+          cell-class-name="text-center"
+          class="bg-body rounded-4"
+          empty-text="暂无符合查询条件的系统账户"
+          row-key="userName"
+          @cell-click="cellClickFun"
+          style="
+            min-height: calc(100% + 1px) !important;
+            padding: 1px 0 !important;
+          ">
+          <el-table-column type="selection" width="55" />
+          <el-table-column prop="userName" label="账号名称" />
+          <el-table-column prop="email" label="邮箱" />
+          <el-table-column prop="phoneNumber" label="电话" />
+          <el-table-column prop="nickName" label="部门主体" />
+          <el-table-column prop="createTime" label="创建时间" />
+          <el-table-column prop="status" label="状态">
+            <template #default="scope">
+              <span
+                :class="[
+                  'rounded-1 border px-1',
+                  scope.row.status == 0
+                    ? 'border-success text-success'
+                    : 'border-danger text-danger',
+                ]">
+                {{ scope.row.status == 0 ? "正常" : "停用" }}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="index">
+            <template #header>
+              <el-button :loading="waitAddUser" @click="addUserDialog"
+                >添加账号</el-button
+              >
+            </template>
+            <template #default>
+              <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
+              <fontIcon icon="bi bi-trash fs-6 text-danger" role="button" />
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
     </div>
     <!-- 弹出对话框 -->
     <el-dialog
@@ -116,6 +124,7 @@
             clearable
             v-model="userInfoForm.userName"
             placeholder="每个后台主体唯一名称"
+            :disabled="!isAddUser"
             :prefix-icon="renderFontIcon('bi bi-123')">
           </el-input>
         </el-form-item>
@@ -154,7 +163,7 @@
         <el-form-item label="商户(可空)" prop="businessId">
           <el-input
             clearable
-            v-model="userInfoForm.password"
+            v-model="userInfoForm.businessId"
             placeholder="留空则表示为系统管理员"
             :prefix-icon="renderFontIcon('bi bi-shop-window')"></el-input>
         </el-form-item>
@@ -167,27 +176,45 @@
             :loading="waitAddUser"
             >确认添加</el-button
           >
-          <el-button v-else>确认修改</el-button>
+          <el-button
+            v-else
+            @click="editUserFun(dialogFromRef)"
+            :loading="waitEditUser"
+            >确认修改</el-button
+          >
         </span>
       </template>
     </el-dialog>
   </div>
 </template>
 <script lang="ts" setup>
-  import { getUserList, addUser } from "@/api/UserManagementAPI.ts";
+  import { getUserList, addUser, editUser } from "@/api/UserManagementAPI.ts";
   import { renderFontIcon } from "@/utils/fontIcon/renderFontIcon";
   import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
-  import { onMounted, reactive, ref } from "vue";
+  import { onMounted, reactive, ref, nextTick } from "vue";
+  import { userType } from "@/type/index";
   import BScroll from "@better-scroll/core";
   import Pullup from "@better-scroll/pull-up"; //上拉懒加载
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
+  import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
   // 不传参数的情况下，就是获取所有用户。传参数的情况下可用作搜索
   let allUserList = ref();
+  const userQueryFrom = reactive({
+    userName: "", //账号
+    email: "", //绑定邮箱
+    phoneNumber: "", //绑定手机号
+    nickName: "", //部门主体名称(账号名称)
+    status: null, //状态
+    currentPage: 1, //页码
+    pageSize: 20, //每页返回的数量
+  });
   const getUserListFun = async () => {
-    let res = await getUserList();
+    let res = await getUserList(userQueryFrom);
     console.log("用户列表=>", res);
     allUserList.value = res.data.records;
+    await nextTick();
+    bs?.refresh();
   };
   getUserListFun();
 
@@ -195,18 +222,36 @@
   BScroll.use(Pullup);
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
-  let bs = null;
+  const userListWrapper = ref();
+  let bs: BScrollConstructor<{}> | null = null;
   onMounted(() => {
-    bs = new BScroll(".el-scrollbar__wrap", {
-      // pullUpLoad: true,
-      // scrollbar: true,
+    bs = new BScroll(userListWrapper.value, {
+      pullUpLoad: {
+        threshold: -30,
+      },
+      scrollbar: true,
       mouseWheel: true,
+    });
+    bs?.on("pullingUp", async () => {
+      userQueryFrom.currentPage++;
+      let res = await getUserList(userQueryFrom);
+      console.log(
+        `第${userQueryFrom.currentPage}页=>`,
+        res.data.records.length,
+        res.data.records
+      );
+      if (res.data.records.length < userQueryFrom.pageSize) bs?.closePullUp();
+      else bs?.finishPullUp();
+      allUserList.value.push(...res.data.records);
+      await nextTick();
+      bs?.refresh();
     });
   });
 
   //dialog弹出框--------------------
   const dialogVisible = ref(false);
   const dialogTitle = ref("添加用户");
+  const isAddUser = ref(true);
   const dialogCloseConfirm = ref("确认放弃当前添加用户吗?所填内容将会被清空");
   let closeConfirm = (done: () => void) => {
     ElMessageBox.confirm(dialogCloseConfirm.value, {
@@ -217,6 +262,7 @@
       customClass: "rounded",
     })
       .then(() => {
+        dialogFromRef.value?.resetFields();
         done();
         ElMessage({
           type: "success",
@@ -314,8 +360,9 @@
   //添加用户-------------------------------------
   let addUserDialog = () => {
     dialogVisible.value = true;
+    isAddUser.value = true;
     dialogTitle.value = "添加用户";
-    dialogCloseConfirm.value = "确认放弃当前添加用户吗?所填内容将会被清空";
+    dialogCloseConfirm.value = "确认放弃添加用户吗?所填内容将会被清空";
   };
   let waitAddUser = ref(false);
   const addUserFun = async (formEl: FormInstance | undefined) => {
@@ -337,15 +384,52 @@
   };
 
   //修改用户--------------------------------------
+  let cellClickFun = (
+    row: userType,
+    column: any,
+    cell: any,
+    event: { target: HTMLElement }
+  ) => {
+    console.log(column, cell, event, event.target.className);
+
+    if (event.target.className.includes("bi-pencil-square"))
+      editUserDialog(row);
+    if (event.target.className.includes("bi-trash")) console.log("删除");
+  };
+  let editUserDialog = (user: userType) => {
+    console.log(user);
+    dialogVisible.value = true;
+    isAddUser.value = false;
+    dialogTitle.value = "修改用户";
+    dialogCloseConfirm.value = "确认放弃修改用户吗?所填内容将会被清空";
+    userInfoForm.userName = user.userName;
+    userInfoForm.businessId = user.businessId;
+    userInfoForm.email = user.email;
+    userInfoForm.nickName = user.nickName;
+    userInfoForm.phoneNumber = user.phoneNumber;
+    userInfoForm.password = user.password;
+  };
+  let waitEditUser = ref(false);
+
+  let editUserFun = async (formEl: FormInstance | undefined) => {
+    // 先进行表单验证
+    if (!formEl) return;
+    await formEl.validate(async (valid, fields) => {
+      if (valid) {
+        waitEditUser.value = true;
+        let res = await editUser(userInfoForm);
+        if (res.code === 200) {
+          ElMessage.success("修改成功");
+          getUserListFun(); //重新请求数据进行用户列表渲染
+          dialogVisible.value = false; //隐藏弹出框
+          formEl.resetFields(); //重置表单
+        } else ElMessage.error(res.message);
+        waitEditUser.value = false;
+      } else console.log("error submit!", fields);
+    });
+  };
 
   //查询用户-------------------------------------
-  const userQueryFrom = reactive({
-    userName: "", //账号
-    email: "", //绑定邮箱
-    phoneNumber: "", //绑定手机号
-    nickName: "", //部门主体名称(账号名称)
-    status: null, //状态
-  });
   const userQueryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const queryRules = reactive({
     userName: [
@@ -371,6 +455,8 @@
         if (res.code === 200) {
           ElMessage.success("查询成功");
           allUserList.value = res.data.records;
+          await nextTick();
+          bs?.refresh();
         } else ElMessage.error(res.message);
         waitQueryUser.value = false;
       } else console.log("error submit!", fields);
@@ -378,12 +464,8 @@
   };
 </script>
 <style lang="scss">
-  .noLabelPadding {
-    &:not(:last-child) {
-      margin-right: 4px !important;
-    }
-    label {
-      padding-right: 4px !important;
-    }
+  .el-table__header-wrapper {
+    position: sticky !important;
+    top: 0 !important;
   }
 </style>
