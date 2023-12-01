@@ -227,7 +227,7 @@
   onMounted(() => {
     bs = new BScroll(userListWrapper.value, {
       pullUpLoad: {
-        threshold: -30,
+        threshold: -10,
       },
       scrollbar: true,
       mouseWheel: true,

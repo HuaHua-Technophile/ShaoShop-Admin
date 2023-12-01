@@ -19,7 +19,7 @@ export const addUser = (data: userType) => {
 export const editUser = (data: userType) => {
   console.log("准备修改=>", data);
   return instance({
-    url: "/system/user/updateUserSelf",
+    url: "/system/user",
     method: "PUT",
     data,
   });
