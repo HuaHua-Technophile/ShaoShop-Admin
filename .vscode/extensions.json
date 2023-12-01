@@ -1,3 +1,26 @@
 {
-  "recommendations": ["Vue.volar", "Vue.vscode-typescript-vue-plugin"]
+  "recommendations": [
+    "sdras.vue-vscode-snippets",
+    "vue.volar",
+    "vscode-icons-team.vscode-icons",
+    "stylelint.vscode-stylelint",
+    "esbenp.prettier-vscode",
+    "csstools.postcss",
+    "christian-kohler.path-intellisense",
+    "xabikos.javascriptsnippets",
+    "visualstudioexptteam.intellicode-api-usage-examples",
+    "visualstudioexptteam.vscodeintellicode",
+    "kisstkondoros.vscode-gutter-preview",
+    "antfu.iconify",
+    "ecmel.vscode-html-css",
+    "vincaslt.highlight-matching-tag",
+    "dbaeumer.vscode-eslint",
+    "pranaygp.vscode-css-peek",
+    "sourcegraph.cody-ai",
+    "mrmlnc.vscode-autoprefixer",
+    "formulahendry.auto-rename-tag",
+    "formulahendry.auto-complete-tag",
+    "formulahendry.auto-close-tag",
+    "xuedao.super-comprehensive"
+  ]
 }
