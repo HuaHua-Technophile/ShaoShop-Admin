@@ -10,7 +10,7 @@ export type authMenuListType = Array<{
 export type loginInfoType = { authentication: string };
 //每一个后台管理系统用户(账号)的信息
 export type userType = {
-  businessId?: number;
+  businessId?: string;
   // companyName: string; //商户名称用不到
   email: string; //绑定邮箱
   nickName: string; //部门主体名称

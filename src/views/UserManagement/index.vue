@@ -397,17 +397,16 @@
     if (event.target.className.includes("bi-trash")) console.log("删除");
   };
   let editUserDialog = (user: userType) => {
-    console.log(user);
     dialogVisible.value = true;
     isAddUser.value = false;
     dialogTitle.value = "修改用户";
     dialogCloseConfirm.value = "确认放弃修改用户吗?所填内容将会被清空";
     userInfoForm.userName = user.userName;
-    userInfoForm.businessId = user.businessId;
+    userInfoForm.businessId = user.businessId + "";
     userInfoForm.email = user.email;
     userInfoForm.nickName = user.nickName;
     userInfoForm.phoneNumber = user.phoneNumber;
-    userInfoForm.password = user.password;
+    userInfoForm.password = user.password + "";
   };
   let waitEditUser = ref(false);
 
