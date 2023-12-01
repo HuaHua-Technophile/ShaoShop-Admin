@@ -72,6 +72,7 @@
           empty-text="暂无符合查询条件的系统账户"
           row-key="userName"
           @cell-click="cellClickFun"
+          @selection-change="selectionChange"
           style="
             min-height: calc(100% + 1px) !important;
             padding: 1px 0 !important;
@@ -124,7 +125,6 @@
             clearable
             v-model="userInfoForm.userName"
             placeholder="每个后台主体唯一名称"
-            :disabled="!isAddUser"
             :prefix-icon="renderFontIcon('bi bi-123')">
           </el-input>
         </el-form-item>
@@ -277,6 +277,20 @@
       });
   };
 
+  //表格点击回调
+  let cellClickFun = (
+    row: userType,
+    column: any,
+    cell: any,
+    event: { target: HTMLElement }
+  ) => {
+    if (event.target.className.includes("bi-pencil-square"))
+      editUserDialog(row);
+    if (event.target.className.includes("bi-trash")) {
+      console.log(row, column, cell, event);
+    }
+  };
+
   // 添加/修改-------------
   const dialogFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const userInfoForm = reactive({
@@ -286,6 +300,7 @@
     phoneNumber: "", //绑定手机号
     nickName: "", //部门主体名称(账号名称)
     password: "", //密码。
+    userId: -1,
   });
   const rules = reactive({
     userName: [
@@ -384,18 +399,6 @@
   };
 
   //修改用户--------------------------------------
-  let cellClickFun = (
-    row: userType,
-    column: any,
-    cell: any,
-    event: { target: HTMLElement }
-  ) => {
-    column;
-    cell;
-    if (event.target.className.includes("bi-pencil-square"))
-      editUserDialog(row);
-    if (event.target.className.includes("bi-trash")) console.log("删除");
-  };
   let editUserDialog = (user: userType) => {
     dialogVisible.value = true;
     isAddUser.value = false;
@@ -407,6 +410,7 @@
     userInfoForm.nickName = user.nickName;
     userInfoForm.phoneNumber = user.phoneNumber;
     userInfoForm.password = user.password + "";
+    userInfoForm.userId = user.userId! + 0;
   };
   let waitEditUser = ref(false);
 
@@ -460,6 +464,11 @@
         waitQueryUser.value = false;
       } else console.log("error submit!", fields);
     });
+  };
+
+  //删除用户------------------------------------
+  let selectionChange = (val: userType[]) => {
+    console.log("多选", val);
   };
 </script>
 <style lang="scss">
