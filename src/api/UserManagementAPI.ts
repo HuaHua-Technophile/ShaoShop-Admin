@@ -24,3 +24,10 @@ export const editUser = (data: userType) => {
     data,
   });
 };
+
+export const deleteUser = (userIdList: (number | undefined)[]) => {
+  return instance({
+    url: `/system/user/batchDel/${userIdList}`,
+    method: "DELETE",
+  });
+};

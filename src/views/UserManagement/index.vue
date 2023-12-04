@@ -64,6 +64,7 @@
         ref="userListWrapper"
         class="userListWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
         <el-table
+          ref="userTableRef"
           :data="allUserList"
           header-cell-class-name="text-center"
           row-class-name="bg-body"
@@ -188,7 +189,12 @@
   </div>
 </template>
 <script lang="ts" setup>
-  import { getUserList, addUser, editUser } from "@/api/UserManagementAPI.ts";
+  import {
+    getUserList,
+    addUser,
+    editUser,
+    deleteUser,
+  } from "@/api/UserManagementAPI.ts";
   import { renderFontIcon } from "@/utils/fontIcon/renderFontIcon";
   import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
   import { onMounted, reactive, ref, nextTick } from "vue";
@@ -287,7 +293,7 @@
     if (event.target.className.includes("bi-pencil-square"))
       editUserDialog(row);
     if (event.target.className.includes("bi-trash")) {
-      console.log(row, column, cell, event);
+      deleteUserFun(row);
     }
   };
 
@@ -467,8 +473,35 @@
   };
 
   //删除用户------------------------------------
+  const userTableRef = ref();
+  const userIdList = ref<(number | undefined)[]>([]);
   let selectionChange = (val: userType[]) => {
-    console.log("多选", val);
+    userIdList.value = val.map((i) => {
+      return i.userId;
+    });
+  };
+  let deleteUserFun = (user: userType) => {
+    userTableRef.value.toggleRowSelection(user, true);
+    ElMessageBox.confirm(
+      `确认要删除勾选的${userIdList.value.length}个用户吗?`,
+      {
+        confirmButtonText: "是的",
+        cancelButtonText: "取消",
+        type: "warning",
+        draggable: true,
+        customClass: "rounded",
+      }
+    )
+      .then(async () => {
+        let res = await deleteUser(userIdList.value);
+        if (res.code === 200) {
+          ElMessage.success("删除成功");
+          getUserListFun(); //重新请求数据进行用户列表渲染
+        } else ElMessage.error(res.message);
+      })
+      .catch(() => {
+        ElMessage.info("取消删除");
+      });
   };
 </script>
 <style lang="scss">
