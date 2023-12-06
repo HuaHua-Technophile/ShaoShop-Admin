@@ -112,7 +112,7 @@
         </div>
       </el-header>
       <!-- 右侧内容 -->
-      <el-main class="p-0 overflow-hidden">
+      <el-main class="p-0 overflow-hidden position-relative">
         <router-view v-slot="{ Component }">
           <transition name="slide-right" mode="out-in">
             <!-- <transition name="slide-right"> -->

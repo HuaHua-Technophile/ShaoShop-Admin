@@ -99,12 +99,26 @@
           </el-table-column>
           <el-table-column prop="index">
             <template #header>
-              <el-button :loading="waitAddUser" @click="addUserDialog"
-                >添加账号</el-button
-              >
+              <div class="d-flex align-items-center">
+                跳至<el-input-number
+                  :disabled="pagesNum === -1"
+                  size="small"
+                  v-model="page"
+                  :min="1"
+                  :max="pagesNum === -1 ? 1 : pagesNum"
+                  @change="jumpPage"
+                  style="width: 75px" />/{{ pagesNum }}页
+              </div>
             </template>
             <template #default>
               <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
+            </template>
+          </el-table-column>
+          <el-table-column prop="index">
+            <template #header>
+              <el-button @click="addUserDialog">添加账号</el-button>
+            </template>
+            <template #default>
               <fontIcon icon="bi bi-trash fs-6 text-danger" role="button" />
             </template>
           </el-table-column>
@@ -186,6 +200,25 @@
         </span>
       </template>
     </el-dialog>
+    <!-- 右下角悬浮跳页 -->
+    <Transition
+      appear
+      enter-active-class="animate__animated animate__bounceIn"
+      leave-active-class="animate__animated animate__bounceOut">
+      <div
+        class="position-absolute align-items-center p-2 rounded-pill me-3 mb-3"
+        style="background: #141414; display: flex; right: 0; bottom: 0"
+        v-show="pagesNum != -1 && hoverBtnVisible">
+        跳至<el-input-number
+          :disabled="pagesNum === -1"
+          size="small"
+          v-model="page"
+          :min="1"
+          :max="pagesNum === -1 ? 1 : pagesNum"
+          style="width: 75px"
+          @change="jumpPage" />/{{ pagesNum }}页
+      </div>
+    </Transition>
   </div>
 </template>
 <script lang="ts" setup>
@@ -199,6 +232,8 @@
   import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
   import { onMounted, reactive, ref, nextTick } from "vue";
   import { userType } from "@/type/index";
+  import throttle from "lodash/throttle"; //lodash节流，按需引入减少打包体积
+  import { ceil } from "lodash"; //lodash节流，按需引入减少打包体积
   import BScroll from "@better-scroll/core";
   import Pullup from "@better-scroll/pull-up"; //上拉懒加载
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
@@ -206,6 +241,11 @@
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
   // 不传参数的情况下，就是获取所有用户。传参数的情况下可用作搜索
   let allUserList = ref();
+  let pagesNum = ref(-1); //总的页数
+  let total = ref(-1); //总用户数量
+  let page = ref(1); // 当前页数
+  let itemHeight = ref<number | undefined>(-1);
+  let trHeight = ref<number | undefined>(-1);
   const userQueryFrom = reactive({
     userName: "", //账号
     email: "", //绑定邮箱
@@ -219,8 +259,12 @@
     let res = await getUserList(userQueryFrom);
     console.log("用户列表=>", res);
     allUserList.value = res.data.records;
+    pagesNum.value = res.data.pages;
+    total.value = res.data.total;
     await nextTick();
     bs?.refresh();
+    itemHeight.value = document.querySelector(".el-table__row")?.clientHeight;
+    trHeight.value = document.querySelector("tr")?.clientHeight;
   };
   getUserListFun();
 
@@ -252,33 +296,56 @@
       await nextTick();
       bs?.refresh();
     });
+    bs.on(
+      "scroll",
+      throttle((e: { x: number; y: number }) => {
+        if (-e.y > trHeight.value!) hoverBtnVisible.value = true;
+        else hoverBtnVisible.value = false;
+        let pages = ceil(-e.y / (itemHeight.value! * 20));
+        console.log(-e.y, itemHeight.value! * 20, pages);
+      }, 400)
+    );
   });
+
+  //页面跳转
+  let hoverBtnVisible = ref(false);
+  let jumpPage = () => {
+    // 如果已经加载出的数据量小于要跳转的,则直接滚动
+    if (userQueryFrom.currentPage >= page.value) {
+      bs?.scrollTo(0, itemHeight.value! * (page.value - 1));
+    }
+    // 否则先请求数据
+    else {
+    }
+  };
 
   //dialog弹出框--------------------
   const dialogVisible = ref(false);
   const dialogTitle = ref("添加用户");
   const isAddUser = ref(true);
-  const dialogCloseConfirm = ref("确认放弃当前添加用户吗?所填内容将会被清空");
   let closeConfirm = (done: () => void) => {
-    ElMessageBox.confirm(dialogCloseConfirm.value, {
-      confirmButtonText: "是的",
-      cancelButtonText: "取消",
-      type: "warning",
-      draggable: true,
-      customClass: "rounded",
-    })
+    ElMessageBox.confirm(
+      `"确认放弃${dialogTitle.value}吗?所填内容将会被清空"`,
+      {
+        confirmButtonText: "是的",
+        cancelButtonText: "取消",
+        type: "warning",
+        draggable: true,
+        customClass: "rounded",
+      }
+    )
       .then(() => {
         dialogFromRef.value?.resetFields();
         done();
         ElMessage({
-          type: "success",
-          message: "确认关闭",
+          type: "info",
+          message: `放弃${dialogTitle.value.slice(0, 2)}`,
         });
       })
       .catch(() => {
         ElMessage({
           type: "info",
-          message: "取消关闭",
+          message: `继续${dialogTitle.value.slice(0, 2)}`,
         });
       });
   };
@@ -290,11 +357,11 @@
     cell: any,
     event: { target: HTMLElement }
   ) => {
+    column;
+    cell;
     if (event.target.className.includes("bi-pencil-square"))
       editUserDialog(row);
-    if (event.target.className.includes("bi-trash")) {
-      deleteUserFun(row);
-    }
+    if (event.target.className.includes("bi-trash")) deleteUserFun(row);
   };
 
   // 添加/修改-------------
@@ -383,7 +450,6 @@
     dialogVisible.value = true;
     isAddUser.value = true;
     dialogTitle.value = "添加用户";
-    dialogCloseConfirm.value = "确认放弃添加用户吗?所填内容将会被清空";
   };
   let waitAddUser = ref(false);
   const addUserFun = async (formEl: FormInstance | undefined) => {
@@ -409,7 +475,6 @@
     dialogVisible.value = true;
     isAddUser.value = false;
     dialogTitle.value = "修改用户";
-    dialogCloseConfirm.value = "确认放弃修改用户吗?所填内容将会被清空";
     userInfoForm.userName = user.userName;
     userInfoForm.businessId = user.businessId + "";
     userInfoForm.email = user.email;
@@ -419,7 +484,6 @@
     userInfoForm.userId = user.userId! + 0;
   };
   let waitEditUser = ref(false);
-
   let editUserFun = async (formEl: FormInstance | undefined) => {
     // 先进行表单验证
     if (!formEl) return;

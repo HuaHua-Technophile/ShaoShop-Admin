@@ -52,3 +52,12 @@ export type stateType = {
     path: string;
   }>;
 };
+//角色对应的菜单
+export type roleMenuType = {
+  icon: string;
+  menuId: number;
+  menuName: string;
+  menuType: string;
+  orderNum: number;
+  path: string;
+};

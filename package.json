@@ -13,24 +13,27 @@
     "@better-scroll/mouse-wheel": "^2.5.1",
     "@better-scroll/pull-up": "^2.5.1",
     "@better-scroll/scroll-bar": "^2.5.1",
+    "animate.css": "^4.1.1",
     "axios": "^1.6.2",
     "bootstrap": "^5.3.2",
     "bootstrap-icons": "^1.11.2",
     "element-plus": "^2.4.3",
+    "lodash": "^4.17.21",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.0",
-    "vue": "^3.3.9",
+    "vue": "^3.3.10",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^20.10.1",
-    "@vitejs/plugin-vue": "^4.5.0",
+    "@types/lodash": "^4.14.202",
+    "@types/node": "^20.10.3",
+    "@vitejs/plugin-vue": "^4.5.1",
     "sass": "^1.69.5",
     "typescript": "^5.3.2",
     "unplugin-auto-import": "^0.16.7",
     "unplugin-vue-components": "^0.25.2",
-    "vite": "^4.5.0",
-    "vue-tsc": "^1.8.24"
+    "vite": "^4.5.1",
+    "vue-tsc": "^1.8.25"
   }
 }
