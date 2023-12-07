@@ -9,6 +9,7 @@ export const getUserList = (params?: userListParamsType) => {
 };
 
 export const addUser = (data: userType) => {
+  console.log("准备添加=>", data);
   return instance({
     url: "/system/user",
     method: "POST",

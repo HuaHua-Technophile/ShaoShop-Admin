@@ -27,10 +27,10 @@
   "devDependencies": {
     "@types/bootstrap": "^5.2.10",
     "@types/lodash": "^4.14.202",
-    "@types/node": "^20.10.3",
+    "@types/node": "^20.10.4",
     "@vitejs/plugin-vue": "^4.5.1",
     "sass": "^1.69.5",
-    "typescript": "^5.3.2",
+    "typescript": "^5.3.3",
     "unplugin-auto-import": "^0.16.7",
     "unplugin-vue-components": "^0.25.2",
     "vite": "^4.5.1",

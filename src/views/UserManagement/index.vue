@@ -78,7 +78,8 @@
             min-height: calc(100% + 1px) !important;
             padding: 1px 0 !important;
           ">
-          <el-table-column type="selection" width="55" />
+          <el-table-column type="selection" width="30" />
+          <el-table-column label="序号" type="index" width="55" />
           <el-table-column prop="userName" label="账号名称" />
           <el-table-column prop="email" label="邮箱" />
           <el-table-column prop="phoneNumber" label="电话" />
@@ -232,8 +233,7 @@
   import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
   import { onMounted, reactive, ref, nextTick } from "vue";
   import { userType } from "@/type/index";
-  import throttle from "lodash/throttle"; //lodash节流，按需引入减少打包体积
-  import { ceil } from "lodash"; //lodash节流，按需引入减少打包体积
+  import { ceil, throttle } from "lodash"; //lodash按需引入减少打包体积
   import BScroll from "@better-scroll/core";
   import Pullup from "@better-scroll/pull-up"; //上拉懒加载
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
@@ -244,8 +244,8 @@
   let pagesNum = ref(-1); //总的页数
   let total = ref(-1); //总用户数量
   let page = ref(1); // 当前页数
-  let itemHeight = ref<number | undefined>(-1);
-  let trHeight = ref<number | undefined>(-1);
+  let itemHeight = ref<number | undefined>(-1); //每一项高度
+  let trHeight = ref<number | undefined>(-1); //表头高度
   const userQueryFrom = reactive({
     userName: "", //账号
     email: "", //绑定邮箱
@@ -286,8 +286,7 @@
       userQueryFrom.currentPage++;
       let res = await getUserList(userQueryFrom);
       console.log(
-        `第${userQueryFrom.currentPage}页=>`,
-        res.data.records.length,
+        `第${userQueryFrom.currentPage}页(${res.data.records.length}条)=>`,
         res.data.records
       );
       if (res.data.records.length < userQueryFrom.pageSize) bs?.closePullUp();
@@ -301,8 +300,10 @@
       throttle((e: { x: number; y: number }) => {
         if (-e.y > trHeight.value!) hoverBtnVisible.value = true;
         else hoverBtnVisible.value = false;
-        let pages = ceil(-e.y / (itemHeight.value! * 20));
-        console.log(-e.y, itemHeight.value! * 20, pages);
+        page.value = ceil(
+          (-e.y + userListWrapper.value.clientHeight - trHeight.value!) /
+            (itemHeight.value! * 20)
+        );
       }, 400)
     );
   });
@@ -312,7 +313,7 @@
   let jumpPage = () => {
     // 如果已经加载出的数据量小于要跳转的,则直接滚动
     if (userQueryFrom.currentPage >= page.value) {
-      bs?.scrollTo(0, itemHeight.value! * (page.value - 1));
+      bs?.scrollTo(0, -(itemHeight.value! * 20 * (page.value - 1)));
     }
     // 否则先请求数据
     else {
@@ -459,6 +460,7 @@
       if (valid) {
         waitAddUser.value = true;
         let res = await addUser(userInfoForm);
+        console.log("添加用户回调=>", res);
         if (res.code === 200) {
           ElMessage.success("添加成功");
           getUserListFun(); //重新请求数据进行用户列表渲染
