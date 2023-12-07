@@ -464,6 +464,7 @@
         // console.log("添加用户回调=>", res);
         if (res.code === 200) {
           ElMessage.success("添加成功");
+          allUserList.value = [];
           getUserListFun(); //重新请求数据进行用户列表渲染
           // dialogVisible.value = false; //隐藏弹出框
           // formEl.resetFields(); //重置表单
@@ -496,6 +497,7 @@
         let res = await editUser(userInfoForm);
         if (res.code === 200) {
           ElMessage.success("修改成功");
+          allUserList.value = [];
           getUserListFun(); //重新请求数据进行用户列表渲染
           dialogVisible.value = false; //隐藏弹出框
           formEl.resetFields(); //重置表单
@@ -564,6 +566,7 @@
         let res = await deleteUser(userIdList.value);
         if (res.code === 200) {
           ElMessage.success("删除成功");
+          allUserList.value = [];
           getUserListFun(); //重新请求数据进行用户列表渲染
         } else ElMessage.error(res.message);
       })
