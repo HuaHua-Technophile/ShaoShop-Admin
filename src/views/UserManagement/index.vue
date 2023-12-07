@@ -308,21 +308,7 @@
     );
   });
 
-  //页面跳转
-  let hoverBtnVisible = ref(false);
-  let jumpPage = async () => {
-    // 如果已经加载出的数据量小于要跳转的,则直接滚动
-    if (!(userQueryFrom.currentPage >= page.value)) {
-      userQueryFrom.pageSize = 20 * (page.value - userQueryFrom.currentPage);
-      await getUserListFun();
-      userQueryFrom.pageSize = 20;
-      userQueryFrom.currentPage = page.value;
-      await nextTick();
-    }
-    bs?.scrollTo(0, -(itemHeight.value! * 20 * (page.value - 1)), 500);
-  };
-
-  //dialog弹出框--------------------
+  //dialog弹出框-----------------------
   const dialogVisible = ref(false);
   const dialogTitle = ref("添加用户");
   const isAddUser = ref(true);
@@ -353,7 +339,7 @@
       });
   };
 
-  //表格点击回调
+  //表格点击回调-------------
   let cellClickFun = (
     row: userType,
     column: any,
@@ -366,8 +352,21 @@
       editUserDialog(row);
     if (event.target.className.includes("bi-trash")) deleteUserFun(row);
   };
+  //表格跳页-----------------
+  let hoverBtnVisible = ref(false);
+  let jumpPage = async () => {
+    // 如果已经加载出的数据量小于要跳转的,则直接滚动
+    if (!(userQueryFrom.currentPage >= page.value)) {
+      userQueryFrom.pageSize = 20 * (page.value - userQueryFrom.currentPage);
+      await getUserListFun();
+      userQueryFrom.pageSize = 20;
+      userQueryFrom.currentPage = page.value;
+      await nextTick();
+    }
+    bs?.scrollTo(0, -(itemHeight.value! * 20 * (page.value - 1)), 500);
+  };
 
-  // 添加/修改-------------
+  // 添加/修改--------------------------------
   const dialogFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const userInfoForm = reactive({
     businessId: "", //商户
