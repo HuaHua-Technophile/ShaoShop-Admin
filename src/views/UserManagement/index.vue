@@ -240,7 +240,7 @@
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
   // 不传参数的情况下，就是获取所有用户。传参数的情况下可用作搜索
-  let allUserList = ref();
+  let allUserList = ref<userType[]>([]);
   let pagesNum = ref(-1); //总的页数
   let total = ref(-1); //总用户数量
   let page = ref(1); // 当前页数
@@ -258,9 +258,9 @@
   const getUserListFun = async () => {
     let res = await getUserList(userQueryFrom);
     console.log("用户列表=>", res);
-    allUserList.value = res.data.records;
-    pagesNum.value = res.data.pages;
+    allUserList.value.push(...res.data.records);
     total.value = res.data.total;
+    pagesNum.value = ceil(res.data.total / 20);
     await nextTick();
     bs?.refresh();
     itemHeight.value = document.querySelector(".el-table__row")?.clientHeight;
@@ -310,14 +310,16 @@
 
   //页面跳转
   let hoverBtnVisible = ref(false);
-  let jumpPage = () => {
+  let jumpPage = async () => {
     // 如果已经加载出的数据量小于要跳转的,则直接滚动
-    if (userQueryFrom.currentPage >= page.value) {
-      bs?.scrollTo(0, -(itemHeight.value! * 20 * (page.value - 1)));
+    if (!(userQueryFrom.currentPage >= page.value)) {
+      userQueryFrom.pageSize = 20 * (page.value - userQueryFrom.currentPage);
+      await getUserListFun();
+      userQueryFrom.pageSize = 20;
+      userQueryFrom.currentPage = page.value;
+      await nextTick();
     }
-    // 否则先请求数据
-    else {
-    }
+    bs?.scrollTo(0, -(itemHeight.value! * 20 * (page.value - 1)), 500);
   };
 
   //dialog弹出框--------------------
@@ -460,7 +462,7 @@
       if (valid) {
         waitAddUser.value = true;
         let res = await addUser(userInfoForm);
-        console.log("添加用户回调=>", res);
+        // console.log("添加用户回调=>", res);
         if (res.code === 200) {
           ElMessage.success("添加成功");
           getUserListFun(); //重新请求数据进行用户列表渲染
@@ -523,13 +525,14 @@
     if (!formEl) return;
     await formEl.validate(async (valid, fields) => {
       if (valid) {
+        allUserList.value = [];
         waitQueryUser.value = true;
-        console.log(userQueryFrom);
+        console.log("查询条件=>", userQueryFrom);
         let res = await getUserList(userQueryFrom);
         console.log("查询结果=>", res);
         if (res.code === 200) {
           ElMessage.success("查询成功");
-          allUserList.value = res.data.records;
+          allUserList.value.push(...res.data.records);
           await nextTick();
           bs?.refresh();
         } else ElMessage.error(res.message);
