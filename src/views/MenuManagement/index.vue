@@ -3,23 +3,52 @@
     <div ref="menuListWrapper" class="w-100 h-100 overflow-hidden rounded-4">
       <el-table
         :data="menuList"
+        table-layout="auto"
         header-cell-class-name="text-center"
         row-class-name="bg-body"
         cell-class-name="text-center"
         class="bg-body rounded-4"
         empty-text="查询菜单异常"
         row-key="menuId"
+        :expand-row-keys="[]"
         style="
           min-height: calc(100% + 1px) !important;
           padding: 1px 0 !important;
         ">
         <el-table-column type="expand">
           <template #default="props">
-            <div>{{ props.row.menuId }}</div>
+            <div>
+              <div>最后更新者：{{ props.row.updateBy }}</div>
+              <div>更新时间：{{ props.row.updateTime }}</div>
+              <div>component：{{ props.row.component }}</div>
+              <div>delFlag：{{ props.row.delFlag }}</div>
+
+              <div>isBusinessVisible：{{ props.row.isBusinessVisible }}</div>
+              <div>isCache：{{ props.row.isCache }}</div>
+              <div>父菜单id：{{ props.row.parentId }}</div>
+              <div>路径：{{ props.row.path }}</div>
+              <div>perms：{{ props.row.perms }}</div>
+              <div>query：{{ props.row.query }}</div>
+              <div>remark：{{ props.row.remark }}</div>
+            </div>
           </template>
         </el-table-column>
         <el-table-column label="ID" prop="menuId" />
         <el-table-column label="菜单名称" prop="menuName" />
+        <el-table-column label="图标">
+          <template #default="scope">
+            <!-- effect="light/dark"是反过来的  -->
+            <el-tooltip
+              effect="light"
+              :offset="0"
+              :content="scope.row.icon"
+              placement="right">
+              <div>
+                <FontIcon :icon="scope.row.icon" />
+              </div>
+            </el-tooltip>
+          </template>
+        </el-table-column>
         <el-table-column label="菜单排序" prop="orderNum" />
         <el-table-column prop="status" label="状态">
           <template #default="scope">
@@ -81,6 +110,8 @@
             </span>
           </template>
         </el-table-column>
+        <el-table-column label="创建者" prop="createBy" />
+        <el-table-column label="创建时间" prop="createTime" />
         <el-table-column>
           <template #header>
             <el-button :loading="waitAddMenu" @click="addMenuFun"

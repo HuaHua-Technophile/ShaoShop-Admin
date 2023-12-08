@@ -42,6 +42,7 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTimePicker: typeof import("element-plus/es")["ElTimePicker"]
+    ElTooltip: typeof import('element-plus/es')['ElTooltip']
     LightIcon: typeof import("./src/components/darkThemeSwitch/lightIcon.vue")["default"]
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

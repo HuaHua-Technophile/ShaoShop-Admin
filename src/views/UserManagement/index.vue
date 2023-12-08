@@ -66,6 +66,7 @@
         <el-table
           ref="userTableRef"
           :data="allUserList"
+          table-layout="auto"
           header-cell-class-name="text-center"
           row-class-name="bg-body"
           cell-class-name="text-center"
@@ -80,11 +81,9 @@
           ">
           <el-table-column type="selection" width="30" />
           <el-table-column label="序号" type="index" width="55" />
+          <el-table-column prop="userId" label="账号ID" />
           <el-table-column prop="userName" label="账号名称" />
-          <el-table-column prop="email" label="邮箱" />
-          <el-table-column prop="phoneNumber" label="电话" />
           <el-table-column prop="nickName" label="部门主体" />
-          <el-table-column prop="createTime" label="创建时间" />
           <el-table-column prop="status" label="状态">
             <template #default="scope">
               <span
@@ -98,9 +97,13 @@
               </span>
             </template>
           </el-table-column>
+          <el-table-column prop="email" label="邮箱" />
+          <el-table-column prop="phoneNumber" label="电话" />
+          <el-table-column prop="createBy" label="创建者" />
+          <el-table-column prop="createTime" label="创建时间" />
           <el-table-column>
             <template #header>
-              <div class="d-flex align-items-center">
+              <div class="d-flex align-items-center justify-content-center">
                 跳至<el-input-number
                   :disabled="pagesNum === -1"
                   size="small"
