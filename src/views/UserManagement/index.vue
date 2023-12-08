@@ -5,7 +5,7 @@
       :model="userQueryFrom"
       ref="userQueryFromRef"
       :rules="queryRules"
-      class="flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
+      class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
       <div class="flex-grow-1 d-flex align-items-center">
         <el-form-item class="col-3 pe-3" label="用户账号" prop="userName">
           <el-input
@@ -59,7 +59,7 @@
       </el-form-item>
     </el-form>
     <!-- 用户列表模块 -->
-    <div class="flex-grow-1 overflow-hidden bg-body-secondary p-3">
+    <div class="flex-grow-1 overflow-hidden p-3">
       <div
         ref="userListWrapper"
         class="userListWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
@@ -98,7 +98,7 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column prop="index">
+          <el-table-column>
             <template #header>
               <div class="d-flex align-items-center">
                 跳至<el-input-number
@@ -115,7 +115,7 @@
               <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
             </template>
           </el-table-column>
-          <el-table-column prop="index">
+          <el-table-column>
             <template #header>
               <el-button @click="addUserDialog">添加账号</el-button>
             </template>

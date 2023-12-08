@@ -5,8 +5,8 @@
       <div
         class="flex-shrink-0 pt-3 border-end text-center text-uppercase fs-4"
         style="font-family: YouSheBiaoTiHei">
-        <span style="color: var(--theme-color)">S</span>hao<span
-          style="color: var(--theme-color)"
+        <span style="color: var(--bs-ShaoShop)">S</span>hao<span
+          style="color: var(--bs-ShaoShop)"
           >S</span
         >hop
       </div>
@@ -112,7 +112,7 @@
         </div>
       </el-header>
       <!-- 右侧内容 -->
-      <el-main class="p-0 overflow-hidden position-relative">
+      <el-main class="p-0 overflow-hidden position-relative bg-body-secondary">
         <router-view v-slot="{ Component }">
           <transition name="slide-right" mode="out-in">
             <!-- <transition name="slide-right"> -->
@@ -264,7 +264,7 @@ https://segmentfault.com/a/1190000022822185 */
       height: 3px;
       left: 0;
       bottom: 0;
-      background-color: var(--theme-color);
+      background-color: var(--bs-ShaoShop);
       transition: all 0.5s;
     }
     &:hover,
@@ -284,7 +284,7 @@ https://segmentfault.com/a/1190000022822185 */
     opacity: 0.2;
     transition: all 0.5s;
     &:hover {
-      color: var(--theme-color);
+      color: var(--bs-ShaoShop);
       transform: scale(1.1) rotate(90deg) !important;
     }
   }

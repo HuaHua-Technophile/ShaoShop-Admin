@@ -1,23 +1,19 @@
-@use "./transitionAnimation.scss"; //过渡动画
-@use "animate.css";
-
-// @use "./primaryColorDark.scss";
-@use "bootstrap-icons/font/bootstrap-icons.css"; //最先导入bootstrap icon字体图标
-@use "bootstrap/scss/bootstrap";
-
-// @use "element-plus/theme-chalk/dark/css-vars.css";只想要支持elementPlus暗色模式,导入该样式即可.
-// 想要在暗色模式下还能支持自定义主题色,则需要↓
+// @use "element-plus/theme-chalk/dark/css-vars.css";只想要支持elementPlus暗色模式,导入该样式即可。想要在暗色模式下还能支持自定义主题色,则需要↓
 @use "./primaryColorDark.scss";
-// 按需导入时,需要全局引入部分特殊的message类型样式
-@use "element-plus/theme-chalk/el-message.css";
-@use "element-plus/theme-chalk/el-message-box.css";
+@use "element-plus/theme-chalk/el-message.css"; // 按需导入时,需要全局引入部分特殊的message类型样式
+@use "element-plus/theme-chalk/el-message-box.css"; // 按需导入时,需要全局引入部分特殊的message类型样式
+
+//修改第三方样式库-----------------
+@use "./primaryBootStrap.scss";
+
+//动画------------------------------
+@use "./transitionAnimation.scss"; //自定义过渡动画
+@use "animate.css"; //第三方库动画
+
+//字体图标-------------------
+@use "bootstrap-icons/font/bootstrap-icons.css"; //最先导入bootstrap icon字体图标
 
 @font-face {
   font-family: "YouSheBiaoTiHei";
   src: url(../static/font/优设标题黑.ttf);
-}
-
-:root {
-  --theme-color-rgb: 243, 64, 13;
-  --theme-color: #f3400d;
 }
