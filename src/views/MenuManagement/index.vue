@@ -4,13 +4,13 @@
       <el-table
         :data="menuList"
         table-layout="auto"
-        header-cell-class-name="text-center"
+        header-cell-class-name="text-center text-body"
         row-class-name="bg-body"
         cell-class-name="text-center"
         class="bg-body rounded-4"
         empty-text="查询菜单异常"
         row-key="menuId"
-        :expand-row-keys="[]"
+        :expand-row-keys="[1]"
         style="
           min-height: calc(100% + 1px) !important;
           padding: 1px 0 !important;
@@ -18,18 +18,115 @@
         <el-table-column type="expand">
           <template #default="props">
             <div>
-              <div>最后更新者：{{ props.row.updateBy }}</div>
-              <div>更新时间：{{ props.row.updateTime }}</div>
-              <div>component：{{ props.row.component }}</div>
-              <div>delFlag：{{ props.row.delFlag }}</div>
-
-              <div>isBusinessVisible：{{ props.row.isBusinessVisible }}</div>
-              <div>isCache：{{ props.row.isCache }}</div>
-              <div>父菜单id：{{ props.row.parentId }}</div>
-              <div>路径：{{ props.row.path }}</div>
-              <div>perms：{{ props.row.perms }}</div>
-              <div>query：{{ props.row.query }}</div>
-              <div>remark：{{ props.row.remark }}</div>
+              <div class="d-flex flex-wrap justify-content-between">
+                <div>最后更新者：{{ props.row.updateBy }}</div>
+                <div>更新时间：{{ props.row.updateTime }}</div>
+                <div>路径：{{ props.row.path }}</div>
+                <div>组件路径：{{ props.row.component }}</div>
+                <div>商户是否可见：{{ props.row.isBusinessVisible }}</div>
+                <div>isCache：{{ props.row.isCache }}</div>
+                <div>权限标识：{{ props.row.perms }}</div>
+                <div>路由参数：{{ props.row.query }}</div>
+                <div class="col-12">备注：{{ props.row.remark }}</div>
+              </div>
+              <div v-if="props.row.children.length > 0" class="px-3">
+                <h5>子菜单({{ props.row.children.length }})</h5>
+                <div>
+                  <el-table
+                    :data="props.row.children"
+                    table-layout="auto"
+                    header-cell-class-name="text-center text-body"
+                    :header-cell-style="{
+                      background: 'rgba(var(--bs-ShaoShop-rgb),0.4) !important',
+                    }"
+                    :row-class-name="
+                      darkTheme ? 'bg-black bg-opacity-75' : 'bg-body-secondary'
+                    "
+                    cell-class-name="text-center"
+                    class="bg-body rounded-4"
+                    row-key="menuId">
+                    <el-table-column label="ID" prop="menuId" />
+                    <el-table-column label="菜单名称" prop="menuName" />
+                    <el-table-column label="图标">
+                      <template #default="scope">
+                        <!-- effect="light/dark"是反过来的  -->
+                        <el-tooltip
+                          effect="light"
+                          :offset="0"
+                          :content="scope.row.icon"
+                          placement="right">
+                          <div>
+                            <FontIcon :icon="scope.row.icon" />
+                          </div>
+                        </el-tooltip>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="排序" prop="orderNum" />
+                    <el-table-column prop="status" label="状态">
+                      <template #default="scope">
+                        <span
+                          :class="[
+                            'rounded-1 border px-1',
+                            scope.row.status == 0
+                              ? 'border-success text-success'
+                              : 'border-danger text-danger',
+                          ]">
+                          {{ scope.row.status == 0 ? "正常" : "停用" }}
+                        </span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="visible" label="显/隐">
+                      <template #default="scope">
+                        <span
+                          :class="[
+                            'rounded-1 border px-1',
+                            scope.row.visible == 0
+                              ? 'border-success text-success'
+                              : 'border-2 text-body-secondary',
+                          ]">
+                          {{ scope.row.visible == 0 ? "显示" : "隐藏" }}
+                        </span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="isFrame" label="是否外链">
+                      <template #default="scope">
+                        <span
+                          :class="[
+                            'rounded-1 border px-1',
+                            scope.row.isFrame == 0
+                              ? 'border-success text-success'
+                              : 'border-2 text-body-secondary',
+                          ]">
+                          {{ scope.row.isFrame == 0 ? "是" : "否" }}
+                        </span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="menuType" label="类型">
+                      <template #default="scope">
+                        <span
+                          :class="[
+                            'rounded-1 border  px-1',
+                            scope.row.menuType == 'M'
+                              ? 'border-primary text-primary-emphasis'
+                              : scope.row.menuType == 'C'
+                              ? 'border-warning text-warning-emphasis'
+                              : 'border-2 text-body-secondary',
+                          ]">
+                          {{
+                            scope.row.menuType == "M"
+                              ? "目录"
+                              : scope.row.menuType == "C"
+                              ? "菜单"
+                              : "按钮"
+                          }}
+                        </span>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="创建者" prop="createBy" />
+                    <el-table-column label="创建时间" prop="createTime" />
+                  </el-table>
+                </div>
+              </div>
             </div>
           </template>
         </el-table-column>
@@ -49,7 +146,7 @@
             </el-tooltip>
           </template>
         </el-table-column>
-        <el-table-column label="菜单排序" prop="orderNum" />
+        <el-table-column label="排序" prop="orderNum" />
         <el-table-column prop="status" label="状态">
           <template #default="scope">
             <span
@@ -76,7 +173,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="isFrame" label="是否外链?">
+        <el-table-column prop="isFrame" label="是否外链">
           <template #default="scope">
             <span
               :class="[
@@ -89,7 +186,7 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="menuType" label="菜单类型">
+        <el-table-column prop="menuType" label="类型">
           <template #default="scope">
             <span
               :class="[
@@ -156,6 +253,10 @@
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
   import { nextTick, onMounted, reactive, ref } from "vue";
   import { ElMessage, ElMessageBox } from "element-plus";
+  import { storeToRefs } from "pinia";
+  import { useDarkThemeStore } from "@/stores/colorTheme";
+  //修改主题-------------------------------------------------
+  let { darkTheme } = storeToRefs(useDarkThemeStore());
   //获取菜单-----------------------
   const menuList = ref<roleMenuType[]>();
   const getMenuListFun = async () => {

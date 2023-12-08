@@ -81,7 +81,7 @@
           ">
           <el-table-column type="selection" width="30" />
           <el-table-column label="序号" type="index" width="55" />
-          <el-table-column prop="userId" label="账号ID" />
+          <el-table-column prop="userId" label="ID" />
           <el-table-column prop="userName" label="账号名称" />
           <el-table-column prop="nickName" label="部门主体" />
           <el-table-column prop="status" label="状态">

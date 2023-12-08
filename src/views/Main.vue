@@ -115,6 +115,11 @@
       <el-main class="p-0 overflow-hidden position-relative bg-body-secondary">
         <router-view v-slot="{ Component }">
           <transition name="slide-right" mode="out-in">
+            <!-- <transition
+            appear
+            enter-active-class="animate__animated animate__fadeInLeft animate__faster"
+            leave-active-class="animate__animated animate__fadeOutRight animate__faster"
+            mode="out-in"> -->
             <!-- <transition name="slide-right"> -->
             <component :is="Component" />
           </transition>
@@ -264,7 +269,7 @@ https://segmentfault.com/a/1190000022822185 */
       height: 3px;
       left: 0;
       bottom: 0;
-      background-color: var(--bs-ShaoShop);
+      background-color: var(--theme-color);
       transition: all 0.5s;
     }
     &:hover,
@@ -284,7 +289,7 @@ https://segmentfault.com/a/1190000022822185 */
     opacity: 0.2;
     transition: all 0.5s;
     &:hover {
-      color: var(--bs-ShaoShop);
+      color: var(--theme-color);
       transform: scale(1.1) rotate(90deg) !important;
     }
   }

@@ -1,6 +1,6 @@
 .slide-right-enter-active {
   will-change: transform;
-  transition: all 0.7s;
+  transition: all 0.5s;
   position: absolute !important;
 }
 .slide-right-enter-from {
@@ -14,7 +14,7 @@
 // ------------------------------
 .slide-right-leave-active {
   will-change: transform;
-  transition: all 0.7s;
+  transition: all 0.5s;
   position: absolute !important;
 }
 .slide-right-leave {
