@@ -516,6 +516,8 @@
             message: "修改菜单失败，菜单已存在" */
         console.log(res);
         if (res.code == 200) {
+          getMenuListFun();
+          // menuDialogVisible.value = false; //隐藏弹出框
         } else {
           ElMessage.error(res.message);
         }
@@ -546,7 +548,6 @@
     menuDialogVisible.value = true;
     dialogTitle.value = "修改菜单";
   };
-
   const editMenuFun = async (formEl: FormInstance | undefined) => {
     // 先进行表单验证
     if (!formEl) return;
@@ -557,6 +558,8 @@
         console.log(res);
         if (res.code == 200) {
           ElMessage.success(res.message);
+          getMenuListFun();
+          menuDialogVisible.value = false; //隐藏弹出框
         } else {
           ElMessage.error(res.message);
         }
@@ -576,8 +579,10 @@
     })
       .then(async () => {
         let res = await delMenu(menuId);
-        if (res.code == 200) ElMessage.success(res.message);
-        else ElMessage.error(res.message);
+        if (res.code == 200) {
+          ElMessage.success(res.message);
+          getMenuListFun();
+        } else ElMessage.error(res.message);
       })
       .catch(() => {
         ElMessage.info("取消删除");
