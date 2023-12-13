@@ -116,6 +116,7 @@
         <router-view v-slot="{ Component }">
           <transition name="slide-right" mode="out-in">
             <!-- <transition
+              
             appear
             enter-active-class="animate__animated animate__fadeInLeft animate__faster"
             leave-active-class="animate__animated animate__fadeOutRight animate__faster"

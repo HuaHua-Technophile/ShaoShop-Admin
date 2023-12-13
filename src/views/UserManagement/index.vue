@@ -187,22 +187,20 @@
             :prefix-icon="renderFontIcon('bi bi-shop-window')"></el-input>
         </el-form-item>
       </el-form>
-      <template #footer>
-        <span>
-          <el-button
-            v-if="dialogTitle == '添加用户'"
-            @click="addUserFun(dialogFromRef)"
-            :loading="waitAddUser"
-            >确认添加</el-button
-          >
-          <el-button
-            v-else
-            @click="editUserFun(dialogFromRef)"
-            :loading="waitEditUser"
-            >确认修改</el-button
-          >
-        </span>
-      </template>
+      <div class="d-flex justify-content-center">
+        <el-button
+          v-if="dialogTitle == '添加用户'"
+          @click="addUserFun(dialogFromRef)"
+          :loading="waitAddUser"
+          >确认添加</el-button
+        >
+        <el-button
+          v-else
+          @click="editUserFun(dialogFromRef)"
+          :loading="waitEditUser"
+          >确认修改</el-button
+        >
+      </div>
     </el-dialog>
     <!-- 右下角悬浮跳页 -->
     <Transition
