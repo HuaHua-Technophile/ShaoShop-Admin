@@ -15,7 +15,6 @@
           class="bg-body rounded-4"
           empty-text="查询菜单异常"
           row-key="menuId"
-          :expand-row-keys="[1]"
           @cell-click="cellClickFun"
           @expand-change="expandChangeFun">
           <!-- 外层表格扩展 -->
@@ -250,9 +249,7 @@
           <el-table-column label="创建时间" prop="createTime" />
           <el-table-column>
             <template #header>
-              <el-button :loading="waitAddMenu" @click="addMenuDialog"
-                >添加菜单</el-button
-              >
+              <el-button @click="addMenuDialog">添加菜单</el-button>
             </template>
             <template #default>
               <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
@@ -399,7 +396,7 @@
   const menuList = ref<roleMenuType[]>();
   const getMenuListFun = async () => {
     let res = await getMenuList();
-    console.log("获取菜单列表", res);
+    console.log("获取菜单列表=>", res);
     menuList.value = res.data;
     await nextTick();
     bs?.refresh();
@@ -430,6 +427,7 @@
       clearTimeout(i);
     });
   });
+
   //dialog弹出框--------------------
   const menuDialogVisible = ref(false);
   const dialogTitle = ref("添加菜单");

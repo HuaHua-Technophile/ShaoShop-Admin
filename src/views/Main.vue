@@ -260,6 +260,7 @@ https://segmentfault.com/a/1190000022822185 */
 </script>
 
 <style lang="scss">
+  //顶部历史路由
   .historicalNavigation {
     transition: all 0.5s;
     &::after {
@@ -270,7 +271,7 @@ https://segmentfault.com/a/1190000022822185 */
       height: 3px;
       left: 0;
       bottom: 0;
-      background-color: var(--theme-color);
+      background-color: var(--bs-ShaoShop);
       transition: all 0.5s;
     }
     &:hover,
@@ -294,7 +295,8 @@ https://segmentfault.com/a/1190000022822185 */
       transform: scale(1.1) rotate(90deg) !important;
     }
   }
-  .custom-horizontal-scrollbar {
+
+  /* .custom-horizontal-scrollbar {
     position: absolute;
     left: 0%;
     bottom: 0px;
@@ -302,12 +304,12 @@ https://segmentfault.com/a/1190000022822185 */
     height: 7px;
     border-radius: 6px;
     transform: translateZ(0);
-    background-color: rgb(200, 200, 200, 0.3);
+    background-color: rgb(255, 0, 0, 1);
   }
   .custom-horizontal-indicator {
     height: 100%;
     // width: 20px;
     border-radius: 6px;
     background-color: #db8090;
-  }
+  } */
 </style>
