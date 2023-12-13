@@ -28,3 +28,15 @@ export const editMenu = (data: roleMenuType) => {
     data,
   });
 };
+export const getMenuDetail = (menuId: number) => {
+  return instance({
+    url: `/system/menu/${menuId}`,
+    method: "GET",
+  });
+};
+export const delMenu = (menuId: number) => {
+  return instance({
+    url: `/system/menu/${menuId}`,
+    method: "DeLETE",
+  });
+};

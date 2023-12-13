@@ -377,7 +377,12 @@
 </template>
 <script lang="ts" setup>
   import { renderFontIcon } from "@/utils/fontIcon/renderFontIcon";
-  import { getMenuList } from "@/api/MenuManagementAPI";
+  import {
+    getMenuList,
+    addMenu,
+    editMenu,
+    delMenu,
+  } from "@/api/MenuManagementAPI";
   import { roleMenuType } from "@/type/index";
   import BScroll from "@better-scroll/core";
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
@@ -387,7 +392,6 @@
   import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
   import { storeToRefs } from "pinia";
   import { useDarkThemeStore } from "@/stores/colorTheme";
-  import { addMenu, editMenu } from "@/api/MenuManagementAPI";
   import { cloneDeep } from "lodash";
   //修改主题-------------------------------------------------
   let { darkTheme } = storeToRefs(useDarkThemeStore());
@@ -491,14 +495,14 @@
   const waitAddMenu = ref(false);
   const addMenuDialog = () => {
     /* menuInfoForm.icon = ""; // 菜单图标
-    menuInfoForm.isFrame = 1; //是否为外链（0是 1否）
-    menuInfoForm.menuName = ""; //菜单名称
-    menuInfoForm.menuType = "C"; //菜单类型（M目录 C菜单 F按钮）
-    menuInfoForm.orderNum = 0; //显示排序
-    menuInfoForm.parentId = 0; //父菜单Id
-    menuInfoForm.path = ""; //路由地址
-    menuInfoForm.status = 0; //菜单状态（0正常 1停用）
-    menuInfoForm.visible = 0; //菜单状态（0显示 1隐藏） */
+      menuInfoForm.isFrame = 1; //是否为外链（0是 1否）
+      menuInfoForm.menuName = ""; //菜单名称
+      menuInfoForm.menuType = "C"; //菜单类型（M目录 C菜单 F按钮）
+      menuInfoForm.orderNum = 0; //显示排序
+      menuInfoForm.parentId = 0; //父菜单Id
+      menuInfoForm.path = ""; //路由地址
+      menuInfoForm.status = 0; //菜单状态（0正常 1停用）
+      menuInfoForm.visible = 0; //菜单状态（0显示 1隐藏） */
     menuInfoForm = reactive(defaultMenuInfo);
     menuDialogVisible.value = true;
     dialogTitle.value = "添加菜单";
@@ -511,7 +515,7 @@
         waitAddMenu.value = true;
         let res = await addMenu(menuInfoForm); //menuInfoForm里暂时不包含id
         /* code500
-          message: "修改菜单失败，菜单已存在" */
+            message: "修改菜单失败，菜单已存在" */
         console.log(res);
         if (res.code == 200) {
         } else {
@@ -523,7 +527,7 @@
   };
 
   //表格点击回调-------------
-  let cellClickFun = (
+  let cellClickFun = async (
     row: roleMenuType,
     column: any,
     cell: any,
@@ -533,25 +537,14 @@
     cell;
     if (event.target.className.includes("bi-pencil-square"))
       editMenuDialog(row);
-    if (event.target.className.includes("bi-trash")) deleteMenuFun(row);
+    if (event.target.className.includes("bi-trash"))
+      delMenuFun(row.menuId!, row.menuName);
   };
 
   // 修改菜单
   const waitEditMenu = ref(false);
   const editMenuDialog = (menu: roleMenuType) => {
-    /* menuInfoForm.menuId = data.menuId;
-    menuInfoForm.icon = data.icon;
-    menuInfoForm.isFrame = data.isFrame * 1;
-    menuInfoForm.menuName = data.menuName;
-    menuInfoForm.menuType = data.menuType;
-    menuInfoForm.orderNum = data.orderNum;
-    menuInfoForm.parentId = data.parentId;
-    menuInfoForm.path = data.path;
-    menuInfoForm.status = data.status * 1;
-    menuInfoForm.visible = data.visible * 1; */
-    console.log(cloneDeep(menu));
     menuInfoForm = reactive(cloneDeep(menu));
-
     menuDialogVisible.value = true;
     dialogTitle.value = "修改菜单";
   };
@@ -575,8 +568,22 @@
   };
 
   // 删除菜单
-  const deleteMenuFun = (data: roleMenuType) => {
-    console.log(data);
+  const delMenuFun = (menuId: number, menuName: string) => {
+    ElMessageBox.confirm(`确认删除ID为 ${menuId} 的菜单"${menuName}"吗?`, {
+      confirmButtonText: "删除",
+      cancelButtonText: "取消",
+      type: "warning",
+      draggable: true,
+      customClass: "rounded",
+    })
+      .then(async () => {
+        let res = await delMenu(menuId);
+        if (res.code == 200) ElMessage.success(res.message);
+        else ElMessage.error(res.message);
+      })
+      .catch(() => {
+        ElMessage.info("取消删除");
+      });
   };
 </script>
 <style lang="scss">
