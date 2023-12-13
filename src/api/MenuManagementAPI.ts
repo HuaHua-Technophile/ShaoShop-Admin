@@ -21,6 +21,7 @@ export const addMenu = (data: roleMenuType) => {
   });
 };
 export const editMenu = (data: roleMenuType) => {
+  console.log("准备修改菜单=>", data);
   return instance({
     url: "/system/menu",
     method: "PUT",

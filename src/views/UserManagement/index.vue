@@ -63,70 +63,72 @@
       <div
         ref="userListWrapper"
         class="userListWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
-        <el-table
-          ref="userTableRef"
-          :data="allUserList"
-          table-layout="auto"
-          header-cell-class-name="text-center"
-          row-class-name="bg-body"
-          cell-class-name="text-center"
-          class="bg-body rounded-4"
-          empty-text="暂无符合查询条件的系统账户"
-          row-key="userName"
-          @cell-click="cellClickFun"
-          @selection-change="selectionChange"
+        <div
           style="
             min-height: calc(100% + 1px) !important;
             padding: 1px 0 !important;
           ">
-          <el-table-column type="selection" width="30" />
-          <el-table-column label="序号" type="index" width="55" />
-          <el-table-column prop="userId" label="ID" />
-          <el-table-column prop="userName" label="账号名称" />
-          <el-table-column prop="nickName" label="部门主体" />
-          <el-table-column prop="status" label="状态">
-            <template #default="scope">
-              <span
-                :class="[
-                  'rounded-1 border px-1',
-                  scope.row.status == 0
-                    ? 'border-success text-success'
-                    : 'border-danger text-danger',
-                ]">
-                {{ scope.row.status == 0 ? "正常" : "停用" }}
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="email" label="邮箱" />
-          <el-table-column prop="phoneNumber" label="电话" />
-          <el-table-column prop="createBy" label="创建者" />
-          <el-table-column prop="createTime" label="创建时间" />
-          <el-table-column>
-            <template #header>
-              <div class="d-flex align-items-center justify-content-center">
-                跳至<el-input-number
-                  :disabled="pagesNum === -1"
-                  size="small"
-                  v-model="page"
-                  :min="1"
-                  :max="pagesNum === -1 ? 1 : pagesNum"
-                  @change="jumpPage"
-                  style="width: 75px" />/{{ pagesNum }}页
-              </div>
-            </template>
-            <template #default>
-              <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
-            </template>
-          </el-table-column>
-          <el-table-column>
-            <template #header>
-              <el-button @click="addUserDialog">添加账号</el-button>
-            </template>
-            <template #default>
-              <fontIcon icon="bi bi-trash fs-6 text-danger" role="button" />
-            </template>
-          </el-table-column>
-        </el-table>
+          <el-table
+            ref="userTableRef"
+            :data="allUserList"
+            table-layout="auto"
+            header-cell-class-name="text-center"
+            row-class-name="bg-body"
+            cell-class-name="text-center"
+            class="bg-body rounded-4"
+            empty-text="暂无符合查询条件的系统账户"
+            row-key="userName"
+            @cell-click="cellClickFun"
+            @selection-change="selectionChange">
+            <el-table-column type="selection" width="30" />
+            <el-table-column label="序号" type="index" width="55" />
+            <el-table-column prop="userId" label="ID" />
+            <el-table-column prop="userName" label="账号名称" />
+            <el-table-column prop="nickName" label="部门主体" />
+            <el-table-column prop="status" label="状态">
+              <template #default="scope">
+                <span
+                  :class="[
+                    'rounded-1 border px-1',
+                    scope.row.status == 0
+                      ? 'border-success text-success'
+                      : 'border-danger text-danger',
+                  ]">
+                  {{ scope.row.status == 0 ? "正常" : "停用" }}
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="email" label="邮箱" />
+            <el-table-column prop="phoneNumber" label="电话" />
+            <el-table-column prop="createBy" label="创建者" />
+            <el-table-column prop="createTime" label="创建时间" />
+            <el-table-column>
+              <template #header>
+                <div class="d-flex align-items-center justify-content-center">
+                  跳至<el-input-number
+                    :disabled="pagesNum === -1"
+                    size="small"
+                    v-model="page"
+                    :min="1"
+                    :max="pagesNum === -1 ? 1 : pagesNum"
+                    @change="jumpPage"
+                    style="width: 75px" />/{{ pagesNum }}页
+                </div>
+              </template>
+              <template #default>
+                <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
+              </template>
+            </el-table-column>
+            <el-table-column>
+              <template #header>
+                <el-button @click="addUserDialog">添加账号</el-button>
+              </template>
+              <template #default>
+                <fontIcon icon="bi bi-trash fs-6 text-danger" role="button" />
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
       </div>
     </div>
     <!-- 弹出对话框 -->
@@ -198,7 +200,7 @@
           v-else
           @click="editUserFun(dialogFromRef)"
           :loading="waitEditUser"
-          >确认修改</el-button
+          >确认修改 ID:{{ userInfoForm.userId }}</el-button
         >
       </div>
     </el-dialog>
@@ -234,7 +236,7 @@
   import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
   import { onMounted, reactive, ref, nextTick } from "vue";
   import { userType } from "@/type/index";
-  import { ceil, throttle } from "lodash"; //lodash按需引入减少打包体积
+  import { ceil, throttle, cloneDeep } from "lodash"; //lodash按需引入减少打包体积
   import BScroll from "@better-scroll/core";
   import Pullup from "@better-scroll/pull-up"; //上拉懒加载
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
@@ -325,8 +327,9 @@
       }
     )
       .then(() => {
-        dialogFromRef.value?.resetFields();
         done();
+        // dialogFromRef.value?.clearValidate();
+        // dialogFromRef.value?.resetFields();
         ElMessage({
           type: "info",
           message: `放弃${dialogTitle.value.slice(0, 2)}`,
@@ -369,7 +372,7 @@
 
   // 添加/修改--------------------------------
   const dialogFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
-  const userInfoForm = reactive({
+  const defaultUserInfo: userType = {
     businessId: "", //商户
     userName: "", //账号
     email: "", //绑定邮箱
@@ -377,7 +380,8 @@
     nickName: "", //部门主体名称(账号名称)
     password: "", //密码。
     userId: -1,
-  });
+  };
+  let userInfoForm = reactive(defaultUserInfo);
   const rules = reactive({
     userName: [
       { required: true, message: "请输入账号", trigger: "blur" },
@@ -450,6 +454,7 @@
 
   //添加用户-------------------------------------
   let addUserDialog = () => {
+    userInfoForm = reactive(defaultUserInfo);
     dialogVisible.value = true;
     isAddUser.value = true;
     dialogTitle.value = "添加用户";
@@ -477,16 +482,10 @@
 
   //修改用户--------------------------------------
   let editUserDialog = (user: userType) => {
+    userInfoForm = reactive(cloneDeep(user));
     dialogVisible.value = true;
     isAddUser.value = false;
     dialogTitle.value = "修改用户";
-    userInfoForm.userName = user.userName;
-    userInfoForm.businessId = user.businessId + "";
-    userInfoForm.email = user.email;
-    userInfoForm.nickName = user.nickName;
-    userInfoForm.phoneNumber = user.phoneNumber;
-    userInfoForm.password = user.password + "";
-    userInfoForm.userId = user.userId! + 0;
   };
   let waitEditUser = ref(false);
   let editUserFun = async (formEl: FormInstance | undefined) => {
