@@ -11,3 +11,11 @@
     <h1>RoleManagement</h1>
   </div>
 </template>
+<script lang="ts" setup>
+  import { getRoleList } from "@/api/RoleManagement";
+  const getRoleListFun = async () => {
+    let res = await getRoleList();
+    console.log(res);
+  };
+  getRoleListFun();
+</script>

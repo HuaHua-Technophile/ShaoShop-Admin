@@ -65,3 +65,5 @@ export type roleMenuType = {
   path: string;
   visible: number;
 };
+// 角色类型
+export type roleTpye = {};
