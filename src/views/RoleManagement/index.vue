@@ -22,18 +22,25 @@
               <el-descriptions-item label="角色ID">{{
                 i.roleId
               }}</el-descriptions-item>
+              <el-descriptions-item label="权限范围">{{
+                i.createTime || "暂无"
+              }}</el-descriptions-item>
               <el-descriptions-item label="角色Key">{{
                 i.roleKey || "暂无"
               }}</el-descriptions-item>
               <el-descriptions-item label="角色排序">{{
                 i.roleSort || "暂无"
               }}</el-descriptions-item>
-              <el-descriptions-item label="管理员">{{
-                i.admin ? "是" : "否"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="状态">{{
-                i.status
-              }}</el-descriptions-item>
+              <el-descriptions-item label="管理员">
+                <el-tag :type="i.admin ? 'success' : 'info'">{{
+                  i.admin ? "是" : "否"
+                }}</el-tag>
+              </el-descriptions-item>
+              <el-descriptions-item label="状态">
+                <el-tag :type="i.status == 0 ? 'success' : 'danger'">{{
+                  i.status == 0 ? "正常" : "停用"
+                }}</el-tag>
+              </el-descriptions-item>
               <el-descriptions-item label="所属商户id">{{
                 i.businessId || "暂无"
               }}</el-descriptions-item>
@@ -49,15 +56,17 @@
               <el-descriptions-item label="最后更新时间">{{
                 i.updateTime || "暂无"
               }}</el-descriptions-item>
-              <el-descriptions-item label="dataScope">{{
-                i.createTime || "暂无"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="是否严格校验菜单">{{
-                i.menuCheckStrictly ? "是" : "否"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="是否严格校验商户">{{
-                i.companyCheckStrictly ? "是" : "否"
-              }}</el-descriptions-item>
+
+              <el-descriptions-item label="菜单树选择项是否关联显示">
+                <el-tag :type="i.menuCheckStrictly ? 'success' : 'info'">{{
+                  i.menuCheckStrictly ? "是" : "否"
+                }}</el-tag>
+              </el-descriptions-item>
+              <el-descriptions-item label="公司树选择项是否关联显示">
+                <el-tag :type="i.companyCheckStrictly ? 'success' : 'info'">{{
+                  i.companyCheckStrictly ? "是" : "否"
+                }}</el-tag>
+              </el-descriptions-item>
               <el-descriptions-item label="备注">{{
                 i.remark || "暂无"
               }}</el-descriptions-item>
@@ -77,7 +86,6 @@
         icon="bi bi-plus-circle "
         style="font-size: 1.5rem; text-shadow: 2px 2px 4px black" />
     </div>
-    <!-- 添加/修改角色对话框 -->
     <!-- 添加/修改弹窗 -->
     <el-dialog
       :title="dialogTitle"
@@ -96,31 +104,21 @@
             :prefix-icon="renderFontIcon('bi bi-123')">
           </el-input>
         </el-form-item>
-        <el-form-item label="对应商户" prop="businessId">
+        <el-form-item
+          label="对应商户"
+          prop="businessId"
+          style="padding-left: 10.18px">
           <el-input
             clearable
             v-model="roleInfoForm.businessId"
-            placeholder="商户ID"
+            placeholder="商户ID,不填写则为管理员角色"
             :prefix-icon="renderFontIcon('bi bi-shop-window')">
           </el-input>
         </el-form-item>
-        <el-form-item label="数据范围" prop="dataScope">
-          <el-input
-            clearable
-            v-model="roleInfoForm.dataScope"
-            placeholder="数据范围"
-            :prefix-icon="renderFontIcon('bi bi-shop-window')">
-          </el-input>
-        </el-form-item>
-        <el-form-item label="角色排序" prop="roleSort">
-          <el-input
-            clearable
-            v-model="roleInfoForm.roleSort"
-            placeholder="角色排序"
-            :prefix-icon="renderFontIcon('bi bi-sort-alpha-down')">
-          </el-input>
-        </el-form-item>
-        <el-form-item label="角色备注" prop="remark">
+        <el-form-item
+          label="角色备注"
+          prop="remark"
+          style="padding-left: 10.18px">
           <el-input
             clearable
             v-model="roleInfoForm.remark"
@@ -128,19 +126,43 @@
             :prefix-icon="renderFontIcon('bi bi-bookmark')">
           </el-input>
         </el-form-item>
-        <el-form-item label="是否管理" style="padding-left: 10.18px">
-          <el-radio-group v-model="roleInfoForm.admin">
-            <el-radio :label="true" size="large">是</el-radio>
-            <el-radio :label="false" size="large">否</el-radio>
-          </el-radio-group>
+        <el-form-item
+          label="权限标识"
+          prop="roleKey"
+          style="padding-left: 10.18px">
+          <el-input
+            clearable
+            v-model="roleInfoForm.roleKey"
+            placeholder="权限标识"
+            :prefix-icon="renderFontIcon('bi bi-key')">
+          </el-input>
         </el-form-item>
-        <el-form-item label="校验商户" style="padding-left: 10.18px">
+        <el-form-item
+          label="权限范围"
+          prop="dataScope"
+          style="padding-left: 10.18px">
+          <el-input-number v-model="roleInfoForm.dataScope" :min="1" :max="5" />
+        </el-form-item>
+        <el-form-item
+          label="角色排序"
+          prop="roleSort"
+          style="padding-left: 10.18px">
+          <el-input-number
+            v-model="roleInfoForm.roleSort"
+            :min="0"
+            :max="999" />
+        </el-form-item>
+        <el-form-item
+          label="公司树选择项关联显示"
+          style="padding-left: 10.18px">
           <el-radio-group v-model="roleInfoForm.companyCheckStrictly">
             <el-radio :label="true" size="large">是</el-radio>
             <el-radio :label="false" size="large">否</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="校验菜单" style="padding-left: 10.18px">
+        <el-form-item
+          label="菜单树选择项关联显示"
+          style="padding-left: 10.18px">
           <el-radio-group v-model="roleInfoForm.menuCheckStrictly">
             <el-radio :label="true" size="large">是</el-radio>
             <el-radio :label="false" size="large">否</el-radio>
@@ -210,13 +232,12 @@
   const dialogFormRef = ref<FormInstance>();
   const defaultRoleInfo: roleType = {
     roleName: "",
-    admin: false,
     businessId: "",
     companyCheckStrictly: false,
-    dataScope: "",
+    dataScope: 5,
     menuCheckStrictly: false,
     remark: "",
-    roleSort: "",
+    roleSort: 0,
     status: 0,
   };
   let roleInfoForm = reactive(defaultRoleInfo);

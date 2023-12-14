@@ -68,18 +68,18 @@ export type roleMenuType = {
 // 角色类型
 export type roleType = {
   roleName: string; //角色名称
-  admin: boolean; //是否是超级管理员
+  admin?: boolean; //是否是超级管理员
   businessId: string; //商户id
-  companyCheckStrictly: boolean; //是否严格校验商户
+  companyCheckStrictly: boolean; //公司树选择项是否关联显示
   createBy?: string; //创建者
   createTime?: string; //创建时间
-  dataScope: string; //数据范围
-  menuCheckStrictly: boolean; //是否严格校验菜单
+  dataScope: number; //权限范围 1=所有数据权限,2=自定义数据权限,3=本部门数据权限,4=本部门及以下数据权限,5=仅本人数据权限
+  menuCheckStrictly: boolean; //菜单树选择项是否关联显示
   remark: string; //备注
   roleId?: number; //角色id
-  roleKey?: string; //角色key
-  roleSort: string; //角色排序
-  status: number; //角色状态
+  roleKey?: string; //角色权限字符串
+  roleSort: number; //角色排序
+  status: number; //角色状态 0正常 1停用
   updateBy?: string; //最后更新者
   updateTime?: string; //最后更新时间
 };
