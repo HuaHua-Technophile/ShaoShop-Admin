@@ -191,16 +191,12 @@
       </el-form>
       <div class="d-flex justify-content-center">
         <el-button
-          v-if="dialogTitle == '添加用户'"
-          @click="addUserFun(dialogFromRef)"
-          :loading="waitAddUser"
-          >确认添加</el-button
-        >
-        <el-button
-          v-else
-          @click="editUserFun(dialogFromRef)"
-          :loading="waitEditUser"
-          >确认修改 ID:{{ userInfoForm.userId }}</el-button
+          @click="addOrEditUserFun(dialogFromRef)"
+          :loading="waitAddOrEditUser"
+          >确认{{ dialogTitle.slice(0, 2)
+          }}<span v-if="!isAddUser"
+            >ID: {{ userInfoForm.userId }}</span
+          ></el-button
         >
       </div>
     </el-dialog>
@@ -230,7 +226,7 @@
     getUserList,
     addUser,
     editUser,
-    deleteUser,
+    delUser,
   } from "@/api/UserManagementAPI.ts";
   import { renderFontIcon } from "@/utils/fontIcon/renderFontIcon";
   import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
@@ -311,38 +307,6 @@
     );
   });
 
-  //dialog弹出框-----------------------
-  const dialogVisible = ref(false);
-  const dialogTitle = ref("添加用户");
-  const isAddUser = ref(true);
-  let closeConfirm = (done: () => void) => {
-    ElMessageBox.confirm(
-      `"确认放弃${dialogTitle.value}吗?所填内容将会被清空"`,
-      {
-        confirmButtonText: "是的",
-        cancelButtonText: "取消",
-        type: "warning",
-        draggable: true,
-        customClass: "rounded",
-      }
-    )
-      .then(() => {
-        done();
-        // dialogFromRef.value?.clearValidate();
-        // dialogFromRef.value?.resetFields();
-        ElMessage({
-          type: "info",
-          message: `放弃${dialogTitle.value.slice(0, 2)}`,
-        });
-      })
-      .catch(() => {
-        ElMessage({
-          type: "info",
-          message: `继续${dialogTitle.value.slice(0, 2)}`,
-        });
-      });
-  };
-
   //表格点击回调-------------
   let cellClickFun = (
     row: userType,
@@ -354,7 +318,7 @@
     cell;
     if (event.target.className.includes("bi-pencil-square"))
       editUserDialog(row);
-    if (event.target.className.includes("bi-trash")) deleteUserFun(row);
+    if (event.target.className.includes("bi-trash")) delUserFun(row);
   };
   //表格跳页-----------------
   let hoverBtnVisible = ref(false);
@@ -370,7 +334,7 @@
     bs?.scrollTo(0, -(itemHeight.value! * 20 * (page.value - 1)), 500);
   };
 
-  // 添加/修改--------------------------------
+  //表单-----------------------
   const dialogFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const defaultUserInfo: userType = {
     businessId: "", //商户
@@ -452,34 +416,46 @@
     ],
   });
 
-  //添加用户-------------------------------------
+  //dialog弹出框-----------------------
+  const dialogVisible = ref(false);
+  const dialogTitle = ref("添加用户");
+  const isAddUser = ref(true);
+  const waitAddOrEditUser = ref(false);
+  let closeConfirm = (done: () => void) => {
+    ElMessageBox.confirm(
+      `"确认放弃${dialogTitle.value}吗?所填内容将会被清空"`,
+      {
+        confirmButtonText: "是的",
+        cancelButtonText: "取消",
+        type: "warning",
+        draggable: true,
+        customClass: "rounded",
+      }
+    )
+      .then(() => {
+        done();
+        // dialogFromRef.value?.clearValidate();
+        // dialogFromRef.value?.resetFields();
+        ElMessage({
+          type: "info",
+          message: `放弃${dialogTitle.value.slice(0, 2)}`,
+        });
+      })
+      .catch(() => {
+        ElMessage({
+          type: "info",
+          message: `继续${dialogTitle.value.slice(0, 2)}`,
+        });
+      });
+  };
+
+  // 添加/修改用户--------------------------------
   let addUserDialog = () => {
-    userInfoForm = reactive(defaultUserInfo);
+    userInfoForm = reactive(cloneDeep(defaultUserInfo));
     dialogVisible.value = true;
     isAddUser.value = true;
     dialogTitle.value = "添加用户";
   };
-  let waitAddUser = ref(false);
-  const addUserFun = async (formEl: FormInstance | undefined) => {
-    // 先进行表单验证
-    if (!formEl) return;
-    await formEl.validate(async (valid, fields) => {
-      if (valid) {
-        waitAddUser.value = true;
-        let res = await addUser(userInfoForm);
-        // console.log("添加用户回调=>", res);
-        if (res.code === 200) {
-          ElMessage.success("添加成功");
-          allUserList.value = [];
-          getUserListFun(); //重新请求数据进行用户列表渲染
-          // dialogVisible.value = false; //隐藏弹出框
-          // formEl.resetFields(); //重置表单
-        } else ElMessage.error(res.message);
-        waitAddUser.value = false;
-      } else console.log("error submit!", fields);
-    });
-  };
-
   //修改用户--------------------------------------
   let editUserDialog = (user: userType) => {
     userInfoForm = reactive(cloneDeep(user));
@@ -487,22 +463,22 @@
     isAddUser.value = false;
     dialogTitle.value = "修改用户";
   };
-  let waitEditUser = ref(false);
-  let editUserFun = async (formEl: FormInstance | undefined) => {
+  const addOrEditUserFun = async (formEl: FormInstance | undefined) => {
     // 先进行表单验证
     if (!formEl) return;
     await formEl.validate(async (valid, fields) => {
       if (valid) {
-        waitEditUser.value = true;
-        let res = await editUser(userInfoForm);
+        waitAddOrEditUser.value = true;
+        let res;
+        if (isAddUser.value) res = await addUser(userInfoForm);
+        else res = await editUser(userInfoForm);
         if (res.code === 200) {
-          ElMessage.success("修改成功");
+          ElMessage.success("添加成功");
           allUserList.value = [];
           getUserListFun(); //重新请求数据进行用户列表渲染
-          dialogVisible.value = false; //隐藏弹出框
-          formEl.resetFields(); //重置表单
+          // dialogVisible.value = false; //隐藏弹出框
         } else ElMessage.error(res.message);
-        waitEditUser.value = false;
+        waitAddOrEditUser.value = false;
       } else console.log("error submit!", fields);
     });
   };
@@ -550,7 +526,7 @@
       return i.userId;
     });
   };
-  let deleteUserFun = (user: userType) => {
+  let delUserFun = (user: userType) => {
     userTableRef.value.toggleRowSelection(user, true);
     ElMessageBox.confirm(
       `确认要删除勾选的${userIdList.value.length}个用户吗?`,
@@ -563,7 +539,7 @@
       }
     )
       .then(async () => {
-        let res = await deleteUser(userIdList.value);
+        let res = await delUser(userIdList.value);
         if (res.code === 200) {
           ElMessage.success("删除成功");
           allUserList.value = [];
