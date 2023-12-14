@@ -6,3 +6,9 @@ export const getRoleList = () => {
     method: "GET",
   });
 };
+export const deleteRole = (roleIds: number) => {
+  return instance({
+    url: "/system/role/" + roleIds,
+    method: "DELETE",
+  });
+};

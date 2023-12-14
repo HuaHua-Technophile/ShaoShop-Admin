@@ -66,4 +66,20 @@ export type roleMenuType = {
   visible: number;
 };
 // 角色类型
-export type roleTpye = {};
+export type roleTpye = {
+  roleName: string; //角色名称
+  admin: boolean; //是否是超级管理员
+  businessId: string; //商户id
+  companyCheckStrictly: boolean; //是否严格校验商户
+  createBy: string; //创建者
+  createTime: string; //创建时间
+  dataScope: string; //数据范围
+  menuCheckStrictly: boolean; //是否严格校验菜单
+  remark: string; //备注
+  roleId: number; //角色id
+  roleKey: string; //角色key
+  roleSort: string; //角色排序
+  status: number; //角色状态
+  updateBy: string; //最后更新者
+  updateTime: string; //最后更新时间
+};

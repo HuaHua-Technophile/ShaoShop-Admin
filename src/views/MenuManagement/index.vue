@@ -384,7 +384,7 @@
   import BScroll from "@better-scroll/core";
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
-  import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
+  import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //bs类型
   import { nextTick, onMounted, onUnmounted, reactive, ref } from "vue";
   import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
   import { storeToRefs } from "pinia";
