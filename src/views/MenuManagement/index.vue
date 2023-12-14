@@ -268,7 +268,7 @@
       class="rounded-4"
       draggable
       center>
-      <el-form :model="menuInfoForm" ref="dialogFromRef" :rules="rules">
+      <el-form :model="menuInfoForm" ref="dialogFormRef" :rules="rules">
         <el-form-item label="菜单名称" prop="menuName">
           <el-input
             clearable
@@ -357,16 +357,12 @@
       </el-form>
       <div class="d-flex justify-content-center">
         <el-button
-          v-if="dialogTitle == '添加菜单'"
-          @click="addMenuFun(dialogFromRef)"
-          :loading="waitAddMenu"
-          >确认添加</el-button
-        >
-        <el-button
-          v-else
-          @click="editMenuFun(dialogFromRef)"
-          :loading="waitAddMenu"
-          >确认修改菜单 ID:{{ menuInfoForm.menuId }}</el-button
+          @click="addOrEditMenuFun(dialogFormRef)"
+          :loading="waitAddOrEditMenu"
+          >确认{{ dialogTitle.slice(0, 2)
+          }}<span v-if="!isAddMenu"
+            >ID: {{ menuInfoForm.menuId }}</span
+          ></el-button
         >
       </div>
     </el-dialog>
@@ -428,37 +424,23 @@
     });
   });
 
-  //dialog弹出框--------------------
-  const menuDialogVisible = ref(false);
-  const dialogTitle = ref("添加菜单");
-  // const isAddMenu = ref(true);
-  let closeConfirm = (done: () => void) => {
-    ElMessageBox.confirm(`确认放弃${dialogTitle.value}吗?所填内容将会清空`, {
-      confirmButtonText: "是的",
-      cancelButtonText: "取消",
-      type: "warning",
-      draggable: true,
-      customClass: "rounded",
-    })
-      .then(() => {
-        done();
-        // dialogFromRef.value?.resetFields();
-        // dialogFromRef.value?.clearValidate();
-        ElMessage({
-          type: "info",
-          message: `放弃${dialogTitle.value.slice(0, 2)}`,
-        });
-      })
-      .catch(() => {
-        ElMessage({
-          type: "info",
-          message: `继续${dialogTitle.value.slice(0, 2)}`,
-        });
-      });
+  //表格点击回调-------------
+  let cellClickFun = async (
+    row: roleMenuType,
+    column: any,
+    cell: any,
+    event: { target: HTMLElement }
+  ) => {
+    column;
+    cell;
+    if (event.target.className.includes("bi-pencil-square"))
+      editMenuDialog(row);
+    if (event.target.className.includes("bi-trash"))
+      delMenuFun(row.menuId!, row.menuName);
   };
 
-  // dialog表单---------------------
-  const dialogFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  // 表单---------------------
+  const dialogFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const defaultMenuInfo: roleMenuType = {
     icon: "", // 菜单图标
     isFrame: 1, //是否为外链（0是 1否）
@@ -489,81 +471,65 @@
     ],
   });
 
-  //添加菜单------------------------
-  const waitAddMenu = ref(false);
+  //dialog弹出框--------------------
+  const menuDialogVisible = ref(false);
+  const dialogTitle = ref("添加菜单");
+  const waitAddOrEditMenu = ref(false);
+  const isAddMenu = ref(true);
+  let closeConfirm = (done: () => void) => {
+    ElMessageBox.confirm(`确认放弃${dialogTitle.value}吗?所填内容将会清空`, {
+      confirmButtonText: "是的",
+      cancelButtonText: "取消",
+      type: "warning",
+      draggable: true,
+      customClass: "rounded",
+    })
+      .then(() => {
+        done();
+        // dialogFormRef.value?.resetFields();
+        // dialogFormRef.value?.clearValidate();
+        ElMessage({
+          type: "info",
+          message: `放弃${dialogTitle.value.slice(0, 2)}`,
+        });
+      })
+      .catch(() => {
+        ElMessage({
+          type: "info",
+          message: `继续${dialogTitle.value.slice(0, 2)}`,
+        });
+      });
+  };
+
+  //添加/修改菜单------------------------
   const addMenuDialog = () => {
-    /* menuInfoForm.icon = ""; // 菜单图标
-      menuInfoForm.isFrame = 1; //是否为外链（0是 1否）
-      menuInfoForm.menuName = ""; //菜单名称
-      menuInfoForm.menuType = "C"; //菜单类型（M目录 C菜单 F按钮）
-      menuInfoForm.orderNum = 0; //显示排序
-      menuInfoForm.parentId = 0; //父菜单Id
-      menuInfoForm.path = ""; //路由地址
-      menuInfoForm.status = 0; //菜单状态（0正常 1停用）
-      menuInfoForm.visible = 0; //菜单状态（0显示 1隐藏） */
-    menuInfoForm = reactive(defaultMenuInfo);
+    menuInfoForm = reactive(cloneDeep(defaultMenuInfo));
     menuDialogVisible.value = true;
+    isAddMenu.value = true;
     dialogTitle.value = "添加菜单";
   };
-  const addMenuFun = async (formEl: FormInstance | undefined) => {
+  const editMenuDialog = (menu: roleMenuType) => {
+    menuInfoForm = reactive(cloneDeep(menu));
+    menuDialogVisible.value = true;
+    isAddMenu.value = false;
+    dialogTitle.value = "修改菜单";
+  };
+  const addOrEditMenuFun = async (formEl: FormInstance | undefined) => {
     // 先进行表单验证
     if (!formEl) return;
     await formEl.validate(async (valid, fields) => {
       if (valid) {
-        waitAddMenu.value = true;
-        let res = await addMenu(menuInfoForm); //menuInfoForm里暂时不包含id
-        /* code500
-            message: "修改菜单失败，菜单已存在" */
-        console.log(res);
+        waitAddOrEditMenu.value = true;
+        let res;
+        if (isAddMenu.value) res = await addMenu(menuInfoForm);
+        else res = await editMenu(menuInfoForm);
         if (res.code == 200) {
           getMenuListFun();
           // menuDialogVisible.value = false; //隐藏弹出框
         } else {
           ElMessage.error(res.message);
         }
-        waitAddMenu.value = false;
-      } else console.log("error submit!", fields);
-    });
-  };
-
-  //表格点击回调-------------
-  let cellClickFun = async (
-    row: roleMenuType,
-    column: any,
-    cell: any,
-    event: { target: HTMLElement }
-  ) => {
-    column;
-    cell;
-    if (event.target.className.includes("bi-pencil-square"))
-      editMenuDialog(row);
-    if (event.target.className.includes("bi-trash"))
-      delMenuFun(row.menuId!, row.menuName);
-  };
-
-  // 修改菜单
-  const waitEditMenu = ref(false);
-  const editMenuDialog = (menu: roleMenuType) => {
-    menuInfoForm = reactive(cloneDeep(menu));
-    menuDialogVisible.value = true;
-    dialogTitle.value = "修改菜单";
-  };
-  const editMenuFun = async (formEl: FormInstance | undefined) => {
-    // 先进行表单验证
-    if (!formEl) return;
-    await formEl.validate(async (valid, fields) => {
-      if (valid) {
-        waitEditMenu.value = true;
-        let res = await editMenu(menuInfoForm);
-        console.log(res);
-        if (res.code == 200) {
-          ElMessage.success(res.message);
-          getMenuListFun();
-          menuDialogVisible.value = false; //隐藏弹出框
-        } else {
-          ElMessage.error(res.message);
-        }
-        waitEditMenu.value = false;
+        waitAddOrEditMenu.value = false;
       } else console.log("error submit!", fields);
     });
   };
