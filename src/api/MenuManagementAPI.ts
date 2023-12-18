@@ -1,7 +1,7 @@
 import instance from "./instance";
 import { roleMenuType } from "@/type/index";
 export const getMenuList = () => {
-  return instance({
+  return instance<roleMenuType[]>({
     url: "/system/menu/list",
     method: "GET",
   });

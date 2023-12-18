@@ -115,6 +115,7 @@
             :prefix-icon="renderFontIcon('bi bi-shop-window')">
           </el-input>
         </el-form-item>
+
         <el-form-item
           label="角色备注"
           prop="remark"
@@ -126,6 +127,7 @@
             :prefix-icon="renderFontIcon('bi bi-bookmark')">
           </el-input>
         </el-form-item>
+
         <el-form-item
           label="权限标识"
           prop="roleKey"
@@ -137,6 +139,7 @@
             :prefix-icon="renderFontIcon('bi bi-key')">
           </el-input>
         </el-form-item>
+
         <el-form-item
           label="权限范围"
           prop="dataScope"
@@ -175,6 +178,8 @@
           </el-radio-group>
         </el-form-item>
       </el-form>
+      <el-tree-select v-model="id" :data="menuTreeList" show-checkbox>
+      </el-tree-select>
       <div class="d-flex justify-content-center">
         <el-button
           @click="addOrEditRoleFun(dialogFormRef)"
@@ -196,12 +201,13 @@
     addRole,
     editRole,
   } from "@/api/RoleManagement";
+  import { getMenuTreeList } from "@/api/MenuManagementAPI";
   import BScroll from "@better-scroll/core";
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //bs类型
   import { nextTick, onMounted, reactive, ref } from "vue";
-  import { roleType } from "@/type";
+  import { roleType, treeListType } from "@/type";
   import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
   import { cloneDeep } from "lodash";
 
@@ -253,6 +259,8 @@
   const dialogTitle = ref("添加角色");
   const waitAddOrEditRole = ref(false);
   const isAddRole = ref(true);
+
+  const menuTreeList = ref<treeListType[]>([]);
   let closeConfirm = (done: () => void) => {
     ElMessageBox.confirm(`确认放弃${dialogTitle.value}吗?所填内容将会清空`, {
       confirmButtonText: "是的",
@@ -279,11 +287,16 @@
   };
 
   //添加/修改角色-----------------------
-  const addRoleDialog = () => {
+  const addRoleDialog = async () => {
     roleInfoForm = reactive(cloneDeep(defaultRoleInfo));
     isAddRole.value = true;
     roleDialogVisible.value = true;
     dialogTitle.value = "添加角色";
+    let res = await getMenuTreeList();
+    if (res.code == 200) {
+      console.log("获取的菜单树=>", res.data);
+      menuTreeList.value = res.data;
+    }
   };
   const editRoleDialog = (role: roleType) => {
     roleInfoForm = reactive(cloneDeep(role));

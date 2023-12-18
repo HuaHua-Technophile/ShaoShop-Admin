@@ -65,6 +65,12 @@ export type roleMenuType = {
   path: string;
   visible: number;
 };
+
+export type treeListType = {
+  id: number;
+  label: string;
+  children?: treeListType[];
+};
 // 角色类型
 export type roleType = {
   roleName: string; //角色名称
