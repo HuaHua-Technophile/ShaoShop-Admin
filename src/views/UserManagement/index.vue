@@ -87,15 +87,9 @@
             <el-table-column prop="nickName" label="部门主体" />
             <el-table-column prop="status" label="状态">
               <template #default="scope">
-                <span
-                  :class="[
-                    'rounded-1 border px-1',
-                    scope.row.status == 0
-                      ? 'border-success text-success'
-                      : 'border-danger text-danger',
-                  ]">
-                  {{ scope.row.status == 0 ? "正常" : "停用" }}
-                </span>
+                <el-tag :type="scope.row.status == 0 ? 'success' : 'danger'">{{
+                  scope.row.status == 0 ? "正常" : "停用"
+                }}</el-tag>
               </template>
             </el-table-column>
             <el-table-column prop="email" label="邮箱" />

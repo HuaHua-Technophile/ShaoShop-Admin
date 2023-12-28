@@ -40,7 +40,7 @@ interface AxiosInstance extends Axios {
 
 // 创建axios初始化-----------------------
 const instance: AxiosInstance = axios.create({
-  baseURL: "http://192.168.1.40:8088", // 基本URL
+  baseURL: "http://192.168.1.14:8088", // 基本URL
   timeout: 30000, //超时时间
   headers: {
     "Content-Type": "application/json;charset=utf-8",

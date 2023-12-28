@@ -88,4 +88,6 @@ export type roleType = {
   status: number; //角色状态 0正常 1停用
   updateBy?: string; //最后更新者
   updateTime?: string; //最后更新时间
+  params?: string; //数据��限
+  menuIds?: number[]; //菜单id集合
 };

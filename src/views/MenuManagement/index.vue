@@ -30,7 +30,9 @@
                   <div>isCache：{{ props.row.isCache }}</div>
                   <div>权限标识：{{ props.row.perms }}</div>
                   <div>路由参数：{{ props.row.query }}</div>
-                  <div class="col-12">备注：{{ props.row.remark }}</div>
+                  <div class="col-12" v-if="props.row.remark">
+                    备注：{{ props.row.remark }}
+                  </div>
                 </div>
                 <!-- 内层表格 -->
                 <div v-if="props.row.children.length > 0" class="px-3">
@@ -67,7 +69,7 @@
                             <div>isCache：{{ props2.row.isCache }}</div>
                             <div>权限标识：{{ props2.row.perms }}</div>
                             <div>路由参数：{{ props2.row.query }}</div>
-                            <div class="col-12">
+                            <div class="col-12" v-if="props2.row.remark">
                               备注：{{ props2.row.remark }}
                             </div>
                           </div>
@@ -92,62 +94,53 @@
                       <el-table-column label="排序" prop="orderNum" />
                       <el-table-column prop="status" label="状态">
                         <template #default="scope">
-                          <span
-                            :class="[
-                              'rounded-1 border px-1',
-                              scope.row.status == 0
-                                ? 'border-success text-success'
-                                : 'border-danger text-danger',
-                            ]">
-                            {{ scope.row.status == 0 ? "正常" : "停用" }}
-                          </span>
+                          <el-tag
+                            :type="scope.row.status == 0 ? 'success' : 'danger'"
+                            >{{
+                              scope.row.status == 0 ? "正常" : "停用"
+                            }}</el-tag
+                          >
                         </template>
                       </el-table-column>
                       <el-table-column prop="visible" label="显/隐">
                         <template #default="scope">
-                          <span
-                            :class="[
-                              'rounded-1 border px-1',
-                              scope.row.visible == 0
-                                ? 'border-success text-success'
-                                : 'border-2 text-body-secondary',
-                            ]">
-                            {{ scope.row.visible == 0 ? "显示" : "隐藏" }}
-                          </span>
+                          <el-tag
+                            :type="
+                              scope.row.visible == 0 ? 'success' : 'warning'
+                            "
+                            >{{
+                              scope.row.visible == 0 ? "显示" : "隐藏"
+                            }}</el-tag
+                          >
                         </template>
                       </el-table-column>
                       <el-table-column prop="isFrame" label="是否外链">
                         <template #default="scope">
-                          <span
-                            :class="[
-                              'rounded-1 border px-1',
-                              scope.row.isFrame == 0
-                                ? 'border-success text-success'
-                                : 'border-2 text-body-secondary',
-                            ]">
-                            {{ scope.row.isFrame == 0 ? "是" : "否" }}
-                          </span>
+                          <el-tag
+                            :type="scope.row.isFrame == 0 ? 'success' : 'info'"
+                            >{{ scope.row.isFrame == 0 ? "是" : "否" }}</el-tag
+                          >
                         </template>
                       </el-table-column>
                       <el-table-column prop="menuType" label="类型">
                         <template #default="scope">
-                          <span
-                            :class="[
-                              'rounded-1 border  px-1',
+                          <el-tag
+                            effect="dark"
+                            :type="
                               scope.row.menuType == 'M'
-                                ? 'border-primary text-primary-emphasis'
+                                ? ''
                                 : scope.row.menuType == 'C'
-                                ? 'border-warning text-warning-emphasis'
-                                : 'border-2 text-body-secondary',
-                            ]">
-                            {{
+                                ? 'success'
+                                : 'danger'
+                            "
+                            >{{
                               scope.row.menuType == "M"
                                 ? "目录"
                                 : scope.row.menuType == "C"
                                 ? "菜单"
                                 : "按钮"
-                            }}
-                          </span>
+                            }}</el-tag
+                          >
                         </template>
                       </el-table-column>
                       <el-table-column label="创建者" prop="createBy" />
@@ -187,62 +180,44 @@
           <el-table-column label="排序" prop="orderNum" />
           <el-table-column prop="status" label="状态">
             <template #default="scope">
-              <span
-                :class="[
-                  'rounded-1 border px-1',
-                  scope.row.status == 0
-                    ? 'border-success text-success'
-                    : 'border-danger text-danger',
-                ]">
-                {{ scope.row.status == 0 ? "正常" : "停用" }}
-              </span>
+              <el-tag :type="scope.row.status == 0 ? 'success' : 'danger'">{{
+                scope.row.status == 0 ? "正常" : "停用"
+              }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="visible" label="显/隐">
             <template #default="scope">
-              <span
-                :class="[
-                  'rounded-1 border px-1',
-                  scope.row.visible == 0
-                    ? 'border-success text-success'
-                    : 'border-2 text-body-secondary',
-                ]">
-                {{ scope.row.visible == 0 ? "显示" : "隐藏" }}
-              </span>
+              <el-tag :type="scope.row.visible == 0 ? 'success' : 'warning'">{{
+                scope.row.visible == 0 ? "显示" : "隐藏"
+              }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="isFrame" label="是否外链">
             <template #default="scope">
-              <span
-                :class="[
-                  'rounded-1 border px-1',
-                  scope.row.isFrame == 0
-                    ? 'border-success text-success'
-                    : 'border-2 text-body-secondary',
-                ]">
-                {{ scope.row.isFrame == 0 ? "是" : "否" }}
-              </span>
+              <el-tag :type="scope.row.isFrame == 0 ? 'success' : 'info'">{{
+                scope.row.isFrame == 0 ? "是" : "否"
+              }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="menuType" label="类型">
             <template #default="scope">
-              <span
-                :class="[
-                  'rounded-1 border  px-1',
+              <el-tag
+                effect="dark"
+                :type="
                   scope.row.menuType == 'M'
-                    ? 'border-primary text-primary-emphasis'
+                    ? ''
                     : scope.row.menuType == 'C'
-                    ? 'border-warning text-warning-emphasis'
-                    : 'border-2 text-body-secondary',
-                ]">
-                {{
+                    ? 'success'
+                    : 'danger'
+                "
+                >{{
                   scope.row.menuType == "M"
                     ? "目录"
                     : scope.row.menuType == "C"
                     ? "菜单"
                     : "按钮"
-                }}
-              </span>
+                }}</el-tag
+              >
             </template>
           </el-table-column>
           <el-table-column label="创建者" prop="createBy" />

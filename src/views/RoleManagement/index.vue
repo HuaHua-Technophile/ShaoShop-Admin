@@ -8,7 +8,8 @@
         ">
         <div class="bg-body p-3 rounded-4">
           <div v-for="(i, index) in roleList">
-            <el-descriptions :title="i.roleName">
+            <!-- 描述面板 -->
+            <el-descriptions :title="i.roleName" :column="4">
               <template #extra>
                 <fontIcon
                   icon="bi bi-pencil-square  fs-5 me-2"
@@ -22,20 +23,20 @@
               <el-descriptions-item label="角色ID">{{
                 i.roleId
               }}</el-descriptions-item>
-              <el-descriptions-item label="权限范围">{{
-                i.createTime || "暂无"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="角色Key">{{
+              <el-descriptions-item label="权限字符">{{
                 i.roleKey || "暂无"
+              }}</el-descriptions-item>
+              <el-descriptions-item label="权限范围">{{
+                i.dataScope || "暂无"
               }}</el-descriptions-item>
               <el-descriptions-item label="角色排序">{{
                 i.roleSort || "暂无"
               }}</el-descriptions-item>
-              <el-descriptions-item label="管理员">
+              <!-- <el-descriptions-item label="管理员">
                 <el-tag :type="i.admin ? 'success' : 'info'">{{
                   i.admin ? "是" : "否"
                 }}</el-tag>
-              </el-descriptions-item>
+              </el-descriptions-item> -->
               <el-descriptions-item label="状态">
                 <el-tag :type="i.status == 0 ? 'success' : 'danger'">{{
                   i.status == 0 ? "正常" : "停用"
@@ -50,13 +51,12 @@
               <el-descriptions-item label="创建时间">{{
                 i.createTime || "暂无"
               }}</el-descriptions-item>
-              <el-descriptions-item label="最后更新者">{{
-                i.updateBy || "暂无"
+              <el-descriptions-item label="最后更新者" v-if="i.updateBy">{{
+                i.updateBy
               }}</el-descriptions-item>
-              <el-descriptions-item label="最后更新时间">{{
-                i.updateTime || "暂无"
+              <el-descriptions-item label="最后更新时间" v-if="i.updateTime">{{
+                i.updateTime
               }}</el-descriptions-item>
-
               <el-descriptions-item label="菜单树选择项是否关联显示">
                 <el-tag :type="i.menuCheckStrictly ? 'success' : 'info'">{{
                   i.menuCheckStrictly ? "是" : "否"
@@ -67,10 +67,11 @@
                   i.companyCheckStrictly ? "是" : "否"
                 }}</el-tag>
               </el-descriptions-item>
-              <el-descriptions-item label="备注">{{
-                i.remark || "暂无"
+              <el-descriptions-item label="备注" v-if="i.remark">{{
+                i.remark
               }}</el-descriptions-item>
             </el-descriptions>
+            <!-- 分割线 -->
             <el-divider v-if="index < roleList!.length - 1" />
           </div>
         </div>
@@ -104,6 +105,14 @@
             :prefix-icon="renderFontIcon('bi bi-123')">
           </el-input>
         </el-form-item>
+        <el-form-item label="权限字符" prop="roleKey">
+          <el-input
+            clearable
+            v-model="roleInfoForm.roleKey"
+            placeholder="权限标识/权限字符"
+            :prefix-icon="renderFontIcon('bi bi-key')">
+          </el-input>
+        </el-form-item>
         <el-form-item
           label="对应商户"
           prop="businessId"
@@ -115,7 +124,6 @@
             :prefix-icon="renderFontIcon('bi bi-shop-window')">
           </el-input>
         </el-form-item>
-
         <el-form-item
           label="角色备注"
           prop="remark"
@@ -127,19 +135,6 @@
             :prefix-icon="renderFontIcon('bi bi-bookmark')">
           </el-input>
         </el-form-item>
-
-        <el-form-item
-          label="权限标识"
-          prop="roleKey"
-          style="padding-left: 10.18px">
-          <el-input
-            clearable
-            v-model="roleInfoForm.roleKey"
-            placeholder="权限标识"
-            :prefix-icon="renderFontIcon('bi bi-key')">
-          </el-input>
-        </el-form-item>
-
         <el-form-item
           label="权限范围"
           prop="dataScope"
@@ -178,7 +173,11 @@
           </el-radio-group>
         </el-form-item>
       </el-form>
-      <el-tree-select v-model="id" :data="menuTreeList" show-checkbox>
+      <el-tree-select
+        v-model="roleInfoForm.menuIds"
+        :data="menuTreeList"
+        show-checkbox
+        multiple>
       </el-tree-select>
       <div class="d-flex justify-content-center">
         <el-button
@@ -245,12 +244,18 @@
     remark: "",
     roleSort: 0,
     status: 0,
+    menuIds: [],
+    params: "",
   };
   let roleInfoForm = reactive(defaultRoleInfo);
   const rules = reactive({
     roleName: [
       { required: true, message: "请输入角色名称", trigger: "blur" },
       { min: 0, max: 12, message: "长度在12位以内", trigger: "blur" },
+    ],
+    roleKey: [
+      { required: true, message: "请输入权限字符", trigger: "blur" },
+      { min: 0, max: 20, message: "长度在20位以内", trigger: "blur" },
     ],
   });
 
@@ -259,8 +264,8 @@
   const dialogTitle = ref("添加角色");
   const waitAddOrEditRole = ref(false);
   const isAddRole = ref(true);
-
   const menuTreeList = ref<treeListType[]>([]);
+
   let closeConfirm = (done: () => void) => {
     ElMessageBox.confirm(`确认放弃${dialogTitle.value}吗?所填内容将会清空`, {
       confirmButtonText: "是的",
@@ -313,10 +318,10 @@
         let res;
         if (isAddRole.value) res = await addRole(roleInfoForm);
         else res = await editRole(roleInfoForm);
-        console.log(res);
+        console.log("添加角色结果=>", res);
         if (res.code == 200) {
           getRoleListFun();
-          //  .value = false; //隐藏弹出框
+          roleDialogVisible.value = false; //隐藏弹出框
         } else {
           ElMessage.error(res.message);
         }
@@ -325,7 +330,7 @@
     });
   };
 
-  // 删除角色
+  // 删除角色---------------------------------
   const delRoleFun = (roleId: number, roleName: string) => {
     ElMessageBox.confirm(`确认删除ID为 ${roleId} 的角色"${roleName}"吗?`, {
       confirmButtonText: "删除",
