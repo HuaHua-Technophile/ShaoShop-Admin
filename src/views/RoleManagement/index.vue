@@ -135,6 +135,16 @@
             :prefix-icon="renderFontIcon('bi bi-bookmark')">
           </el-input>
         </el-form-item>
+        <el-form-item label="关联菜单" style="padding-left: 10.18px">
+          <el-tree-select
+            v-model="roleInfoForm.menuIds"
+            :data="menuTreeList"
+            show-checkbox
+            multiple
+            collapse-tags
+            collapse-tags-tooltip>
+          </el-tree-select>
+        </el-form-item>
         <el-form-item
           label="权限范围"
           prop="dataScope"
@@ -173,12 +183,6 @@
           </el-radio-group>
         </el-form-item>
       </el-form>
-      <el-tree-select
-        v-model="roleInfoForm.menuIds"
-        :data="menuTreeList"
-        show-checkbox
-        multiple>
-      </el-tree-select>
       <div class="d-flex justify-content-center">
         <el-button
           @click="addOrEditRoleFun(dialogFormRef)"
@@ -200,7 +204,10 @@
     addRole,
     editRole,
   } from "@/api/RoleManagement";
-  import { getMenuTreeList } from "@/api/MenuManagementAPI";
+  import {
+    getMenuTreeList,
+    getRoleMenuTreeSelect,
+  } from "@/api/MenuManagementAPI";
   import BScroll from "@better-scroll/core";
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
@@ -300,14 +307,24 @@
     let res = await getMenuTreeList();
     if (res.code == 200) {
       console.log("获取的菜单树=>", res.data);
-      menuTreeList.value = res.data;
+      menuTreeList.value = [
+        { value: -1, label: "全部菜单", children: res.data },
+      ];
     }
   };
-  const editRoleDialog = (role: roleType) => {
+  const editRoleDialog = async (role: roleType) => {
     roleInfoForm = reactive(cloneDeep(role));
     roleDialogVisible.value = true;
     isAddRole.value = false;
     dialogTitle.value = "修改角色";
+    let res = await getRoleMenuTreeSelect(role.roleId!);
+    if (res.code == 200) {
+      console.log(`id${role.roleId}的菜单树=>`, res.data);
+      menuTreeList.value = [
+        { value: -1, label: "全部菜单", children: res.data.menus },
+      ];
+      roleInfoForm.menuIds = res.data.checkedKeys;
+    }
   };
   const addOrEditRoleFun = async (dialogFromRef: FormInstance | undefined) => {
     // 先进行表单验证

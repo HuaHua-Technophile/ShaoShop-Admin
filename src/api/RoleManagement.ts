@@ -6,6 +6,7 @@ export const getRoleList = () => {
     method: "GET",
   });
 };
+
 export const delRole = (roleIds: number) => {
   return instance({
     url: "/system/role/" + roleIds,
@@ -15,11 +16,11 @@ export const delRole = (roleIds: number) => {
 
 export const addRole = (data: roleType) => {
   console.log("尝试添加该角色=>", data);
-  /* return instance({
+  return instance({
     url: "/system/role",
     method: "POST",
     data,
-  }); */
+  });
 };
 
 export const editRole = (data: roleType) => {

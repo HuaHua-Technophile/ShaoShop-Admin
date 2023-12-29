@@ -1,5 +1,5 @@
 import instance from "./instance";
-import { roleMenuType } from "@/type/index";
+import { roleMenuType, treeListType } from "@/type/index";
 export const getMenuList = () => {
   return instance<roleMenuType[]>({
     url: "/system/menu/list",
@@ -7,11 +7,19 @@ export const getMenuList = () => {
   });
 };
 export const getMenuTreeList = () => {
-  return instance({
+  return instance<treeListType[]>({
     url: "/system/menu/treeList",
     method: "GET",
   });
 };
+
+export const getRoleMenuTreeSelect = (roleId: number) => {
+  return instance<{ checkedKeys: number[]; menus: treeListType[] }>({
+    url: `/system/menu/roleMenuTreeSelect/${roleId}`,
+    method: "GET",
+  });
+};
+
 export const addMenu = (data: roleMenuType) => {
   console.log("准备添加菜单=>", data);
   return instance({

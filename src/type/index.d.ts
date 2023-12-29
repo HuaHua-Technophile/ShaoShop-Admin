@@ -67,7 +67,7 @@ export type roleMenuType = {
 };
 
 export type treeListType = {
-  id: number;
+  value: number;
   label: string;
   children?: treeListType[];
 };
