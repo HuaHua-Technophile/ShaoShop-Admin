@@ -203,7 +203,7 @@
     delRole,
     addRole,
     editRole,
-  } from "@/api/RoleManagement";
+  } from "@/api/RoleManagementAPI";
   import {
     getMenuTreeList,
     getRoleMenuTreeSelect,
@@ -380,3 +380,4 @@
     }
   }
 </style>
+@/api/RoleManagementAPI

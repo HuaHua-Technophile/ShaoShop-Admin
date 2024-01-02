@@ -71,6 +71,7 @@ export type treeListType = {
   label: string;
   children?: treeListType[];
 };
+
 // 角色类型
 export type roleType = {
   roleName: string; //角色名称
@@ -90,4 +91,24 @@ export type roleType = {
   updateTime?: string; //最后更新时间
   params?: string; //数据��限
   menuIds?: number[]; //菜单id集合
+};
+
+// 字典数据类型
+export type dictType = {};
+// 字典数据类型
+export type dictDataType = {
+  createBy: string; //创建者
+  createTime: string; //创建时间
+  cssClass: string; //样式属性（其他样式扩展）
+  dictCode: number; //字典编码
+  dictLabel: string; //字典标签
+  dictSort: number; //字典排序
+  dictType: string; //字典类型
+  dictValue: string; //字典键值
+  isDefault?: boolean; //是否默认（Y是 N否）
+  listClass: string; //表格回显样式
+  remark: string; //备注
+  status: number; //状态（0正常 1停用）
+  updateBy: string; //更新者
+  updateTime: string; //更新时间
 };
