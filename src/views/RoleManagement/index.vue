@@ -162,7 +162,8 @@
         </el-form-item>
         <el-form-item
           label="公司树选择项关联显示"
-          style="padding-left: 10.18px">
+          style="padding-left: 10.18px"
+          class="align-items-center">
           <el-radio-group v-model="roleInfoForm.companyCheckStrictly">
             <el-radio :label="true" size="large">是</el-radio>
             <el-radio :label="false" size="large">否</el-radio>
@@ -170,13 +171,17 @@
         </el-form-item>
         <el-form-item
           label="菜单树选择项关联显示"
-          style="padding-left: 10.18px">
+          style="padding-left: 10.18px"
+          class="align-items-center">
           <el-radio-group v-model="roleInfoForm.menuCheckStrictly">
             <el-radio :label="true" size="large">是</el-radio>
             <el-radio :label="false" size="large">否</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="角色状态" style="padding-left: 10.18px">
+        <el-form-item
+          label="角色状态"
+          style="padding-left: 10.18px"
+          class="align-items-center">
           <el-radio-group v-model="roleInfoForm.status">
             <el-radio :label="0" size="large">正常</el-radio>
             <el-radio :label="1" size="large">停用</el-radio>
@@ -252,7 +257,6 @@
     roleSort: 0,
     status: 0,
     menuIds: [],
-    params: "",
   };
   let roleInfoForm = reactive(defaultRoleInfo);
   const rules = reactive({
@@ -272,7 +276,6 @@
   const waitAddOrEditRole = ref(false);
   const isAddRole = ref(true);
   const menuTreeList = ref<treeListType[]>([]);
-
   let closeConfirm = (done: () => void) => {
     ElMessageBox.confirm(`确认放弃${dialogTitle.value}吗?所填内容将会清空`, {
       confirmButtonText: "是的",
