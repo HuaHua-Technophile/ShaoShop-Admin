@@ -93,22 +93,36 @@ export type roleType = {
   menuIds?: number[]; //菜单id集合
 };
 
-// 字典数据类型
-export type dictType = {};
+// 字典类型-类型
+export type dictType = {
+  dictId?: number; //字典类型id
+  dictType: string; //字典类型
+  dictName: string; //字典名称
+  status?: number | null; //状态（0正常 1停用）
+  sysDictDataList?: dictDataType[];
+  createBy?: string; //创建者
+  createTime?: string; //创建时间
+  updateBy?: string; //更新者
+  updateTime?: string; //更新时间
+  remark?: string; //备注
+};
 // 字典数据类型
 export type dictDataType = {
-  createBy: string; //创建者
-  createTime: string; //创建时间
+  createBy?: string; //创建者
+  createTime?: string; //创建时间
+  updateBy?: string; //更新者
+  updateTime?: string; //更新时间
   cssClass: string; //样式属性（其他样式扩展）
-  dictCode: number; //字典编码
-  dictLabel: string; //字典标签
-  dictSort: number; //字典排序
-  dictType: string; //字典类型
-  dictValue: string; //字典键值
+  dictCode: number; //字典数据编码
+  dictLabel: string; //字典数据标签
+  dictSort: number; //字典数据排序
+  dictType: string; //字典数据所属的父级类型
+  dictValue: string; //字典数据键值
   isDefault?: boolean; //是否默认（Y是 N否）
   listClass: string; //表格回显样式
   remark: string; //备注
-  status: number; //状态（0正常 1停用）
-  updateBy: string; //更新者
-  updateTime: string; //更新时间
+  status?: number; //状态（0正常 1停用）
 };
+
+// 消息类型
+export type messageType = {};

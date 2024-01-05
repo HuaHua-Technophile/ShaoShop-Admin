@@ -12,32 +12,28 @@
             clearable
             v-model="userQueryFrom.userName"
             placeholder="每个后台主体唯一名称"
-            :prefix-icon="renderFontIcon('bi bi-123')">
-          </el-input>
+            :prefix-icon="renderFontIcon('bi bi-123')" />
         </el-form-item>
         <el-form-item class="col-3 pe-3" label="绑定邮箱" prop="email">
           <el-input
             clearable
             v-model="userQueryFrom.email"
             placeholder="每个后台主体唯一邮箱"
-            :prefix-icon="renderFontIcon('bi bi-envelope')">
-          </el-input>
+            :prefix-icon="renderFontIcon('bi bi-envelope')" />
         </el-form-item>
         <el-form-item class="col-3 pe-3" label="绑定电话" prop="phoneNumber">
           <el-input
             clearable
             v-model="userQueryFrom.phoneNumber"
             placeholder="每个后台主体唯一手机号"
-            :prefix-icon="renderFontIcon('bi bi-telephone')">
-          </el-input>
+            :prefix-icon="renderFontIcon('bi bi-telephone')" />
         </el-form-item>
         <el-form-item class="col-3 pe-3" label="部门主体" prop="nickName">
           <el-input
             clearable
             v-model="userQueryFrom.nickName"
             placeholder="运营部/物流部/..."
-            :prefix-icon="renderFontIcon('bi bi-people')">
-          </el-input>
+            :prefix-icon="renderFontIcon('bi bi-people')" />
         </el-form-item>
       </div>
       <el-form-item class="flex-shrink-0 pe-3" label="帐号状态" prop="status">
@@ -96,6 +92,18 @@
             <el-table-column prop="phoneNumber" label="电话" />
             <el-table-column prop="createBy" label="创建者" />
             <el-table-column prop="createTime" label="创建时间" />
+            <el-table-column prop="remark" label="备注">
+              <template #default="scope">
+                <el-tooltip
+                  :content="scope.row.remark"
+                  effect="light"
+                  placement="left">
+                  <el-text style="max-width: 100px" truncated>
+                    {{ scope.row.remark }}
+                  </el-text>
+                </el-tooltip>
+              </template>
+            </el-table-column>
             <el-table-column>
               <template #header>
                 <div class="d-flex align-items-center justify-content-center">
@@ -140,47 +148,42 @@
             clearable
             v-model="userInfoForm.userName"
             placeholder="每个后台主体唯一名称"
-            :prefix-icon="renderFontIcon('bi bi-123')">
-          </el-input>
+            :prefix-icon="renderFontIcon('bi bi-123')" />
         </el-form-item>
         <el-form-item label="绑定邮箱" prop="email">
           <el-input
             clearable
             v-model="userInfoForm.email"
             placeholder="每个后台主体唯一邮箱"
-            :prefix-icon="renderFontIcon('bi bi-envelope')">
-          </el-input>
+            :prefix-icon="renderFontIcon('bi bi-envelope')" />
         </el-form-item>
         <el-form-item label="绑定电话" prop="phoneNumber">
           <el-input
             clearable
             v-model="userInfoForm.phoneNumber"
             placeholder="每个后台主体唯一手机号"
-            :prefix-icon="renderFontIcon('bi bi-telephone')">
-          </el-input>
+            :prefix-icon="renderFontIcon('bi bi-telephone')" />
         </el-form-item>
         <el-form-item label="部门主体" prop="nickName">
           <el-input
             clearable
             v-model="userInfoForm.nickName"
             placeholder="运营部/物流部/..."
-            :prefix-icon="renderFontIcon('bi bi-people')">
-          </el-input>
+            :prefix-icon="renderFontIcon('bi bi-people')" />
         </el-form-item>
         <el-form-item label="账号密码" prop="password">
           <el-input
             clearable
             v-model="userInfoForm.password"
             placeholder="6~20位密码,不能含有中文与空格"
-            :prefix-icon="renderFontIcon('bi-shield-lock')">
-          </el-input>
+            :prefix-icon="renderFontIcon('bi-shield-lock')" />
         </el-form-item>
         <el-form-item label="商户(可空)" prop="businessId">
           <el-input
             clearable
             v-model="userInfoForm.businessId"
             placeholder="留空则表示为系统管理员"
-            :prefix-icon="renderFontIcon('bi bi-shop-window')"></el-input>
+            :prefix-icon="renderFontIcon('bi bi-shop-window')" />
         </el-form-item>
       </el-form>
       <div class="d-flex justify-content-center">

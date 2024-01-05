@@ -500,7 +500,7 @@
         else res = await editMenu(menuInfoForm);
         if (res.code == 200) {
           getMenuListFun();
-          // menuDialogVisible.value = false; //隐藏弹出框
+          menuDialogVisible.value = false; //隐藏弹出框
         } else {
           ElMessage.error(res.message);
         }
