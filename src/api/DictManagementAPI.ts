@@ -56,7 +56,7 @@ export const delDict = (dictId: number) => {
 // /system/dict-data/{dictCodes}删除字典数据
 export const delDictData = (dictCodes: number) => {
   return instance({
-    url: `/system/dict/data/${dictCodes}`,
+    url: `/system/dict-data/${dictCodes}`,
     method: "delete",
   });
 };
