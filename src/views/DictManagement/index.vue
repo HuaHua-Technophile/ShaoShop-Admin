@@ -24,9 +24,9 @@
           clearable
           v-model="dictQueryFrom.dictType"
           placeholder="字典类型"
-          :prefix-icon="renderFontIcon('fa-solid fa-font')" />
+          :prefix-icon="renderFontIcon('fa-solid fa-code')" />
       </el-form-item>
-      <el-form-item class="flex-shrink-0 pe-3" label="帐号状态" prop="status">
+      <el-form-item class="flex-shrink-0 pe-3" label="字典状态" prop="status">
         <el-select
           v-model="dictQueryFrom.status"
           placeholder="正常/停用"
@@ -127,7 +127,7 @@
             </el-table-column>
             <el-table-column label="序号" type="index" width="55" />
             <el-table-column prop="dictId" label="ID" />
-            <el-table-column prop="dictName" label="字典类型" />
+            <el-table-column prop="dictName" label="字典名称" />
             <el-table-column prop="dictType" label="类型值" />
             <el-table-column prop="status" label="状态">
               <template #default="scope">
@@ -183,7 +183,7 @@
             clearable
             v-model="dictInfoForm.dictName"
             placeholder="在选框外呈现给用户"
-            :prefix-icon="renderFontIcon('fa-solid fa-tag')">
+            :prefix-icon="renderFontIcon('fa-solid fa-quote-left')">
           </el-input>
         </el-form-item>
         <el-form-item label="字典类型" prop="dictType">
