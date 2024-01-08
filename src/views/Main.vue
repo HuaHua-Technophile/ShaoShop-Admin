@@ -175,16 +175,17 @@
   /* history.replaceState和pushState不会触发popstate事件
 那么如何监听这两个行为呢。可以通过在方法里面主动的去触发popstate事件。另一种就是在方法中创建一个新的全局事件
 https://segmentfault.com/a/1190000022822185 */
-  const _historyWrap = function (type: any) {
+  const _historyWrap = (type: keyof History) => {
     const orig = history[type];
     const e = new Event(type) as any;
-    return function () {
+    return function (this: History) {
       const rv = orig.apply(this, arguments);
       e.arguments = arguments;
       window.dispatchEvent(e);
       return rv;
     };
   };
+
   history.replaceState = _historyWrap("replaceState");
   window.addEventListener("replaceState", (e: any) => {
     // console.log("change replaceState", e);
@@ -254,6 +255,8 @@ https://segmentfault.com/a/1190000022822185 */
     if (logoutResult.code == 200) {
       ElMessage.success("退出成功");
       localStorage.removeItem("token");
+      localStorage.removeItem("historicalNavigation");
+      historicalNavigationStore.historicalNavigation = [];
       router.replace({ name: "login" });
     } else ElMessage.success("网络异常");
   };

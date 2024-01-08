@@ -350,7 +350,7 @@
     ],
     email: [
       { required: true, message: "请输入绑定邮箱", trigger: "blur" },
-      // { min: 0, max: 12, message: "密码为6~12位", trigger: "blur" },
+      { min: 0, max: 25, message: "邮箱至多25位", trigger: "blur" },
       {
         validator: (rule: any, value: string, callback: Function) => {
           rule; //不用一下会Eslint提示报错,看着红色就烦
@@ -392,7 +392,7 @@
         message: "请输入密码",
         trigger: "blur",
       },
-      { min: 6, max: 20, message: "密码长度在20位以内", trigger: "blur" },
+      { min: 6, max: 20, message: "密码长度为6~20位", trigger: "blur" },
       {
         validator: (rule: any, value: string, callback: Function) => {
           rule; //不用一下会Eslint提示报错,看着红色就烦
@@ -404,12 +404,7 @@
       },
     ],
     businessId: [
-      {
-        min: 0,
-        max: 12,
-        message: "长度在12位以内",
-        trigger: "blur",
-      },
+      { min: 0, max: 15, message: "商户ID长度为0~15位", trigger: "blur" },
     ],
   });
 

@@ -88,8 +88,8 @@
                     empty-text="该字典下暂无数据,请添加">
                     <el-table-column label="序号" type="index" width="55" />
                     <el-table-column prop="dictCode" label="数据编码" />
-                    <el-table-column prop="dictValue" label="字典数据" />
                     <el-table-column prop="dictLabel" label="数据标签" />
+                    <el-table-column prop="dictValue" label="数据键值" />
                     <el-table-column prop="dictSort" label="排序" />
                     <el-table-column prop="isDefault" label="是否默认" />
                     <el-table-column prop="listClass" label="listClass" />
@@ -366,7 +366,6 @@
       clearTimeout(i);
     });
   });
-
   //表格点击回调-------------
   let cellClickFun = (
     row: dictType & dictDataType,
@@ -389,7 +388,7 @@
     if (event.target.className.includes("bi-trash") && row.sysDictDataList)
       delDictFun(row.dictId!, row.dictName);
     if (event.target.className.includes("bi-trash") && !row.sysDictDataList)
-      delDictDataFun(row.dictCode, row.dictLabel);
+      delDictDataFun(row.dictCode!, row.dictLabel);
   };
   // 表单---------------------
   const dictDialogFormRef = ref<FormInstance>(); //表单实例
@@ -510,7 +509,7 @@
           res = await editDictData(dictDataInfoForm);
         if (res!.code == 200) {
           getDictListFun();
-          // dialogVisible.value = false; //隐藏弹出框
+          dialogVisible.value = false; //隐藏弹出框
         } else {
           ElMessage.error(res!.message);
         }
