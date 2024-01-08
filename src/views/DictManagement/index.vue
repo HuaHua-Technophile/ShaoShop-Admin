@@ -61,7 +61,7 @@
             header-cell-class-name="text-center"
             row-class-name="bg-body"
             cell-class-name="text-center"
-            class="bg-body rounded-4"
+            class="lalalalala bg-body rounded-4"
             empty-text="暂无符合查询条件的字典"
             row-key="dictName"
             @cell-click="cellClickFun"
@@ -81,12 +81,13 @@
                       darkTheme ? 'bg-black' : 'bg-body-secondary'
                     "
                     cell-class-name="text-center"
-                    class="bg-body rounded-4 border-start border-end"
+                    class="bg-body rounded-4"
                     row-key="dictId"
                     @cell-click="cellClickFun"
-                    @expand-change="expandChangeFun">
+                    @expand-change="expandChangeFun"
+                    empty-text="该字典下暂无数据,请添加">
                     <el-table-column label="序号" type="index" width="55" />
-                    <el-table-column prop="dictCode" label="字典数据" />
+                    <el-table-column prop="dictCode" label="数据编码" />
                     <el-table-column prop="dictValue" label="字典数据" />
                     <el-table-column prop="dictLabel" label="数据标签" />
                     <el-table-column prop="dictSort" label="排序" />
@@ -107,7 +108,7 @@
                     </el-table-column>
                     <el-table-column>
                       <template #header>
-                        <el-button @click="addDictDataDialog"
+                        <el-button @click="addDictDataDialog(props.row)"
                           >添加数据</el-button
                         >
                       </template>
@@ -162,7 +163,6 @@
         </div>
       </div>
     </div>
-
     <!-- 添加/修改弹窗 -->
     <el-dialog
       :title="dialogTitle"
@@ -170,20 +170,117 @@
       :before-close="closeConfirm"
       class="rounded-4"
       draggable
-      center>
+      center
+      width="400px">
       <!-- 字典类型表单 -->
       <el-form
         :model="dictInfoForm"
         ref="dictDialogFormRef"
         :rules="dictRules"
         v-if="isDict">
+        <el-form-item label="字典名称" prop="dictName">
+          <el-input
+            clearable
+            v-model="dictInfoForm.dictName"
+            placeholder="在选框外呈现给用户"
+            :prefix-icon="renderFontIcon('fa-solid fa-tag')">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="字典类型" prop="dictType">
+          <el-input
+            clearable
+            v-model="dictInfoForm.dictType"
+            placeholder="在数据库中的标识"
+            :prefix-icon="renderFontIcon('fa-solid fa-code')">
+          </el-input>
+        </el-form-item>
+        <el-form-item
+          label="字典备注"
+          prop="remark"
+          style="padding-left: 10.18px">
+          <el-input
+            clearable
+            v-model="dictInfoForm.remark"
+            placeholder="备注"
+            :prefix-icon="renderFontIcon('fa-solid fa-marker')">
+          </el-input>
+        </el-form-item>
       </el-form>
       <!-- 字典数据表单 -->
       <el-form
         :model="dictDataInfoForm"
         ref="dictDataDialogFormRef"
-        :rules="dictRules"
+        :rules="dictDataRules"
         v-else>
+        <el-form-item
+          label="父级类型"
+          prop="dictType"
+          style="padding-left: 10.18px">
+          <el-input
+            clearable
+            disabled
+            v-model="dictDataInfoForm.dictType"
+            :prefix-icon="renderFontIcon('fa-solid fa-code-fork')">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="数据标签" prop="dictLabel">
+          <el-input
+            clearable
+            v-model="dictDataInfoForm.dictLabel"
+            placeholder="字典数据呈现出的选项名称"
+            :prefix-icon="renderFontIcon('fa-solid fa-tag')">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="数据键值" prop="dictValue">
+          <el-input
+            clearable
+            v-model="dictDataInfoForm.dictValue"
+            placeholder="字典数据传递的值"
+            :prefix-icon="renderFontIcon('bi bi-123')">
+          </el-input>
+        </el-form-item>
+        <el-form-item
+          label="样式属性"
+          prop="cssClass"
+          style="padding-left: 10.18px">
+          <el-input
+            clearable
+            v-model="dictDataInfoForm.cssClass"
+            placeholder="cssClass样式属性（其他样式扩展）"
+            :prefix-icon="renderFontIcon('fa-brands fa-bootstrap')">
+          </el-input>
+        </el-form-item>
+        <el-form-item
+          label="回显样式"
+          prop="listClass"
+          style="padding-left: 10.18px">
+          <el-input
+            clearable
+            v-model="dictDataInfoForm.listClass"
+            placeholder="listClass 表格回显样式"
+            :prefix-icon="renderFontIcon('fa-brands fa-bootstrap')">
+          </el-input>
+        </el-form-item>
+        <el-form-item
+          label="数据备注"
+          prop="remark"
+          style="padding-left: 10.18px">
+          <el-input
+            clearable
+            v-model="dictDataInfoForm.remark"
+            placeholder="备注"
+            :prefix-icon="renderFontIcon('fa-solid fa-marker')">
+          </el-input>
+        </el-form-item>
+        <el-form-item
+          label="选项排序"
+          prop="dictSort"
+          style="padding-left: 10.18px">
+          <el-input-number
+            v-model="dictDataInfoForm.dictSort"
+            :min="0"
+            :max="999" />
+        </el-form-item>
       </el-form>
       <!-- 通用确认按钮 -->
       <div class="d-flex justify-content-center">
@@ -279,7 +376,6 @@
   ) => {
     column;
     cell;
-    console.log(row);
     if (
       event.target.className.includes("bi-pencil-square") &&
       row.sysDictDataList
@@ -305,7 +401,6 @@
   };
   const defaultDictDataInfo: dictDataType = {
     cssClass: "",
-    dictCode: 0,
     dictLabel: "",
     dictSort: 0,
     dictType: "",
@@ -322,6 +417,16 @@
     ],
     dictType: [
       { required: true, message: "请输入字典类型", trigger: "blur" },
+      { min: 0, max: 12, message: "长度在12位以内", trigger: "blur" },
+    ],
+  });
+  const dictDataRules = reactive({
+    dictLabel: [
+      { required: true, message: "请输入字典数据标签", trigger: "blur" },
+      { min: 0, max: 12, message: "长度在12位以内", trigger: "blur" },
+    ],
+    dictValue: [
+      { required: true, message: "请输入字典数据键值", trigger: "blur" },
       { min: 0, max: 12, message: "长度在12位以内", trigger: "blur" },
     ],
   });
@@ -371,8 +476,11 @@
     isDict.value = true;
     dialogTitle.value = "修改字典类型";
   };
-  const addDictDataDialog = () => {
-    dictDataInfoForm = reactive(cloneDeep(defaultDictDataInfo));
+  const addDictDataDialog = (dict: dictType) => {
+    let DictDataInfo = cloneDeep(defaultDictDataInfo);
+    DictDataInfo.dictType = dict.dictType;
+    console.log("添加字典数据的默认值=>", DictDataInfo);
+    dictDataInfoForm = reactive(DictDataInfo);
     dialogVisible.value = true;
     isAdd.value = true;
     isDict.value = false;
@@ -402,7 +510,7 @@
           res = await editDictData(dictDataInfoForm);
         if (res!.code == 200) {
           getDictListFun();
-          dialogVisible.value = false; //隐藏弹出框
+          // dialogVisible.value = false; //隐藏弹出框
         } else {
           ElMessage.error(res!.message);
         }

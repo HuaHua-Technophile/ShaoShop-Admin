@@ -113,7 +113,7 @@ export type dictDataType = {
   updateBy?: string; //更新者
   updateTime?: string; //更新时间
   cssClass: string; //样式属性（其他样式扩展）
-  dictCode: number; //字典数据编码
+  dictCode?: number; //字典数据编码(自增,类似于排序)
   dictLabel: string; //字典数据标签
   dictSort: number; //字典数据排序
   dictType: string; //字典数据所属的父级类型
