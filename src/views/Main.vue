@@ -87,6 +87,19 @@
           </div>
           <!-- 右侧控件 -->
           <div class="flex-shrink-0 d-flex align-items-center">
+            <!-- 站内信 -->
+            <el-dropdown class="me-3">
+              <div class="position-relative">
+                <fontIcon icon="fa-regular fa-message fs-3"></fontIcon>
+                <!-- 未读消息红字 -->
+                <div class="position-absolute top-50 start-50 translate-middle">
+                  {{ systemMessage.length }}
+                </div>
+              </div>
+              <template #dropdown>
+                <div>Dropdown</div>
+              </template>
+            </el-dropdown>
             <!-- 用户 -->
             <el-dropdown>
               <div class="d-flex align-items-center me-3">
@@ -130,10 +143,12 @@
   </el-container>
 </template>
 <script setup lang="ts">
-  import router from "../router";
-  import { useUserInfoStore } from "../stores/userInfo";
-  import { useHistoricalNavigationStore } from "../stores/historicalNavigation";
-  import { logout } from "../api/logout";
+  import { systemMessageType } from "@/type/index";
+  import router from "@/router/index";
+  import { useUserInfoStore } from "@/stores/userInfo";
+  import { useHistoricalNavigationStore } from "@/stores/historicalNavigation";
+  import { logout } from "@/api/logout";
+  import { getSystemMessage } from "@/api/SystemMessageAPI";
   import { ElMessage } from "element-plus";
   import { nextTick, onMounted, ref } from "vue";
   import BScroll from "@better-scroll/core"; //bs核心
@@ -157,6 +172,7 @@
       },
     });
   });
+
   // 页面加载时就检查历史路由导航条是否存在当前路由,若不存在则表明是首次进入页面,需添加进顶部历史路由导航条
   const historicalNavigationStore = useHistoricalNavigationStore();
   const routerList = router.getRoutes();
@@ -170,8 +186,18 @@
       path: routerItem!.path,
     });
   }
-  // 页面渲染所需数据------------------------
+
+  // 页面渲染所需数据(左侧菜单、站内消息)------------------------
   let userInfoStore = useUserInfoStore();
+  const systemMessage = ref<systemMessageType[]>([]);
+  const getSystemMessageFun = async () => {
+    let res = await getSystemMessage();
+    console.log("获取到的站内信=>", res);
+    systemMessage.value = res.data.records;
+  };
+  getSystemMessageFun();
+  // 自动调整左侧路由激活项为当前页面url(将el-menu设置为router模式)-------------
+  let active = ref(window.location.pathname);
   /* history.replaceState和pushState不会触发popstate事件
 那么如何监听这两个行为呢。可以通过在方法里面主动的去触发popstate事件。另一种就是在方法中创建一个新的全局事件
 https://segmentfault.com/a/1190000022822185 */
@@ -185,19 +211,15 @@ https://segmentfault.com/a/1190000022822185 */
       return rv;
     };
   };
-
   history.replaceState = _historyWrap("replaceState");
   window.addEventListener("replaceState", (e: any) => {
     // console.log("change replaceState", e);
     active.value = e.arguments[0].forward;
   });
-
-  // 自动调整左侧路由激活项为当前页面url(将el-menu设置为router模式)-------------
-  let active = ref(window.location.pathname);
-  /* 菜单点击回调
-  (index: 选中菜单项的 index, indexPath: 选中菜单项的 index path, item: 选中菜单项, routeResult: vue-router 的返回值（如果 router 为 true）) */
   let menuSelect = async (index: string) => {
+    /* 菜单点击回调(index: 选中菜单项的 index, indexPath: 选中菜单项的 index path, item: 选中菜单项, routeResult: vue-router 的返回值（如果 router 为 true）) */
     let routerItem = routerList.find((i) => i.path == index);
+    // 如果不在历史路由里就加进去
     if (
       !historicalNavigationStore.historicalNavigation.some(
         (i) => i.path == index

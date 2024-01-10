@@ -124,5 +124,5 @@ export type dictDataType = {
   status?: number; //状态（0正常 1停用）
 };
 
-// 消息类型
-export type messageType = {};
+// 站内信类型
+export type systemMessageType = {};

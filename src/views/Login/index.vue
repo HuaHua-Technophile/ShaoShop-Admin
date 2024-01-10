@@ -68,13 +68,13 @@
     loginSvg.value = svgFixedSize.replace(FixedSize, "");
   };
   getImageFun();
-  // 信息输入--------------------------------------------------------
+
+  // 登录信息表单--------------------------------------------------------
   const ruleFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const form = reactive({
     userName: "admin",
     password: "123456",
   });
-  // ElementPlus 表单验证规则------------------------------------------------
   const rules = reactive({
     userName: [
       { required: true, message: "请输入账号", trigger: "blur" },
@@ -94,27 +94,25 @@
       },
     ],
   });
+  let waitLogin = ref(false); //是否处于等待登陆状态
+
   // 表单提交前验证,验证不通过不发送请求------------------------------------
   const submitForm = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
-    await formEl.validate((valid, fields) => {
+    await formEl.validate(async (valid, fields) => {
       if (valid) {
-        getLoginInfo();
+        waitLogin.value = true;
+        let res = await login({
+          userName: form.userName,
+          password: form.password,
+        });
+        console.log("getLoginInfo获取到了登陆数据=>", res);
+        waitLogin.value = false;
+        if (res.code == 200) {
+          localStorage.setItem("token", res.data?.authentication);
+          addMenuRouter(true);
+        } else ElMessage.error(res.message);
       } else console.log("error submit!", fields);
     });
-  };
-  // 登录--------------------------------------------------------
-  let waitLogin = ref(false); //是否处于等待登陆状态
-  let getLoginInfo = async () => {
-    waitLogin.value = true;
-    let loginInfo = await login({
-      userName: form.userName,
-      password: form.password,
-    });
-    console.log("getLoginInfo获取到了登陆数据=>", loginInfo);
-    if (loginInfo.data) {
-      localStorage.setItem("token", loginInfo.data?.authentication);
-      addMenuRouter(true);
-    } else ElMessage.error(loginInfo.message);
   };
 </script>
