@@ -24,6 +24,7 @@ export const addRole = (data: roleType) => {
 };
 
 export const editRole = (data: roleType) => {
+  console.log("尝试编辑该角色=>", data);
   return instance({
     url: "/system/role",
     method: "PUT",

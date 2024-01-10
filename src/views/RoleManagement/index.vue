@@ -141,6 +141,7 @@
             :data="menuTreeList"
             show-checkbox
             multiple
+            check-strictly
             collapse-tags
             collapse-tags-tooltip>
           </el-tree-select>
@@ -310,9 +311,7 @@
     let res = await getMenuTreeList();
     if (res.code == 200) {
       console.log("获取的菜单树=>", res.data);
-      menuTreeList.value = [
-        { value: -1, label: "全部菜单", children: res.data },
-      ];
+      menuTreeList.value = res.data;
     }
   };
   const editRoleDialog = async (role: roleType) => {
@@ -323,9 +322,7 @@
     let res = await getRoleMenuTreeSelect(role.roleId!);
     if (res.code == 200) {
       console.log(`id${role.roleId}的菜单树=>`, res.data);
-      menuTreeList.value = [
-        { value: -1, label: "全部菜单", children: res.data.menus },
-      ];
+      menuTreeList.value = res.data.menus;
       roleInfoForm.menuIds = res.data.checkedKeys;
     }
   };
