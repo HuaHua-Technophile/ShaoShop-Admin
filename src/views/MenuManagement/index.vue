@@ -143,8 +143,8 @@
                           >
                         </template>
                       </el-table-column>
-                      <el-table-column label="创建者" prop="createBy" />
-                      <el-table-column label="创建时间" prop="createTime" />
+                      <el-table-column label="更新者" prop="updateBy" />
+                      <el-table-column label="更新时间" prop="updateTime" />
                       <el-table-column label="删改">
                         <template #default>
                           <fontIcon
@@ -220,8 +220,8 @@
               >
             </template>
           </el-table-column>
-          <el-table-column label="创建者" prop="createBy" />
-          <el-table-column label="创建时间" prop="createTime" />
+          <el-table-column label="更新者" prop="updateBy" />
+          <el-table-column label="更新时间" prop="updateTime" />
           <el-table-column>
             <template #header>
               <el-button @click="addMenuDialog">添加菜单</el-button>

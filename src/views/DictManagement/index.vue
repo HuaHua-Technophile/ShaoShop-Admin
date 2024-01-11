@@ -61,7 +61,7 @@
             header-cell-class-name="text-center"
             row-class-name="bg-body"
             cell-class-name="text-center"
-            class="lalalalala bg-body rounded-4"
+            class="bg-body rounded-4"
             empty-text="暂无符合查询条件的字典"
             row-key="dictName"
             @cell-click="cellClickFun"
@@ -92,8 +92,43 @@
                     <el-table-column prop="dictValue" label="数据键值" />
                     <el-table-column prop="dictSort" label="排序" />
                     <el-table-column prop="isDefault" label="是否默认" />
-                    <el-table-column prop="listClass" label="listClass" />
-                    <el-table-column prop="cssClass" label="cssClass" />
+                    <el-table-column prop="listClass" label="listClass">
+                      <template #default="scope">
+                        <el-tooltip
+                          :content="scope.row.listClass"
+                          effect="light"
+                          placement="left">
+                          <el-text style="max-width: 100px" truncated>
+                            {{ scope.row.listClass }}
+                          </el-text>
+                        </el-tooltip>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="cssClass" label="cssClass">
+                      <template #default="scope">
+                        <el-tooltip
+                          :content="scope.row.cssClass"
+                          effect="light"
+                          placement="left">
+                          <el-text style="max-width: 100px" truncated>
+                            {{ scope.row.cssClass }}
+                          </el-text>
+                        </el-tooltip>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="updateBy" label="更新者" />
+                    <el-table-column prop="updateTime" label="更新时间">
+                      <template #default="scope">
+                        <el-tooltip
+                          :content="scope.row.updateTime"
+                          effect="light"
+                          placement="left">
+                          <el-text style="max-width: 100px" truncated>
+                            {{ scope.row.updateTime }}
+                          </el-text>
+                        </el-tooltip>
+                      </template>
+                    </el-table-column>
                     <el-table-column prop="remark" label="备注">
                       <template #default="scope">
                         <el-tooltip
@@ -136,8 +171,8 @@
                 }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="createBy" label="创建者" />
-            <el-table-column prop="createTime" label="创建时间" />
+            <el-table-column prop="updateBy" label="更新者" />
+            <el-table-column prop="updateTime" label="更新时间" />
             <el-table-column prop="remark" label="备注">
               <template #default="scope">
                 <el-tooltip
@@ -366,6 +401,7 @@
       clearTimeout(i);
     });
   });
+
   //表格点击回调-------------
   let cellClickFun = (
     row: dictType & dictDataType,

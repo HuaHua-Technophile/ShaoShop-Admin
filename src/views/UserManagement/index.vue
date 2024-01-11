@@ -90,15 +90,26 @@
             </el-table-column>
             <el-table-column prop="email" label="邮箱" />
             <el-table-column prop="phoneNumber" label="电话" />
-            <el-table-column prop="createBy" label="创建者" />
-            <el-table-column prop="createTime" label="创建时间" />
+            <el-table-column prop="updateBy" label="更新者" />
+            <el-table-column prop="updateTime" label="更新时间">
+              <template #default="scope">
+                <el-tooltip
+                  :content="scope.row.updateTime"
+                  effect="light"
+                  placement="left">
+                  <el-text style="max-width: 100px" truncated>
+                    {{ scope.row.updateTime }}
+                  </el-text>
+                </el-tooltip>
+              </template>
+            </el-table-column>
             <el-table-column prop="remark" label="备注">
               <template #default="scope">
                 <el-tooltip
                   :content="scope.row.remark"
                   effect="light"
                   placement="left">
-                  <el-text style="max-width: 100px" truncated>
+                  <el-text style="max-width: 80px" truncated>
                     {{ scope.row.remark }}
                   </el-text>
                 </el-tooltip>
@@ -182,7 +193,7 @@
           <el-input
             clearable
             v-model="userInfoForm.businessId"
-            placeholder="留空则表示为系统管理员"
+            placeholder="填写以绑定对应商户"
             :prefix-icon="renderFontIcon('bi bi-shop-window')" />
         </el-form-item>
       </el-form>

@@ -6,57 +6,71 @@
           min-height: calc(100% + 1px) !important;
           padding: 1px 0 !important;
         ">
-        <div class="bg-body p-3 rounded-4">
-          <div v-for="(i, index) in roleList">
-            <!-- 描述面板 -->
-            <el-descriptions :title="i.roleName" :column="4">
-              <template #extra>
-                <fontIcon
-                  icon="bi bi-pencil-square  fs-5 me-2"
-                  role="button"
-                  @click="editRoleDialog(i)" />
-                <fontIcon
-                  icon="bi bi-trash fs-5 text-danger"
-                  role="button"
-                  @click="delRoleFun(i.roleId!, i.roleName)" />
-              </template>
-              <el-descriptions-item label="角色ID">{{
-                i.roleId
-              }}</el-descriptions-item>
-              <el-descriptions-item label="权限字符">{{
-                i.roleKey || "暂无"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="权限范围">{{
-                i.dataScope || "暂无"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="角色排序">{{
-                i.roleSort || "暂无"
-              }}</el-descriptions-item>
-              <!-- <el-descriptions-item label="管理员">
-                <el-tag :type="i.admin ? 'success' : 'info'">{{
-                  i.admin ? "是" : "否"
-                }}</el-tag>
-              </el-descriptions-item> -->
-              <el-descriptions-item label="状态">
-                <el-tag :type="i.status == 0 ? 'success' : 'danger'">{{
-                  i.status == 0 ? "正常" : "停用"
-                }}</el-tag>
-              </el-descriptions-item>
-              <el-descriptions-item label="所属商户id">{{
-                i.businessId || "暂无"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="创建者">{{
-                i.createBy || "暂无"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="创建时间">{{
-                i.createTime || "暂无"
-              }}</el-descriptions-item>
-              <el-descriptions-item label="最后更新者" v-if="i.updateBy">{{
-                i.updateBy
-              }}</el-descriptions-item>
-              <el-descriptions-item label="最后更新时间" v-if="i.updateTime">{{
-                i.updateTime
-              }}</el-descriptions-item>
+        <el-table
+          ref="roleTableRef"
+          :data="roleList"
+          table-layout="auto"
+          header-cell-class-name="text-center"
+          row-class-name="bg-body"
+          cell-class-name="text-center"
+          class="bg-body rounded-4"
+          empty-text="接口错误,查询角色失败"
+          row-key="roleId"
+          @cell-click="cellClickFun"
+          @expand-change="expandChangeFun">
+          <!-- 外层表格扩展 -->
+          <el-table-column type="expand">
+            <template #default="props"> </template>
+          </el-table-column>
+          <el-table-column prop="roleName" label="角色" />
+          <el-table-column prop="roleId" label="角色ID" />
+          <el-table-column prop="roleKey" label="权限字符" />
+          <el-table-column prop="dataScope" label="权限范围" />
+          <el-table-column prop="roleSort" label="角色排序" />
+          <el-table-column prop="status" label="状态">
+            <template #default="scope">
+              <el-tag :type="scope.row.status == 0 ? 'success' : 'danger'">{{
+                scope.row.status == 0 ? "正常" : "停用"
+              }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="businessId" label="所属商户id" />
+          <el-table-column prop="updateBy" label="更新者" />
+          <el-table-column prop="updateTime" label="更新时间">
+            <template #default="scope">
+              <el-tooltip
+                :content="scope.row.updateTime"
+                effect="light"
+                placement="left">
+                <el-text style="max-width: 100px" truncated>
+                  {{ scope.row.updateTime }}
+                </el-text>
+              </el-tooltip>
+            </template>
+          </el-table-column>
+          <el-table-column prop="remark" label="备注">
+            <template #default="scope">
+              <el-tooltip
+                :content="scope.row.remark"
+                effect="light"
+                placement="left">
+                <el-text style="max-width: 80px" truncated>
+                  {{ scope.row.remark }}
+                </el-text>
+              </el-tooltip>
+            </template>
+          </el-table-column>
+          <el-table-column>
+            <template #header>
+              <el-button @click="addRoleDialog">添加角色</el-button>
+            </template>
+            <template #default>
+              <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
+              <fontIcon icon="bi bi-trash fs-6 text-danger" role="button" />
+            </template>
+          </el-table-column>
+        </el-table>
+        <!--
               <el-descriptions-item label="菜单树选择项是否关联显示">
                 <el-tag :type="i.menuCheckStrictly ? 'success' : 'info'">{{
                   i.menuCheckStrictly ? "是" : "否"
@@ -67,27 +81,10 @@
                   i.companyCheckStrictly ? "是" : "否"
                 }}</el-tag>
               </el-descriptions-item>
-              <el-descriptions-item label="备注" v-if="i.remark">{{
-                i.remark
-              }}</el-descriptions-item>
-            </el-descriptions>
-            <!-- 分割线 -->
-            <el-divider v-if="index < roleList!.length - 1" />
-          </div>
-        </div>
+               -->
       </div>
     </div>
-    <!-- 增加角色悬浮按钮 -->
-    <div
-      class="AddBtn position-absolute end-0 bottom-0 me-4 mb-4 rounded-pill bg-success shadow d-flex align-items-center justify-content-center"
-      style="width: 3rem; height: 3rem"
-      role="button"
-      @click="addRoleDialog">
-      <fontIcon
-        icon="bi bi-plus-circle "
-        style="font-size: 1.5rem; text-shadow: 2px 2px 4px black" />
-    </div>
-    <!-- 添加/修改弹窗 -->
+    <!-- 添加/修改角色弹窗 -->
     <el-dialog
       :title="dialogTitle"
       v-model="roleDialogVisible"
@@ -218,7 +215,7 @@
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //bs类型
-  import { nextTick, onMounted, reactive, ref } from "vue";
+  import { nextTick, onMounted, onUnmounted, reactive, ref } from "vue";
   import { roleType, treeListType } from "@/type";
   import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
   import { cloneDeep } from "lodash";
@@ -245,6 +242,34 @@
       mouseWheel: true,
     });
   });
+  let timeOutArr: NodeJS.Timeout[] = [];
+  const expandChangeFun = async () => {
+    timeOutArr.push(
+      setTimeout(() => {
+        bs?.refresh();
+      }, 150)
+    );
+  };
+  onUnmounted(() => {
+    timeOutArr.forEach((i) => {
+      clearTimeout(i);
+    });
+  });
+
+  //表格点击回调-------------
+  let cellClickFun = (
+    row: roleType,
+    column: any,
+    cell: any,
+    event: { target: HTMLElement }
+  ) => {
+    column;
+    cell;
+    if (event.target.className.includes("bi-pencil-square"))
+      editRoleDialog(row);
+    if (event.target.className.includes("bi-trash"))
+      delRoleFun(row.roleId!, row.roleName);
+  };
 
   //表单----------------------
   const dialogFormRef = ref<FormInstance>();
@@ -368,15 +393,3 @@
       });
   };
 </script>
-<style lang="scss" scoped>
-  .AddBtn {
-    & > * {
-      transition: all 0.5s;
-    }
-    &:hover {
-      & > * {
-        transform: rotate(90deg) scale(1.3) !important;
-      }
-    }
-  }
-</style>
