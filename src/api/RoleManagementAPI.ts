@@ -49,13 +49,14 @@ export const getUnallocatedList = (roleId: number) => {
 };
 
 //  /system/role/authUser/cancelAll 批量取消授权
-export const cancelUser = (roleId: number, userId: number[]) => {
+export const cancelUser = (roleId: number, userIds: (number | undefined)[]) => {
+  console.log(`尝试为ID${roleId}取消授权用户=>`, userIds);
   return instance({
     url: "/system/role/authUser/cancelAll",
     method: "DELETE",
     data: {
       roleId,
-      userId,
+      userIds,
     },
   });
 };

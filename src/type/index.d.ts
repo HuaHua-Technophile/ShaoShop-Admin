@@ -93,6 +93,7 @@ export type roleType = {
   params?: string; //数据��限
   menuIds?: number[]; //菜单id集合
   userList?: userType[]; //用户集合
+  selectList?: (number | undefined)[]; //选中用户id集合,用于取消授权
 };
 
 // 字典类型-类型
