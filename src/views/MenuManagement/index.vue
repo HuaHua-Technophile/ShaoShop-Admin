@@ -21,18 +21,20 @@
           <el-table-column type="expand">
             <template #default="props">
               <div>
-                <div class="d-flex flex-wrap justify-content-between px-3">
-                  <div>最后更新者：{{ props.row.updateBy }}</div>
-                  <div>更新时间：{{ props.row.updateTime }}</div>
-                  <div>路径：{{ props.row.path }}</div>
+                <!-- 其他菜单信息 -->
+                <div
+                  class="d-flex align-items-center flex-wrap justify-content-between px-3">
                   <div>组件路径：{{ props.row.component }}</div>
-                  <div>商户是否可见：{{ props.row.isBusinessVisible }}</div>
+                  <div class="d-flex align-items-center">
+                    商户是否可见：
+                    <el-tag
+                      :type="props.row.status == 0 ? 'success' : 'danger'"
+                      >{{ props.row.status == 0 ? "是" : "否" }}</el-tag
+                    >
+                  </div>
                   <div>isCache：{{ props.row.isCache }}</div>
                   <div>权限标识：{{ props.row.perms }}</div>
                   <div>路由参数：{{ props.row.query }}</div>
-                  <div class="col-12" v-if="props.row.remark">
-                    备注：{{ props.row.remark }}
-                  </div>
                 </div>
                 <!-- 内层表格 -->
                 <div v-if="props.row.children.length > 0" class="px-3">
@@ -59,19 +61,21 @@
                         <template #default="props2">
                           <div
                             class="d-flex flex-wrap justify-content-between px-3">
-                            <div>最后更新者：{{ props2.row.updateBy }}</div>
-                            <div>更新时间：{{ props2.row.updateTime }}</div>
-                            <div>路径：{{ props2.row.path }}</div>
                             <div>组件路径：{{ props2.row.component }}</div>
-                            <div>
-                              商户是否可见：{{ props2.row.isBusinessVisible }}
+                            <div class="d-flex align-items-center">
+                              商户是否可见：
+                              <el-tag
+                                :type="
+                                  props2.row.status == 0 ? 'success' : 'danger'
+                                "
+                                >{{
+                                  props.row.status == 0 ? "是" : "否"
+                                }}</el-tag
+                              >
                             </div>
                             <div>isCache：{{ props2.row.isCache }}</div>
                             <div>权限标识：{{ props2.row.perms }}</div>
                             <div>路由参数：{{ props2.row.query }}</div>
-                            <div class="col-12" v-if="props2.row.remark">
-                              备注：{{ props2.row.remark }}
-                            </div>
                           </div>
                         </template>
                       </el-table-column>
@@ -143,8 +147,43 @@
                           >
                         </template>
                       </el-table-column>
+                      <el-table-column prop="path" label="路径">
+                        <template #default="scope">
+                          <el-tooltip
+                            :content="scope.row.path"
+                            effect="light"
+                            placement="left">
+                            <el-text style="max-width: 100px" truncated>
+                              {{ scope.row.path }}
+                            </el-text>
+                          </el-tooltip>
+                        </template>
+                      </el-table-column>
                       <el-table-column label="更新者" prop="updateBy" />
-                      <el-table-column label="更新时间" prop="updateTime" />
+                      <el-table-column prop="updateTime" label="更新时间">
+                        <template #default="scope">
+                          <el-tooltip
+                            :content="scope.row.updateTime"
+                            effect="light"
+                            placement="left">
+                            <el-text style="max-width: 100px" truncated>
+                              {{ scope.row.updateTime }}
+                            </el-text>
+                          </el-tooltip>
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="remark" label="备注">
+                        <template #default="scope">
+                          <el-tooltip
+                            :content="scope.row.remark"
+                            effect="light"
+                            placement="left">
+                            <el-text style="max-width: 80px" truncated>
+                              {{ scope.row.remark }}
+                            </el-text>
+                          </el-tooltip>
+                        </template>
+                      </el-table-column>
                       <el-table-column label="删改">
                         <template #default>
                           <fontIcon
@@ -220,8 +259,43 @@
               >
             </template>
           </el-table-column>
+          <el-table-column prop="path" label="路径">
+            <template #default="scope">
+              <el-tooltip
+                :content="scope.row.path"
+                effect="light"
+                placement="left">
+                <el-text style="max-width: 100px" truncated>
+                  {{ scope.row.path }}
+                </el-text>
+              </el-tooltip>
+            </template>
+          </el-table-column>
           <el-table-column label="更新者" prop="updateBy" />
-          <el-table-column label="更新时间" prop="updateTime" />
+          <el-table-column prop="updateTime" label="更新时间">
+            <template #default="scope">
+              <el-tooltip
+                :content="scope.row.updateTime"
+                effect="light"
+                placement="left">
+                <el-text style="max-width: 100px" truncated>
+                  {{ scope.row.updateTime }}
+                </el-text>
+              </el-tooltip>
+            </template>
+          </el-table-column>
+          <el-table-column prop="remark" label="备注">
+            <template #default="scope">
+              <el-tooltip
+                :content="scope.row.remark"
+                effect="light"
+                placement="left">
+                <el-text style="max-width: 80px" truncated>
+                  {{ scope.row.remark }}
+                </el-text>
+              </el-tooltip>
+            </template>
+          </el-table-column>
           <el-table-column>
             <template #header>
               <el-button @click="addMenuDialog">添加菜单</el-button>
@@ -334,7 +408,7 @@
         <el-button
           @click="addOrEditMenuFun(dialogFormRef)"
           :loading="waitAddOrEditMenu"
-          >确认{{ dialogTitle.slice(0, 2)
+          >确认{{ dialogTitle
           }}<span v-if="!isAddMenu"
             >ID: {{ menuInfoForm.menuId }}</span
           ></el-button
@@ -465,13 +539,13 @@
         // dialogFormRef.value?.clearValidate();
         ElMessage({
           type: "info",
-          message: `放弃${dialogTitle.value.slice(0, 2)}`,
+          message: `放弃${dialogTitle.value}`,
         });
       })
       .catch(() => {
         ElMessage({
           type: "info",
-          message: `继续${dialogTitle.value.slice(0, 2)}`,
+          message: `继续${dialogTitle.value}`,
         });
       });
   };

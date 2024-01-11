@@ -19,6 +19,7 @@ export type userType = {
   status?: number | null; //该后台管理账号的状态
   userName: string; //账号
   userId?: number; //
+  remark?: string; //备注
 };
 //分页查询用户列表所需参数
 export type userListParamsType = userType & {
@@ -91,6 +92,7 @@ export type roleType = {
   updateTime?: string; //最后更新时间
   params?: string; //数据��限
   menuIds?: number[]; //菜单id集合
+  userList?: userType[]; //用户集合
 };
 
 // 字典类型-类型

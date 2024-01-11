@@ -20,7 +20,102 @@
           @expand-change="expandChangeFun">
           <!-- 外层表格扩展 -->
           <el-table-column type="expand">
-            <template #default="props"> </template>
+            <template #default="props">
+              <div class="px-3">
+                <div
+                  class="d-flex align-items-center justify-content-around mb-2">
+                  <el-button
+                    @click="
+                      revokeUserDrawer(props.row.roleId, props.row.roleName)
+                    "
+                    >授权用户</el-button
+                  >
+                  <div class="d-flex align-items-center">
+                    菜单树选择项是否关联显示:<el-tag
+                      :type="props.row.menuCheckStrictly ? 'success' : 'info'"
+                      class="ms-3"
+                      >{{ props.row.menuCheckStrictly ? "是" : "否" }}</el-tag
+                    >
+                  </div>
+                  <div class="d-flex align-items-center">
+                    公司树选择项是否关联显示:<el-tag
+                      :type="
+                        props.row.companyCheckStrictly ? 'success' : 'info'
+                      "
+                      class="ms-3"
+                      >{{
+                        props.row.companyCheckStrictly ? "是" : "否"
+                      }}</el-tag
+                    >
+                  </div>
+                </div>
+                <!-- 绑定的用户 -->
+                <el-table
+                  ref="userTableRef"
+                  :data="props.row.userList"
+                  table-layout="auto"
+                  header-cell-class-name="text-center text-body"
+                  :header-cell-style="{
+                    background: 'rgba(var(--bs-ShaoShop-rgb),0.4) !important',
+                  }"
+                  :row-class-name="darkTheme ? 'bg-black' : 'bg-body-secondary'"
+                  cell-class-name="text-center"
+                  class="bg-body rounded-4"
+                  empty-text="暂未查询到绑定该角色的用户"
+                  row-key="userName"
+                  @selection-change="cancelUserSelectionChange">
+                  <el-table-column type="selection" width="30" />
+                  <el-table-column label="序号" type="index" width="55" />
+                  <el-table-column prop="userId" label="ID" />
+                  <el-table-column prop="userName" label="账号名称" />
+                  <el-table-column prop="nickName" label="部门主体" />
+                  <el-table-column prop="status" label="状态">
+                    <template #default="scope">
+                      <el-tag
+                        :type="scope.row.status == 0 ? 'success' : 'danger'"
+                        >{{ scope.row.status == 0 ? "正常" : "停用" }}</el-tag
+                      >
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="email" label="邮箱" />
+                  <el-table-column prop="phoneNumber" label="电话" />
+                  <el-table-column prop="updateBy" label="更新者" />
+                  <el-table-column prop="updateTime" label="更新时间">
+                    <template #default="scope">
+                      <el-tooltip
+                        :content="scope.row.updateTime"
+                        effect="light"
+                        placement="left">
+                        <el-text style="max-width: 100px" truncated>
+                          {{ scope.row.updateTime }}
+                        </el-text>
+                      </el-tooltip>
+                    </template>
+                  </el-table-column>
+                  <el-table-column prop="remark" label="备注">
+                    <template #default="scope">
+                      <el-tooltip
+                        :content="scope.row.remark"
+                        effect="light"
+                        placement="left">
+                        <el-text style="max-width: 80px" truncated>
+                          {{ scope.row.remark }}
+                        </el-text>
+                      </el-tooltip>
+                    </template>
+                  </el-table-column>
+                  <el-table-column>
+                    <template #header> </template>
+                    <template #default="scope">
+                      <fontIcon
+                        icon="bi bi-trash fs-6 text-danger"
+                        role="button"
+                        @click="cancelUserFun(scope.row)" />
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+            </template>
           </el-table-column>
           <el-table-column prop="roleName" label="角色" />
           <el-table-column prop="roleId" label="角色ID" />
@@ -70,18 +165,6 @@
             </template>
           </el-table-column>
         </el-table>
-        <!--
-              <el-descriptions-item label="菜单树选择项是否关联显示">
-                <el-tag :type="i.menuCheckStrictly ? 'success' : 'info'">{{
-                  i.menuCheckStrictly ? "是" : "否"
-                }}</el-tag>
-              </el-descriptions-item>
-              <el-descriptions-item label="公司树选择项是否关联显示">
-                <el-tag :type="i.companyCheckStrictly ? 'success' : 'info'">{{
-                  i.companyCheckStrictly ? "是" : "否"
-                }}</el-tag>
-              </el-descriptions-item>
-               -->
       </div>
     </div>
     <!-- 添加/修改角色弹窗 -->
@@ -190,13 +273,60 @@
         <el-button
           @click="addOrEditRoleFun(dialogFormRef)"
           :loading="waitAddOrEditRole"
-          >确认{{ dialogTitle.slice(0, 2)
+          >确认{{ dialogTitle
           }}<span v-if="!isAddRole"
             >ID: {{ roleInfoForm.roleId }}</span
           ></el-button
         >
       </div>
     </el-dialog>
+    <!-- 授权用户抽屉 -->
+    <el-drawer
+      v-model="revokeUserDrawerVisible"
+      direction="rtl"
+      size="50%"
+      class="bg-body-secondary rounded-start-5"
+      :before-close="closeConfirm">
+      <template #header>
+        <div class="d-flex align-items-center">
+          <span class="text-body">{{
+            `为'${revokeUserDrawerTitle}'授权用户`
+          }}</span>
+          <el-button
+            @click="revokeUserFun"
+            class="ms-3"
+            :disabled="revokeUserSelectList.length == 0"
+            :loading="waitRevokeUser"
+            >确认授权{{ revokeUserSelectList.length }}个用户</el-button
+          >
+        </div>
+      </template>
+      <el-table
+        :data="UnallocatedList"
+        empty-text="暂无用户未授权"
+        table-layout="auto"
+        header-cell-class-name="text-center"
+        row-class-name="bg-body"
+        cell-class-name="text-center"
+        class="bg-body rounded-4"
+        row-key="userId"
+        @selection-change="revokeUserSelectionChange">
+        <el-table-column type="selection" width="30" />
+        <el-table-column label="序号" type="index" width="55" />
+        <el-table-column prop="userId" label="ID" />
+        <el-table-column prop="userName" label="账号名称" />
+        <el-table-column prop="nickName" label="部门主体" />
+        <el-table-column prop="status" label="状态">
+          <template #default="scope">
+            <el-tag :type="scope.row.status == 0 ? 'success' : 'danger'">{{
+              scope.row.status == 0 ? "正常" : "停用"
+            }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="email" label="邮箱" />
+        <el-table-column prop="phoneNumber" label="电话" />
+      </el-table>
+    </el-drawer>
   </div>
 </template>
 <script lang="ts" setup>
@@ -206,6 +336,10 @@
     delRole,
     addRole,
     editRole,
+    getAllocatedList,
+    getUnallocatedList,
+    cancelUser,
+    revokeUser,
   } from "@/api/RoleManagementAPI";
   import {
     getMenuTreeList,
@@ -216,10 +350,14 @@
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //bs类型
   import { nextTick, onMounted, onUnmounted, reactive, ref } from "vue";
-  import { roleType, treeListType } from "@/type";
+  import { roleType, treeListType, userType } from "@/type";
   import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
   import { cloneDeep } from "lodash";
+  import { storeToRefs } from "pinia";
+  import { useDarkThemeStore } from "@/stores/colorTheme";
 
+  //修改主题-----------------------------------------
+  let { darkTheme } = storeToRefs(useDarkThemeStore());
   //获取数据-----------------------
   const roleList = ref<roleType[]>();
   const getRoleListFun = async () => {
@@ -243,7 +381,9 @@
     });
   });
   let timeOutArr: NodeJS.Timeout[] = [];
-  const expandChangeFun = async () => {
+  const expandChangeFun = async (row: roleType) => {
+    getAllocatedListFun(row.roleId!, row.roleName);
+    // 延迟刷新betterscroll
     timeOutArr.push(
       setTimeout(() => {
         bs?.refresh();
@@ -302,27 +442,31 @@
   const waitAddOrEditRole = ref(false);
   const isAddRole = ref(true);
   const menuTreeList = ref<treeListType[]>([]);
-  let closeConfirm = (done: () => void) => {
-    ElMessageBox.confirm(`确认放弃${dialogTitle.value}吗?所填内容将会清空`, {
-      confirmButtonText: "是的",
-      cancelButtonText: "取消",
-      type: "warning",
-      draggable: true,
-      customClass: "rounded",
-    })
+  const closeConfirmTitle = ref("");
+  const closeConfirm = (done: () => void) => {
+    ElMessageBox.confirm(
+      `确认放弃${closeConfirmTitle.value}吗?所填内容将会清空`,
+      {
+        confirmButtonText: "是的",
+        cancelButtonText: "取消",
+        type: "warning",
+        draggable: true,
+        customClass: "rounded",
+      }
+    )
       .then(() => {
         done();
         // dialogFromRef.value?.resetFields();
         // dialogFromRef.value?.clearValidate();
         ElMessage({
           type: "info",
-          message: `放弃${dialogTitle.value.slice(0, 2)}`,
+          message: `放弃${closeConfirmTitle.value}`,
         });
       })
       .catch(() => {
         ElMessage({
           type: "info",
-          message: `继续${dialogTitle.value.slice(0, 2)}`,
+          message: `继续${closeConfirmTitle.value}`,
         });
       });
   };
@@ -332,7 +476,7 @@
     roleInfoForm = reactive(cloneDeep(defaultRoleInfo));
     isAddRole.value = true;
     roleDialogVisible.value = true;
-    dialogTitle.value = "添加角色";
+    dialogTitle.value = closeConfirmTitle.value = "添加角色";
     let res = await getMenuTreeList();
     if (res.code == 200) {
       console.log("获取的菜单树=>", res.data);
@@ -343,7 +487,7 @@
     roleInfoForm = reactive(cloneDeep(role));
     roleDialogVisible.value = true;
     isAddRole.value = false;
-    dialogTitle.value = "修改角色";
+    dialogTitle.value = closeConfirmTitle.value = "修改角色";
     let res = await getRoleMenuTreeSelect(role.roleId!);
     if (res.code == 200) {
       console.log(`id${role.roleId}的菜单树=>`, res.data);
@@ -392,4 +536,97 @@
         ElMessage.info("取消删除");
       });
   };
+
+  // 抽屉-------------------
+  const revokeUserDrawerVisible = ref(false);
+  const revokeUserDrawerTitle = ref("");
+  const UnallocatedList = ref<userType[]>([]);
+  const revokeUserSelectList = ref<(number | undefined)[]>([]);
+  const revokeUserForRoleId = ref(-1);
+  const revokeUserForRoleName = ref("");
+  const waitRevokeUser = ref(false);
+  const revokeUserSelectionChange = (val: userType[]) => {
+    revokeUserSelectList.value = val.map((i) => {
+      return i.userId;
+    });
+  };
+
+  //查询授权用户-------------
+  const getAllocatedListFun = async (roleId: number, roleName: string) => {
+    let res = await getAllocatedList(roleId!);
+    console.log(`'${roleName}'已挂载用户=>`, res);
+    if (res.code === 200) {
+      let index = roleList.value?.findIndex((i) => i.roleId === roleId);
+      roleList.value![index!].userList = res.data;
+    }
+  };
+
+  // 授权用户-----------------------------
+  const revokeUserDrawer = async (roleId: number, roleName: string) => {
+    revokeUserDrawerVisible.value = true;
+    revokeUserDrawerTitle.value = revokeUserForRoleName.value = roleName;
+    revokeUserForRoleId.value = roleId;
+    closeConfirmTitle.value = `为'${roleName}'授权用户`;
+    let res = await getUnallocatedList(roleId);
+    console.log(`'${roleName}'未分配用户=>`, res);
+    UnallocatedList.value = res.data;
+  };
+  const revokeUserFun = async () => {
+    waitRevokeUser.value = true;
+    let res = await revokeUser(
+      revokeUserForRoleId.value,
+      revokeUserSelectList.value
+    );
+    waitRevokeUser.value = false;
+    if (res.code === 200) {
+      ElMessage.success(`授权${revokeUserSelectList.value.length}个用户成功`);
+      getAllocatedListFun(
+        revokeUserForRoleId.value,
+        revokeUserForRoleName.value
+      );
+      revokeUserDrawerVisible.value = false;
+    } else ElMessage.error(res.message);
+  };
+
+  // 取消授权用户----------------
+  const userTableRef = ref();
+  const userIdList = ref<(number | undefined)[]>([]);
+  const cancelUserSelectionChange = (val: userType[]) => {
+    userIdList.value = val.map((i) => {
+      return i.userId;
+    });
+  };
+  let cancelUserFun = (user: userType) => {
+    userTableRef.value.toggleRowSelection(user, true);
+    ElMessageBox.confirm(
+      `确认要删除勾选的${userIdList.value.length}个用户吗?`,
+      {
+        confirmButtonText: "是的",
+        cancelButtonText: "取消",
+        type: "warning",
+        draggable: true,
+        customClass: "rounded",
+      }
+    )
+      .then(async () => {
+        let res = await cancelUser(userIdList.value);
+        if (res.code === 200) {
+          ElMessage.success("删除成功");
+          allUserList.value = [];
+          getUserListFun(); //重新请求数据进行用户列表渲染
+        } else ElMessage.error(res.message);
+      })
+      .catch(() => {
+        ElMessage.info("取消删除");
+      });
+  };
 </script>
+<style lang="scss">
+  .el-drawer__header {
+    margin-bottom: 0 !important;
+    padding-bottom: var(--el-drawer-padding-primary) !important;
+  }
+  .el-drawer__body {
+    padding-top: 0 !important;
+  }
+</style>

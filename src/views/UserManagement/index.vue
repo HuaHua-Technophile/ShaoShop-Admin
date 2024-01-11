@@ -73,7 +73,7 @@
             cell-class-name="text-center"
             class="bg-body rounded-4"
             empty-text="暂无符合查询条件的系统账户"
-            row-key="userName"
+            row-key="userId"
             @cell-click="cellClickFun"
             @selection-change="selectionChange">
             <el-table-column type="selection" width="30" />
@@ -182,7 +182,7 @@
             placeholder="运营部/物流部/..."
             :prefix-icon="renderFontIcon('bi bi-people')" />
         </el-form-item>
-        <el-form-item label="账号密码" prop="password">
+        <el-form-item label="账号密码" prop="password" v-if="isAddUser">
           <el-input
             clearable
             v-model="userInfoForm.password"
@@ -196,12 +196,22 @@
             placeholder="填写以绑定对应商户"
             :prefix-icon="renderFontIcon('bi bi-shop-window')" />
         </el-form-item>
+        <el-form-item
+          label="用户备注"
+          prop="remark"
+          style="padding-left: 10.18px">
+          <el-input
+            clearable
+            v-model="userInfoForm.remark"
+            placeholder="备注"
+            :prefix-icon="renderFontIcon('fa-solid fa-marker')" />
+        </el-form-item>
       </el-form>
       <div class="d-flex justify-content-center">
         <el-button
           @click="addOrEditUserFun(dialogFromRef)"
           :loading="waitAddOrEditUser"
-          >确认{{ dialogTitle.slice(0, 2)
+          >确认{{ dialogTitle
           }}<span v-if="!isAddUser"
             >ID: {{ userInfoForm.userId }}</span
           ></el-button
@@ -352,6 +362,7 @@
     nickName: "", //部门主体名称(账号名称)
     password: "", //密码。
     userId: -1,
+    remark: "", //备注
   };
   let userInfoForm = reactive(defaultUserInfo);
   const rules = reactive({
@@ -441,13 +452,13 @@
         // dialogFromRef.value?.resetFields();
         ElMessage({
           type: "info",
-          message: `放弃${dialogTitle.value.slice(0, 2)}`,
+          message: `放弃${dialogTitle.value}`,
         });
       })
       .catch(() => {
         ElMessage({
           type: "info",
-          message: `继续${dialogTitle.value.slice(0, 2)}`,
+          message: `继续${dialogTitle.value}`,
         });
       });
   };

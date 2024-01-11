@@ -326,7 +326,7 @@
             )
           "
           :loading="waitAddOrEdit"
-          >确认{{ dialogTitle.slice(0, 2) }}
+          >确认{{ dialogTitle }}
           <span v-if="!isAdd && isDict">ID: {{ dictInfoForm.dictId }}</span>
           <span v-if="!isAdd && !isDict"
             >Code: {{ dictDataInfoForm.dictCode }}</span
@@ -485,13 +485,13 @@
         // dialogFormRef.value?.clearValidate();
         ElMessage({
           type: "info",
-          message: `放弃${dialogTitle.value.slice(0, 2)}`,
+          message: `放弃${dialogTitle.value}`,
         });
       })
       .catch(() => {
         ElMessage({
           type: "info",
-          message: `继续${dialogTitle.value.slice(0, 2)}`,
+          message: `继续${dialogTitle.value}`,
         });
       });
   };
