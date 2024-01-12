@@ -107,13 +107,13 @@
               <template #header>
                 <div class="d-flex align-items-center justify-content-center">
                   跳至<el-input-number
-                    :disabled="pagesNum === -1"
+                    :disabled="allPageCount === -1"
                     size="small"
-                    v-model="page"
+                    v-model="nowPage"
                     :min="1"
-                    :max="pagesNum === -1 ? 1 : pagesNum"
+                    :max="allPageCount === -1 ? 1 : allPageCount"
                     @change="jumpPage"
-                    style="width: 75px" />/{{ pagesNum }}页
+                    style="width: 75px" />/{{ allPageCount }}页
                 </div>
               </template>
               <template #default="scope">
@@ -222,15 +222,15 @@
       <div
         class="position-absolute align-items-center p-2 rounded-pill me-3 mb-3"
         style="background: #141414; display: flex; right: 0; bottom: 0"
-        v-show="pagesNum != -1 && hoverBtnVisible">
+        v-show="allPageCount != -1 && hoverBtnVisible">
         跳至<el-input-number
-          :disabled="pagesNum === -1"
+          :disabled="allPageCount === -1"
           size="small"
-          v-model="page"
+          v-model="nowPage"
           :min="1"
-          :max="pagesNum === -1 ? 1 : pagesNum"
+          :max="allPageCount === -1 ? 1 : allPageCount"
           style="width: 75px"
-          @change="jumpPage" />/{{ pagesNum }}页
+          @change="jumpPage" />/{{ allPageCount }}页
       </div>
     </Transition>
   </div>
@@ -254,11 +254,11 @@
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
   // 不传参数的情况下，就是获取所有用户。传参数的情况下可用作搜索
   let allUserList = ref<userType[]>([]);
-  let pagesNum = ref(-1); //总的页数
-  let total = ref(-1); //总用户数量
-  let page = ref(1); // 当前页数
-  let itemHeight = ref<number | undefined>(-1); //每一项高度
-  let trHeight = ref<number | undefined>(-1); //表头高度
+  let allPageCount = ref(-1); //总的页数
+  let allUserCount = ref(-1); //总用户数量
+  let nowPage = ref(1); // 当前页数
+  let tableItemHeight = ref<number | undefined>(-1); //每一项高度
+  let tableHeaderHeight = ref<number | undefined>(-1); //表头高度
   const userQueryFrom = reactive({
     userName: "", //账号
     email: "", //绑定邮箱
@@ -272,12 +272,13 @@
     let res = await getUserList(userQueryFrom);
     console.log("用户列表=>", res);
     allUserList.value.push(...res.data.records);
-    total.value = res.data.total;
-    pagesNum.value = ceil(res.data.total / 20);
+    allUserCount.value = res.data.total;
+    allPageCount.value = ceil(res.data.total / 20);
     await nextTick();
     bs?.refresh();
-    itemHeight.value = document.querySelector(".el-table__row")?.clientHeight;
-    trHeight.value = document.querySelector("tr")?.clientHeight;
+    tableItemHeight.value =
+      document.querySelector(".el-table__row")?.clientHeight;
+    tableHeaderHeight.value = document.querySelector("tr")?.clientHeight;
   };
   getUserListFun();
 
@@ -311,11 +312,13 @@
     bs.on(
       "scroll",
       throttle((e: { x: number; y: number }) => {
-        if (-e.y > trHeight.value!) hoverBtnVisible.value = true;
+        if (-e.y > tableHeaderHeight.value!) hoverBtnVisible.value = true;
         else hoverBtnVisible.value = false;
-        page.value = ceil(
-          (-e.y + userListWrapper.value.clientHeight - trHeight.value!) /
-            (itemHeight.value! * 20)
+        nowPage.value = ceil(
+          (-e.y +
+            userListWrapper.value.clientHeight -
+            tableHeaderHeight.value!) /
+            (tableItemHeight.value! * 20)
         );
       }, 400)
     );
@@ -338,14 +341,14 @@
   let hoverBtnVisible = ref(false);
   let jumpPage = async () => {
     // 如果已经加载出的数据量小于要跳转的,则直接滚动
-    if (!(userQueryFrom.currentPage >= page.value)) {
-      userQueryFrom.pageSize = 20 * (page.value - userQueryFrom.currentPage);
+    if (!(userQueryFrom.currentPage >= nowPage.value)) {
+      userQueryFrom.pageSize = 20 * (nowPage.value - userQueryFrom.currentPage);
       await getUserListFun();
       userQueryFrom.pageSize = 20;
-      userQueryFrom.currentPage = page.value;
+      userQueryFrom.currentPage = nowPage.value;
       await nextTick();
     }
-    bs?.scrollTo(0, -(itemHeight.value! * 20 * (page.value - 1)), 500);
+    bs?.scrollTo(0, -(tableItemHeight.value! * 20 * (nowPage.value - 1)), 500);
   };
 
   //表单-----------------------

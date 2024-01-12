@@ -1,13 +1,21 @@
-// import { RouteRecordName } from "vue-router";
 // 左侧用户菜单
-export type authMenuListType = Array<{
+export type authMenuListType = {
   path: string;
   icon: string;
   menuName: string;
-  children: authMenuListType;
-}>;
-//用户登录所需信息,例如token
-export type loginInfoType = { authentication: string };
+  children: authMenuListType[];
+};
+// 登录表单
+export type loginFormType = {
+  userName: string;
+  password: string;
+};
+//登录返回信息,例如token
+export type loginInfoType = {
+  authentication: string;
+  username: string;
+  userId: number;
+};
 //每一个后台管理系统用户(账号)的信息
 export type userType = {
   businessId?: string;
@@ -47,11 +55,9 @@ export type iconType = {
   style?: object;
 };
 // 历史路由
-export type stateType = {
-  historicalNavigation: Array<{
-    name: RouteRecordName | undefined;
-    path: string;
-  }>;
+export type historicalRouteType = {
+  name: RouteRecordName | undefined;
+  path: string;
 };
 //角色对应的菜单
 export type roleMenuType = {
@@ -66,13 +72,12 @@ export type roleMenuType = {
   path: string;
   visible: number;
 };
-
+//树形选择器
 export type treeListType = {
   value: number;
   label: string;
   children?: treeListType[];
 };
-
 // 角色类型
 export type roleType = {
   roleName: string; //角色名称
@@ -95,7 +100,6 @@ export type roleType = {
   userList?: userType[]; //用户集合
   selectList?: (number | undefined)[]; //选中用户id集合,用于取消授权
 };
-
 // 字典类型-类型
 export type dictType = {
   dictId?: number; //字典类型id
@@ -126,6 +130,12 @@ export type dictDataType = {
   remark: string; //备注
   status?: number; //状态（0正常 1停用）
 };
-
 // 站内信类型
 export type systemMessageType = {};
+// 站内信查询类型
+export type messageQueryFromType = {
+  createTime: string | null; //创建时间
+  read: boolean | null; //是否已读
+  pageSize: number; //每页条数
+  currentPage: number; //当前页码
+};

@@ -111,7 +111,7 @@
                   :size="38"
                   shape="square"
                   src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png" />
-                <div class="ms-1">Admin</div>
+                <div class="ms-1">{{ userInfoStore.userName }}</div>
               </div>
               <template #dropdown>
                 <el-dropdown-menu>
@@ -182,6 +182,7 @@
   let hasThisRouter = historicalNavigationStore.historicalNavigation.some(
     (i) => i.path == window.location.pathname
   );
+  console.log("历史路由中存在当前windowPath", hasThisRouter);
   if (!hasThisRouter) {
     let routerItem = routerList.find((i) => i.path == window.location.pathname);
     historicalNavigationStore.historicalNavigation.push({
@@ -189,7 +190,7 @@
       path: routerItem!.path,
     });
   }
-  // 页面渲染所需数据(左侧菜单、站内消息)------------------------
+  // 页面渲染所需数据(左侧菜单、站内消息)----------------
   let userInfoStore = useUserInfoStore();
   const unReadMessage = ref(0);
   const getUnReadMessageFun = async () => {
@@ -243,7 +244,7 @@ https://segmentfault.com/a/1190000022822185 */
     e: MouseEvent,
     item: { path: string }
   ) => {
-    // 如果点击了关闭按钮,就删除并且跳转第一个，同时重新实例化BS
+    // 如果点击了关闭按钮,就删除并且跳转第一个,同时重新实例化BS
     if (
       /.*bi-x.*/.test((e.target as HTMLElement).className) ||
       /.*historicalNavigationClose.*/.test((e.target as HTMLElement).className)
@@ -252,7 +253,7 @@ https://segmentfault.com/a/1190000022822185 */
         historicalNavigationStore.historicalNavigation.filter(
           (i) => i.path != item.path
         );
-      // 如果关闭的是当前路由，
+      // 如果关闭的是当前路由,
       if (active.value == item.path) {
         // 判断路由是否只剩一个
         if (historicalNavigationStore.historicalNavigation.length == 1) {
@@ -276,14 +277,15 @@ https://segmentfault.com/a/1190000022822185 */
 
   //点击退出登录-------------------------------
   let logoutFun = async () => {
-    let logoutResult = await logout();
-    if (logoutResult.code == 200) {
-      ElMessage.success("退出成功");
-      localStorage.removeItem("token");
-      localStorage.removeItem("historicalNavigation");
-      historicalNavigationStore.historicalNavigation = [];
+    let res = await logout();
+    if (res.code == 200) {
+      localStorage.removeItem("token"); //清除本地token
+      historicalNavigationStore.historicalNavigation = []; //清除历史路由
+      userInfoStore.authMenuList = []; // 清除用户对应权限的路由列表
+
+      ElMessage.success(res.message);
       router.replace({ name: "login" });
-    } else ElMessage.success("网络异常");
+    } else ElMessage.error(res.message);
   };
 </script>
 

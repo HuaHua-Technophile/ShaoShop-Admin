@@ -1,15 +1,15 @@
 // import { ref } from "vue";
 import { defineStore } from "pinia";
-import { stateType } from "@/type/index";
+import { historicalRouteType } from "@/type/index";
+import { ref } from "vue";
 
 export const useHistoricalNavigationStore = defineStore(
   "historicalNavigation",
+  () => {
+    const historicalNavigation = ref<historicalRouteType[]>([]);
+    return { historicalNavigation };
+  },
   {
-    state: (): stateType => {
-      return {
-        historicalNavigation: [],
-      };
-    },
     persist: true,
   }
 );

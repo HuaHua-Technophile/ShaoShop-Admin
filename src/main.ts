@@ -14,7 +14,7 @@ const app = createApp(App);
 app.component("FontIcon", FontIcon); //全局字体图标渲染方式,自适应渲染class\unicode\svg
 
 const pinia = createPinia();
-pinia.use(piniaPluginPersistedstate);
+pinia.use(piniaPluginPersistedstate); //pinia数据持久化
 app.use(pinia);
 
 app.use(router);

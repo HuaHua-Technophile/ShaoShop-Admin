@@ -1,6 +1,6 @@
-import { authMenuListType, loginInfoType } from "../type/index";
+import { authMenuListType, loginFormType, loginInfoType } from "@/type/index";
 import instance from "./instance";
-export const login = (data: { password: string; userName: string }) => {
+export const login = (data: loginFormType) => {
   return instance<loginInfoType>({
     url: "/system/auth",
     method: "POST",
@@ -15,7 +15,7 @@ export const getImage = () => {
 };
 
 export const getAuthMenuList = () => {
-  return instance<authMenuListType>({
+  return instance<authMenuListType[]>({
     url: "/system/auth/list-menus",
     method: "GET",
   });

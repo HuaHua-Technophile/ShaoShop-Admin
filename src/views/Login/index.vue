@@ -12,21 +12,21 @@
         <div class="flex-shrink-0 ms-5">
           <div class="text-uppercase text-center fs-1 fw-bold">ShaoShop</div>
           <el-form
-            :model="form"
+            :model="loginForm"
             size="large"
             ref="ruleFormRef"
             :rules="rules"
             style="width: 300px">
             <el-form-item prop="userName">
               <el-input
-                v-model="form.userName"
+                v-model="loginForm.userName"
                 placeholder="账号"
                 clearable
                 :prefix-icon="renderFontIcon('bi bi-person')"></el-input>
             </el-form-item>
             <el-form-item prop="password">
               <el-input
-                v-model="form.password"
+                v-model="loginForm.password"
                 placeholder="密码"
                 clearable
                 show-password
@@ -36,7 +36,7 @@
               <el-button
                 type="primary"
                 class="w-100"
-                @click="submitForm(ruleFormRef)"
+                @click="loginFun(ruleFormRef)"
                 :loading="waitLogin">
                 <span class="me-2">登录</span>
                 <FontIcon icon="fa-solid fa-arrow-right-to-bracket"></FontIcon>
@@ -51,13 +51,16 @@
 
 <script lang="ts" setup>
   import { ref, reactive } from "vue";
-  import { login, getImage } from "../../api/login";
-  import { addMenuRouter } from "../../utils/addMenuRouter/addMenuRouter";
-  import { renderFontIcon } from "../../utils/fontIcon/renderFontIcon";
+  import { login, getImage, getAuthMenuList } from "@/api/login";
+  import { addMenuRouter } from "@/utils/addMenuRouter/addMenuRouter";
+  import { renderFontIcon } from "@/utils/fontIcon/renderFontIcon";
   import { ElMessage } from "element-plus";
   import type { FormInstance } from "element-plus";
+  import { useUserInfoStore } from "@/stores/userInfo";
+  import { loginFormType } from "@/type";
+  import router from "@/router";
 
-  // 获取登录图片-------------------------------------------------------
+  // 获取登录图片--------------------------------
   let loginSvg = ref();
   let getImageFun = async () => {
     let svgFixedSize = (await getImage()) + "";
@@ -69,10 +72,10 @@
   };
   getImageFun();
 
-  // 登录信息表单--------------------------------------------------------
+  // 登录信息表单---------------------------------
   const ruleFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
-  const form = reactive({
-    userName: "admin",
+  const loginForm = reactive<loginFormType>({
+    userName: "test",
     password: "123456",
   });
   const rules = reactive({
@@ -96,23 +99,35 @@
   });
   let waitLogin = ref(false); //是否处于等待登陆状态
 
-  // 表单提交前验证,验证不通过不发送请求------------------------------------
-  const submitForm = async (formEl: FormInstance | undefined) => {
+  // 表单提交前验证,验证不通过不发送请求-----------------
+  const userInfoStore = useUserInfoStore();
+
+  const loginFun = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate(async (valid, fields) => {
       if (valid) {
         waitLogin.value = true;
-        let res = await login({
-          userName: form.userName,
-          password: form.password,
+        let loginRes = await login({
+          userName: loginForm.userName,
+          password: loginForm.password,
         });
-        console.log("getLoginInfo获取到了登陆数据=>", res);
+        console.log("Login返回数据=>", loginRes);
         waitLogin.value = false;
-        if (res.code == 200) {
-          localStorage.setItem("token", res.data?.authentication);
-          addMenuRouter(true);
-        } else ElMessage.error(res.message);
+        if (loginRes.code == 200) {
+          localStorage.setItem("token", loginRes.data.authentication); //token放入本地存储
+          userInfoStore.userName = loginRes.data.username;
+          userInfoStore.userId = loginRes.data.userId; //userName和Id存入pinia跨组件通讯
+          // addMenuRouter(true);
+          let res = await getAuthMenuList();
+          console.log(`${loginRes.data.username}用户的路由列表=>`, res);
+          if (res.code == 200) {
+            let { firstRoute } = addMenuRouter(res.data);
+            userInfoStore.authMenuList = res.data; //赋值进入pinia
+            router.replace(firstRoute);
+          }
+        } else ElMessage.error(loginRes.message);
       } else console.log("error submit!", fields);
     });
   };
 </script>
+@/utils/addMenuRouter/addMenuRouter2
