@@ -103,7 +103,19 @@
                 </el-tooltip>
               </template>
             </el-table-column>
-            <el-table-column prop="remark" label="备注">
+            <el-table-column prop="remark">
+              <template #header>
+                <div class="d-flex align-items-center justify-content-center">
+                  跳至<el-input-number
+                    :disabled="pagesNum === -1"
+                    size="small"
+                    v-model="page"
+                    :min="1"
+                    :max="pagesNum === -1 ? 1 : pagesNum"
+                    @change="jumpPage"
+                    style="width: 75px" />/{{ pagesNum }}页
+                </div>
+              </template>
               <template #default="scope">
                 <el-tooltip
                   :content="scope.row.remark"
@@ -117,26 +129,10 @@
             </el-table-column>
             <el-table-column>
               <template #header>
-                <div class="d-flex align-items-center justify-content-center">
-                  跳至<el-input-number
-                    :disabled="pagesNum === -1"
-                    size="small"
-                    v-model="page"
-                    :min="1"
-                    :max="pagesNum === -1 ? 1 : pagesNum"
-                    @change="jumpPage"
-                    style="width: 75px" />/{{ pagesNum }}页
-                </div>
-              </template>
-              <template #default>
-                <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
-              </template>
-            </el-table-column>
-            <el-table-column>
-              <template #header>
                 <el-button @click="addUserDialog">添加账号</el-button>
               </template>
               <template #default>
+                <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
                 <fontIcon icon="bi bi-trash fs-6 text-danger" role="button" />
               </template>
             </el-table-column>

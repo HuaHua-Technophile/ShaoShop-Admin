@@ -50,75 +50,91 @@
                   </div>
                 </div>
                 <!-- 绑定的用户 -->
-                <el-table
-                  :ref="
-                    (el: TableInstance) => {
-                      userTableRefs[props.row.roleId] = el;
-                    }
-                  "
-                  :data="props.row.userList"
-                  table-layout="auto"
-                  header-cell-class-name="text-center text-body"
-                  :header-cell-style="{
-                    background: 'rgba(var(--bs-ShaoShop-rgb),0.4) !important',
-                  }"
-                  :row-class-name="darkTheme ? 'bg-black' : 'bg-body-secondary'"
-                  cell-class-name="text-center"
-                  class="bg-body rounded-4"
-                  empty-text="暂未查询到绑定该角色的用户"
-                  row-key="userName"
-                  @selection-change="
-                    cancelUserSelectionChange($event, props.row.roleId)
-                  ">
-                  <el-table-column type="selection" width="30" />
-                  <el-table-column label="序号" type="index" width="55" />
-                  <el-table-column prop="userId" label="ID" />
-                  <el-table-column prop="userName" label="账号名称" />
-                  <el-table-column prop="nickName" label="部门主体" />
-                  <el-table-column prop="status" label="状态">
-                    <template #default="scope">
-                      <el-tag
-                        :type="scope.row.status == 0 ? 'success' : 'danger'"
-                        >{{ scope.row.status == 0 ? "正常" : "停用" }}</el-tag
-                      >
-                    </template>
-                  </el-table-column>
-                  <el-table-column prop="email" label="邮箱" />
-                  <el-table-column prop="phoneNumber" label="电话" />
-                  <el-table-column prop="updateBy" label="更新者" />
-                  <el-table-column prop="updateTime" label="更新时间">
-                    <template #default="scope">
-                      <el-tooltip
-                        :content="scope.row.updateTime"
-                        effect="light"
-                        placement="left">
-                        <el-text style="max-width: 100px" truncated>
-                          {{ scope.row.updateTime }}
-                        </el-text>
-                      </el-tooltip>
-                    </template>
-                  </el-table-column>
-                  <el-table-column prop="remark" label="备注">
-                    <template #default="scope">
-                      <el-tooltip
-                        :content="scope.row.remark"
-                        effect="light"
-                        placement="left">
-                        <el-text style="max-width: 80px" truncated>
-                          {{ scope.row.remark }}
-                        </el-text>
-                      </el-tooltip>
-                    </template>
-                  </el-table-column>
-                  <el-table-column label="取消授权">
-                    <template #default="scope">
-                      <fontIcon
-                        icon="bi bi-trash fs-6 text-danger"
-                        role="button"
-                        @click="cancelUserFun(props.row.roleId, scope.row)" />
-                    </template>
-                  </el-table-column>
-                </el-table>
+                <div
+                  style="max-height: 600px !important"
+                  class="overflow-hidden"
+                  :id="`BSRef${props.row.roleId}`">
+                  <div
+                    class="内层BS"
+                    style="
+                      min-height: calc(100% + 1px) !important;
+                      padding: 1px 0 !important;
+                    ">
+                    <el-table
+                      :ref="(el: TableInstance) => {
+                      userTableRefs[props.row.roleId] = el;}"
+                      :data="props.row.userList"
+                      table-layout="auto"
+                      header-cell-class-name="text-center text-body"
+                      :header-cell-style="{
+                        background:
+                          'rgba(var(--bs-ShaoShop-rgb),0.4) !important',
+                      }"
+                      :row-class-name="
+                        darkTheme ? 'bg-black' : 'bg-body-secondary'
+                      "
+                      cell-class-name="text-center"
+                      class="bg-body rounded-4"
+                      empty-text="暂未查询到绑定该角色的用户"
+                      row-key="userName"
+                      @selection-change="
+                        cancelUserSelectionChange($event, props.row.roleId)
+                      ">
+                      <el-table-column type="selection" width="30" />
+                      <el-table-column label="序号" type="index" width="55" />
+                      <el-table-column prop="userId" label="ID" />
+                      <el-table-column prop="userName" label="账号名称" />
+                      <el-table-column prop="nickName" label="部门主体" />
+                      <el-table-column prop="status" label="状态">
+                        <template #default="scope">
+                          <el-tag
+                            :type="scope.row.status == 0 ? 'success' : 'danger'"
+                            >{{
+                              scope.row.status == 0 ? "正常" : "停用"
+                            }}</el-tag
+                          >
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="email" label="邮箱" />
+                      <el-table-column prop="phoneNumber" label="电话" />
+                      <el-table-column prop="updateBy" label="更新者" />
+                      <el-table-column prop="updateTime" label="更新时间">
+                        <template #default="scope">
+                          <el-tooltip
+                            :content="scope.row.updateTime"
+                            effect="light"
+                            placement="left">
+                            <el-text style="max-width: 100px" truncated>
+                              {{ scope.row.updateTime }}
+                            </el-text>
+                          </el-tooltip>
+                        </template>
+                      </el-table-column>
+                      <el-table-column prop="remark" label="备注">
+                        <template #default="scope">
+                          <el-tooltip
+                            :content="scope.row.remark"
+                            effect="light"
+                            placement="left">
+                            <el-text style="max-width: 80px" truncated>
+                              {{ scope.row.remark }}
+                            </el-text>
+                          </el-tooltip>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="取消授权">
+                        <template #default="scope">
+                          <fontIcon
+                            icon="bi bi-trash fs-6 text-danger"
+                            role="button"
+                            @click="
+                              cancelUserFun(props.row.roleId, scope.row)
+                            " />
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                  </div>
+                </div>
               </div>
             </template>
           </el-table-column>
@@ -353,6 +369,8 @@
   import BScroll from "@better-scroll/core";
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
+  import NestedScroll from "@better-scroll/nested-scroll";
+  //嵌套滚动
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //bs类型
   import { nextTick, onMounted, onUnmounted, reactive, ref } from "vue";
   import { roleType, treeListType, userType } from "@/type";
@@ -375,28 +393,35 @@
     console.log("获取的角色列表=>", res);
     roleList.value = res.data;
     await nextTick();
-    bs?.refresh();
+    bsOuter?.refresh();
   };
   getRoleListFun();
 
   // better scroll-------------------------
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
+  BScroll.use(NestedScroll);
   const roleListWrapper = ref();
-  let bs: BScrollConstructor<{}> | null = null;
+  let bsOuter: BScrollConstructor<{}> | null = null;
+  let bsInners = ref<{ [key: number]: BScrollConstructor }>({}); //bs实例
   onMounted(() => {
-    bs = new BScroll(roleListWrapper.value, {
+    bsOuter = new BScroll(roleListWrapper.value, {
       scrollbar: true,
       mouseWheel: true,
+      nestedScroll: {
+        groupId: 1, // string or number
+      },
     });
   });
   let timeOutArr: NodeJS.Timeout[] = [];
-  const expandChangeFun = async (row: roleType) => {
-    getAllocatedListFun(row.roleId!);
-    // 延迟刷新betterscroll
+  const expandChangeFun = async (row: roleType, expandedRows: roleType[]) => {
+    // 如果是展开就重载数据,并且延迟实例化内层BetterScroll
+    if (expandedRows.includes(row)) getAllocatedListFun(row.roleId!);
+    // 不管展开还是收起,都需要重新刷新BS
     timeOutArr.push(
       setTimeout(() => {
-        bs?.refresh();
+        bsOuter?.refresh();
+        bsInners.value[row.roleId!]?.destroy();
       }, 150)
     );
   };
@@ -567,6 +592,18 @@
     if (res.code === 200) {
       let index = roleList.value?.findIndex((i) => i.roleId === roleId);
       roleList.value![index!].userList = res.data;
+      bsInners.value[roleId] = new BScroll(`#BSRef${roleId}`, {
+        scrollbar: true,
+        mouseWheel: true,
+        nestedScroll: {
+          groupId: 1, // string or number
+        },
+      });
+      timeOutArr.push(
+        setTimeout(() => {
+          bsInners.value[roleId]?.refresh();
+        }, 150)
+      );
     }
   };
 
