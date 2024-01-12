@@ -417,11 +417,11 @@
   const expandChangeFun = async (row: roleType, expandedRows: roleType[]) => {
     // 如果是展开就重载数据,并且延迟实例化内层BetterScroll
     if (expandedRows.includes(row)) getAllocatedListFun(row.roleId!);
+    else bsInners.value[row.roleId!]?.destroy();
     // 不管展开还是收起,都需要重新刷新BS
     timeOutArr.push(
       setTimeout(() => {
         bsOuter?.refresh();
-        bsInners.value[row.roleId!]?.destroy();
       }, 150)
     );
   };
