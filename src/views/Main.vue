@@ -88,18 +88,22 @@
           <!-- 右侧控件 -->
           <div class="flex-shrink-0 d-flex align-items-center">
             <!-- 站内信 -->
-            <el-dropdown class="me-3">
-              <div class="position-relative">
-                <fontIcon icon="fa-regular fa-message fs-3"></fontIcon>
-                <!-- 未读消息红字 -->
-                <div class="position-absolute top-50 start-50 translate-middle">
-                  {{ systemMessage.length }}
-                </div>
+            <div
+              class="position-relative px-2 me-3 d-flex align-items-center justify-content-center">
+              <fontIcon icon="fa-regular fa-bell fs-4"></fontIcon>
+              <!-- 未读消息红字 -->
+              <div
+                class="position-absolute lh-1 top-0 rounded"
+                :class="[
+                  unReadMessage == 0
+                    ? 'bg-body fs-6 p-0 '
+                    : 'bg-danger end-0 px-1',
+                ]"
+                style="font-size: 10.6px; padding: 1.8px 0 1.6px 0"
+                :style="[unReadMessage == 0 ? 'right:7px' : '']">
+                {{ unReadMessage }}
               </div>
-              <template #dropdown>
-                <div>Dropdown</div>
-              </template>
-            </el-dropdown>
+            </div>
             <!-- 用户 -->
             <el-dropdown>
               <div class="d-flex align-items-center me-3">
@@ -143,12 +147,11 @@
   </el-container>
 </template>
 <script setup lang="ts">
-  import { systemMessageType } from "@/type/index";
   import router from "@/router/index";
   import { useUserInfoStore } from "@/stores/userInfo";
   import { useHistoricalNavigationStore } from "@/stores/historicalNavigation";
   import { logout } from "@/api/logout";
-  import { getSystemMessage } from "@/api/SystemMessageAPI";
+  import { getUnReadMessage } from "@/api/SystemMessageAPI";
   import { ElMessage } from "element-plus";
   import { nextTick, onMounted, ref } from "vue";
   import BScroll from "@better-scroll/core"; //bs核心
@@ -186,16 +189,16 @@
       path: routerItem!.path,
     });
   }
-
   // 页面渲染所需数据(左侧菜单、站内消息)------------------------
   let userInfoStore = useUserInfoStore();
-  const systemMessage = ref<systemMessageType[]>([]);
-  const getSystemMessageFun = async () => {
-    let res = await getSystemMessage();
-    console.log("获取到的站内信=>", res);
-    systemMessage.value = res.data.records;
+  const unReadMessage = ref(0);
+  const getUnReadMessageFun = async () => {
+    let res = await getUnReadMessage();
+    console.log(`未读系统消息${res.data}条`);
+    unReadMessage.value = res.data;
+    unReadMessage.value = 0;
   };
-  getSystemMessageFun();
+  getUnReadMessageFun();
   // 自动调整左侧路由激活项为当前页面url(将el-menu设置为router模式)-------------
   let active = ref(window.location.pathname);
   /* history.replaceState和pushState不会触发popstate事件

@@ -6,3 +6,11 @@ export const getSystemMessage = () => {
     method: "GET",
   });
 };
+// /system/message/unReadMessage 未读消息
+
+export const getUnReadMessage = () => {
+  return instance<number>({
+    url: "/system/message/unReadMessage",
+    method: "GET",
+  });
+};
