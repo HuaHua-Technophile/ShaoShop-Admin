@@ -8,11 +8,11 @@ export const useDarkThemeStore = defineStore(
       if (darkTheme.value) {
         document.documentElement.classList.add("dark");
         document.documentElement.dataset.bsTheme = "dark";
-        // console.log("toggledarkTheme => dark");
+        // console.log("当前主题色为Dark=>", darkTheme.value);
       } else {
         document.documentElement.classList.remove("dark");
         document.documentElement.dataset.bsTheme = "light";
-        // console.log("toggledarkTheme => light");
+        // console.log("当前主题色为Dark=>", darkTheme.value);
       }
     };
     return {

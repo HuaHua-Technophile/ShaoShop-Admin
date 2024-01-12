@@ -203,8 +203,8 @@
   // 自动调整左侧路由激活项为当前页面url(将el-menu设置为router模式)-------------
   let active = ref(window.location.pathname);
   /* history.replaceState和pushState不会触发popstate事件
-那么如何监听这两个行为呢。可以通过在方法里面主动的去触发popstate事件。另一种就是在方法中创建一个新的全局事件
-https://segmentfault.com/a/1190000022822185 */
+  那么如何监听这两个行为呢。可以通过在方法里面主动的去触发popstate事件。另一种就是在方法中创建一个新的全局事件
+  https://segmentfault.com/a/1190000022822185 */
   const _historyWrap = (type: keyof History) => {
     const orig = history[type];
     const e = new Event(type) as any;
