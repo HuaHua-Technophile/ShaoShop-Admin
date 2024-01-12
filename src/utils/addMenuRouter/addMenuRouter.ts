@@ -34,13 +34,7 @@ export const addMenuRouter = (
   let allRoutes = router.getRoutes();
   console.log("路由添加完毕=>", allRoutes);
   if (toPath) {
-    /* hasTargetRouter = allRoutes.some((i) => {
-      i.path == toPath;
-    }); */
-    allRoutes.forEach((i) => {
-      if (i.path == toPath) hasTargetRouter = true;
-    });
-
+    hasTargetRouter = allRoutes.some((i) => i.path == toPath);
     console.log("要跳转的目标=>", toPath, "已写入vueRouter", hasTargetRouter);
   }
 
