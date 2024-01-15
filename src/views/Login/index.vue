@@ -120,11 +120,13 @@
           // addMenuRouter(true);
           let res = await getAuthMenuList();
           console.log(`${loginRes.data.username}用户的路由列表=>`, res);
-          if (res.code == 200) {
-            let { firstRoute } = addMenuRouter(res.data);
+          if (res.code == 200 && res.data.length > 0) {
+            let { firstRoute, removeRouterArr } = addMenuRouter(res.data);
             userInfoStore.authMenuList = res.data; //赋值进入pinia
+            userInfoStore.removeRouterArr = removeRouterArr; //将所有动态路由暂存,在退出登录时清除动态路由
             router.replace(firstRoute);
-          }
+          } else if (!(res.data.length > 0))
+            ElMessage.error("该用户无权限路由，请核查是否授予相应角色");
         } else ElMessage.error(loginRes.message);
       } else console.log("error submit!", fields);
     });

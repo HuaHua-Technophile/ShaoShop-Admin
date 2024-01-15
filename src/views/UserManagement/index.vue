@@ -378,7 +378,6 @@
     remark: "", //备注
   };
   let userInfoForm = reactive(defaultUserInfo);
-
   const rules = reactive({
     userName: [{ required: true, message: "请输入账号", trigger: "blur" }],
     email: [
@@ -387,7 +386,7 @@
     ],
     phoneNumber: [
       { required: true, message: "请输入绑定手机号", trigger: "blur" },
-      { validator: emailValidator, trigger: "blur" },
+      { validator: phoneNumberValidator, trigger: "blur" },
     ],
     nickName: [
       {
