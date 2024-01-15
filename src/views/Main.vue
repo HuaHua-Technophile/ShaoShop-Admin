@@ -278,11 +278,11 @@
   //点击退出登录-------------------------------
   let logoutFun = async () => {
     let res = await logout();
-    if (res.code == 200) {
+    console.log(res);
+    if (res.code == 200 || res.code == 401) {
       localStorage.removeItem("token"); //清除本地token
       historicalNavigationStore.historicalNavigation = []; //清除历史路由
       userInfoStore.authMenuList = []; // 清除用户对应权限的路由列表
-
       ElMessage.success(res.message);
       router.replace({ name: "login" });
     } else ElMessage.error(res.message);

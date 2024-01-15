@@ -1,5 +1,6 @@
 <template>
   <div class="p-3 w-100 h-100">
+    <!-- 菜单列表 -->
     <div ref="menuListWrapper" class="w-100 h-100 overflow-hidden rounded-4">
       <div
         style="
@@ -321,14 +322,16 @@
         <el-form-item label="菜单名称" prop="menuName">
           <el-input
             clearable
+            maxlength="10"
             v-model="menuInfoForm.menuName"
-            placeholder="在左侧导航与顶部导航显示"
+            placeholder="在左侧导航与顶部导航显示(建议4字)"
             :prefix-icon="renderFontIcon('bi bi-123')">
           </el-input>
         </el-form-item>
         <el-form-item label="菜单路径" prop="path">
           <el-input
             clearable
+            maxlength="30"
             v-model="menuInfoForm.path"
             placeholder="路由地址"
             :prefix-icon="renderFontIcon('bi bi-geo-alt')">
@@ -337,6 +340,7 @@
         <el-form-item label="父级菜单" prop="parentId">
           <el-input
             clearable
+            maxlength="12"
             v-model="menuInfoForm.parentId"
             placeholder="挂靠的父级菜单id"
             :prefix-icon="renderFontIcon('bi bi-diagram-3')">
@@ -503,14 +507,8 @@
   };
   let menuInfoForm = reactive(defaultMenuInfo);
   const rules = reactive({
-    menuName: [
-      { required: true, message: "请输入菜单名称", trigger: "blur" },
-      { min: 0, max: 6, message: "长度在6位以内", trigger: "blur" },
-    ],
-    path: [
-      { required: true, message: "请输入路由地址", trigger: "blur" },
-      { min: 0, max: 30, message: "长度在30位以内", trigger: "blur" },
-    ],
+    menuName: [{ required: true, message: "请输入菜单名称", trigger: "blur" }],
+    path: [{ required: true, message: "请输入路由地址", trigger: "blur" }],
     parentId: [
       {
         required: true,
@@ -606,6 +604,6 @@
 </script>
 <style lang="scss">
   .el-table__placeholder {
-    display: none !important; //消除element表格中奇怪的占位元素，倒是ID那一栏被挤向右侧
+    display: none !important; //消除element表格中奇怪的占位元素，导致ID那一栏被挤向右侧
   }
 </style>

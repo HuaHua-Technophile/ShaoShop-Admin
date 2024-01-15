@@ -10,6 +10,7 @@
         <el-form-item class="col-3 pe-3" label="用户账号" prop="userName">
           <el-input
             clearable
+            maxlength="12"
             v-model="userQueryFrom.userName"
             placeholder="每个后台主体唯一名称"
             :prefix-icon="renderFontIcon('bi bi-123')" />
@@ -17,6 +18,7 @@
         <el-form-item class="col-3 pe-3" label="绑定邮箱" prop="email">
           <el-input
             clearable
+            maxlength="20"
             v-model="userQueryFrom.email"
             placeholder="每个后台主体唯一邮箱"
             :prefix-icon="renderFontIcon('bi bi-envelope')" />
@@ -24,6 +26,7 @@
         <el-form-item class="col-3 pe-3" label="绑定电话" prop="phoneNumber">
           <el-input
             clearable
+            maxlength="11"
             v-model="userQueryFrom.phoneNumber"
             placeholder="每个后台主体唯一手机号"
             :prefix-icon="renderFontIcon('bi bi-telephone')" />
@@ -31,6 +34,7 @@
         <el-form-item class="col-3 pe-3" label="部门主体" prop="nickName">
           <el-input
             clearable
+            maxlength="12"
             v-model="userQueryFrom.nickName"
             placeholder="运营部/物流部/..."
             :prefix-icon="renderFontIcon('bi bi-people')" />
@@ -140,7 +144,7 @@
         </div>
       </div>
     </div>
-    <!-- 弹出对话框 -->
+    <!-- 添加/修改用户弹窗 -->
     <el-dialog
       v-model="dialogVisible"
       :title="dialogTitle"
@@ -153,6 +157,7 @@
         <el-form-item label="用户账号" prop="userName">
           <el-input
             clearable
+            maxlength="12"
             v-model="userInfoForm.userName"
             placeholder="每个后台主体唯一名称"
             :prefix-icon="renderFontIcon('bi bi-123')" />
@@ -160,6 +165,7 @@
         <el-form-item label="绑定邮箱" prop="email">
           <el-input
             clearable
+            maxlength="20"
             v-model="userInfoForm.email"
             placeholder="每个后台主体唯一邮箱"
             :prefix-icon="renderFontIcon('bi bi-envelope')" />
@@ -167,6 +173,7 @@
         <el-form-item label="绑定电话" prop="phoneNumber">
           <el-input
             clearable
+            maxlength="11"
             v-model="userInfoForm.phoneNumber"
             placeholder="每个后台主体唯一手机号"
             :prefix-icon="renderFontIcon('bi bi-telephone')" />
@@ -174,6 +181,7 @@
         <el-form-item label="部门主体" prop="nickName">
           <el-input
             clearable
+            maxlength="12"
             v-model="userInfoForm.nickName"
             placeholder="运营部/物流部/..."
             :prefix-icon="renderFontIcon('bi bi-people')" />
@@ -181,6 +189,7 @@
         <el-form-item label="账号密码" prop="password" v-if="isAddUser">
           <el-input
             clearable
+            maxlength="20"
             v-model="userInfoForm.password"
             placeholder="6~20位密码,不能含有中文与空格"
             :prefix-icon="renderFontIcon('bi-shield-lock')" />
@@ -188,6 +197,7 @@
         <el-form-item label="商户(可空)" prop="businessId">
           <el-input
             clearable
+            maxlength="12"
             v-model="userInfoForm.businessId"
             placeholder="填写以绑定对应商户"
             :prefix-icon="renderFontIcon('bi bi-shop-window')" />
@@ -214,7 +224,7 @@
         >
       </div>
     </el-dialog>
-    <!-- 右下角悬浮跳页 -->
+    <!-- 右下角悬浮跳页按钮 -->
     <Transition
       appear
       enter-active-class="animate__animated animate__bounceIn"
@@ -253,6 +263,10 @@
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
   // 不传参数的情况下，就是获取所有用户。传参数的情况下可用作搜索
+  import {
+    phoneNumberValidator,
+    emailValidator,
+  } from "@/utils/elFromValidator/elFromValidator";
   let allUserList = ref<userType[]>([]);
   let allPageCount = ref(-1); //总的页数
   let allUserCount = ref(-1); //总用户数量
@@ -364,40 +378,16 @@
     remark: "", //备注
   };
   let userInfoForm = reactive(defaultUserInfo);
+
   const rules = reactive({
-    userName: [
-      { required: true, message: "请输入账号", trigger: "blur" },
-      { min: 0, max: 12, message: "长度在12位以内", trigger: "blur" },
-    ],
+    userName: [{ required: true, message: "请输入账号", trigger: "blur" }],
     email: [
       { required: true, message: "请输入绑定邮箱", trigger: "blur" },
-      { min: 0, max: 25, message: "邮箱至多25位", trigger: "blur" },
-      {
-        validator: (rule: any, value: string, callback: Function) => {
-          rule; //不用一下会Eslint提示报错,看着红色就烦
-          if (!/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/g.test(value)) {
-            callback(new Error("不符合邮箱规范"));
-          } else callback();
-        },
-        trigger: "blur",
-      },
+      { validator: emailValidator, trigger: "blur" },
     ],
     phoneNumber: [
       { required: true, message: "请输入绑定手机号", trigger: "blur" },
-      { min: 0, max: 11, message: "长度在11位以内", trigger: "blur" },
-      {
-        validator: (rule: any, value: string, callback: Function) => {
-          rule; //不用一下会Eslint提示报错,看着红色就烦
-          if (
-            !/^(13[0-9]|14[01456879]|15[0-35-9]|16[2567]|17[0-8]|18[0-9]|19[0-35-9])\d{8}$/.test(
-              value
-            )
-          ) {
-            callback(new Error("不符合手机号规范"));
-          } else callback();
-        },
-        trigger: "blur",
-      },
+      { validator: emailValidator, trigger: "blur" },
     ],
     nickName: [
       {
@@ -405,7 +395,6 @@
         message: "请输入部门主体名称(账号名称)",
         trigger: "blur",
       },
-      { min: 0, max: 12, message: "长度在12位以内", trigger: "blur" },
     ],
     password: [
       {
@@ -423,9 +412,6 @@
         },
         trigger: "blur",
       },
-    ],
-    businessId: [
-      { min: 0, max: 15, message: "商户ID长度为0~15位", trigger: "blur" },
     ],
   });
 
@@ -499,15 +485,8 @@
   //查询用户-------------------------------------
   const userQueryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const queryRules = reactive({
-    userName: [
-      { min: 0, max: 12, message: "长度在12位以内", trigger: "change" },
-    ],
-    phoneNumber: [
-      { min: 0, max: 11, message: "长度在11位以内", trigger: "change" },
-    ],
-    nickName: [
-      { min: 0, max: 12, message: "长度在12位以内", trigger: "change" },
-    ],
+    phoneNumber: [{ validator: phoneNumberValidator, trigger: "change" }],
+    email: [{ validator: emailValidator, trigger: "change" }],
   });
   const waitQueryUser = ref(false);
   let queryUserFun = async (formEl: FormInstance | undefined) => {

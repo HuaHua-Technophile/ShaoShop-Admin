@@ -1,10 +1,9 @@
 <template>
   <div class="w-100 h-100 d-flex flex-column">
-    <!-- 搜索用户/新建用户 -->
+    <!-- 搜索字典 -->
     <el-form
       :model="dictQueryFrom"
       ref="dictQueryFromRef"
-      :rules="queryRules"
       class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
       <el-form-item
         class="col-3 pe-3 flex-grow-1"
@@ -12,6 +11,7 @@
         prop="dictName">
         <el-input
           clearable
+          maxlength="10"
           v-model="dictQueryFrom.dictName"
           placeholder="字典名称"
           :prefix-icon="renderFontIcon('fa-solid fa-quote-left')" />
@@ -22,6 +22,7 @@
         prop="dictType">
         <el-input
           clearable
+          maxlength="20"
           v-model="dictQueryFrom.dictType"
           placeholder="字典类型"
           :prefix-icon="renderFontIcon('fa-solid fa-code')" />
@@ -198,7 +199,7 @@
         </div>
       </div>
     </div>
-    <!-- 添加/修改弹窗 -->
+    <!-- 添加/修改字典弹窗 -->
     <el-dialog
       :title="dialogTitle"
       v-model="dialogVisible"
@@ -216,6 +217,7 @@
         <el-form-item label="字典名称" prop="dictName">
           <el-input
             clearable
+            maxlength="10"
             v-model="dictInfoForm.dictName"
             placeholder="在选框外呈现给用户"
             :prefix-icon="renderFontIcon('fa-solid fa-quote-left')">
@@ -224,6 +226,7 @@
         <el-form-item label="字典类型" prop="dictType">
           <el-input
             clearable
+            maxlength="20"
             v-model="dictInfoForm.dictType"
             placeholder="在数据库中的标识"
             :prefix-icon="renderFontIcon('fa-solid fa-code')">
@@ -261,6 +264,7 @@
         <el-form-item label="数据标签" prop="dictLabel">
           <el-input
             clearable
+            maxlength="20"
             v-model="dictDataInfoForm.dictLabel"
             placeholder="字典数据呈现出的选项名称"
             :prefix-icon="renderFontIcon('fa-solid fa-tag')">
@@ -269,6 +273,7 @@
         <el-form-item label="数据键值" prop="dictValue">
           <el-input
             clearable
+            maxlength="20"
             v-model="dictDataInfoForm.dictValue"
             placeholder="字典数据传递的值"
             :prefix-icon="renderFontIcon('bi bi-123')">
@@ -446,23 +451,15 @@
   let dictInfoForm = reactive(defaultDictInfo);
   let dictDataInfoForm = reactive(defaultDictDataInfo);
   const dictRules = reactive({
-    dictName: [
-      { required: true, message: "请输入字典名称", trigger: "blur" },
-      { min: 0, max: 12, message: "长度在12位以内", trigger: "blur" },
-    ],
-    dictType: [
-      { required: true, message: "请输入字典类型", trigger: "blur" },
-      { min: 0, max: 12, message: "长度在12位以内", trigger: "blur" },
-    ],
+    dictName: [{ required: true, message: "请输入字典名称", trigger: "blur" }],
+    dictType: [{ required: true, message: "请输入字典类型", trigger: "blur" }],
   });
   const dictDataRules = reactive({
     dictLabel: [
       { required: true, message: "请输入字典数据标签", trigger: "blur" },
-      { min: 0, max: 12, message: "长度在12位以内", trigger: "blur" },
     ],
     dictValue: [
       { required: true, message: "请输入字典数据键值", trigger: "blur" },
-      { min: 0, max: 12, message: "长度在12位以内", trigger: "blur" },
     ],
   });
   //dialog弹出框--------------------
@@ -556,14 +553,6 @@
 
   //查询用户-------------------------------------
   const dictQueryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
-  const queryRules = reactive({
-    dictName: [
-      { min: 0, max: 12, message: "长度在12位以内", trigger: "change" },
-    ],
-    dictType: [
-      { min: 0, max: 12, message: "长度在12位以内", trigger: "change" },
-    ],
-  });
   const waitQueryDict = ref(false);
   let queryDictFun = async (formEl: FormInstance | undefined) => {
     // 先验证表单

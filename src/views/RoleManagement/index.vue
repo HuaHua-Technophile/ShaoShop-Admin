@@ -201,6 +201,7 @@
         <el-form-item label="角色称呼" prop="roleName">
           <el-input
             clearable
+            maxlength="10"
             v-model="roleInfoForm.roleName"
             placeholder="角色称呼"
             :prefix-icon="renderFontIcon('bi bi-123')">
@@ -209,6 +210,7 @@
         <el-form-item label="权限字符" prop="roleKey">
           <el-input
             clearable
+            maxlength="20"
             v-model="roleInfoForm.roleKey"
             placeholder="权限标识/权限字符"
             :prefix-icon="renderFontIcon('bi bi-key')">
@@ -217,6 +219,7 @@
         <el-form-item
           label="对应商户"
           prop="businessId"
+          maxlength="12"
           style="padding-left: 10.18px">
           <el-input
             clearable
@@ -461,14 +464,8 @@
   };
   let roleInfoForm = reactive(defaultRoleInfo);
   const rules = reactive({
-    roleName: [
-      { required: true, message: "请输入角色名称", trigger: "blur" },
-      { min: 0, max: 12, message: "长度在12位以内", trigger: "blur" },
-    ],
-    roleKey: [
-      { required: true, message: "请输入权限字符", trigger: "blur" },
-      { min: 0, max: 20, message: "长度在20位以内", trigger: "blur" },
-    ],
+    roleName: [{ required: true, message: "请输入角色名称", trigger: "blur" }],
+    roleKey: [{ required: true, message: "请输入权限字符", trigger: "blur" }],
   });
 
   //dialog对话框-----------------
@@ -572,7 +569,7 @@
       });
   };
 
-  // 抽屉-------------------
+  // 抽屉---------------------------------
   const revokeUserDrawerVisible = ref(false);
   const revokeUserDrawerTitle = ref("");
   const UnallocatedList = ref<userType[]>([]);
@@ -585,7 +582,7 @@
     });
   };
 
-  //查询授权用户-------------
+  //查询授权用户------------------------------
   const getAllocatedListFun = async (roleId: number) => {
     let res = await getAllocatedList(roleId!);
     console.log(`ID${roleId}已挂载用户=>`, res);
