@@ -43,6 +43,7 @@ const router = createRouter({
       name: "notFound",
       component: () => import("../views/notFound/index.vue"),
       beforeEnter: async (to, from, next) => {
+        from;
         const userInfoStore = useUserInfoStore();
         // 页面刷新后vue中没有路由,只存储在userInfoStore中,需要重新添加
         if (

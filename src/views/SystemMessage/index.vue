@@ -13,12 +13,34 @@
             padding: 1px 0 !important;
           ">
           <el-table
+            :data="systemMessageList"
             table-layout="auto"
             header-cell-class-name="text-center"
             row-class-name="bg-body"
             cell-class-name="text-center"
             class="bg-body rounded-4"
-            empty-text="暂无符合查询条件的消息"></el-table>
+            empty-text="暂无符合查询条件的消息">
+            <el-table-column label="序号" type="index" width="55" />
+            <el-table-column prop="messageId" label="ID" />
+            <el-table-column prop="receiverName" label="收件人" />
+            <el-table-column
+              prop="messageContent"
+              label="内容概览" /><el-table-column
+              prop="updateBy"
+              label="更新者" />
+            <el-table-column prop="updateTime" label="更新时间">
+              <template #default="scope">
+                <el-tooltip
+                  :content="scope.row.updateTime"
+                  effect="light"
+                  placement="left">
+                  <el-text style="max-width: 100px" truncated>
+                    {{ scope.row.updateTime }}
+                  </el-text>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
       </div>
     </div>
@@ -26,11 +48,11 @@
 </template>
 <script lang="ts" setup>
   import { getSystemMessage } from "@/api/SystemMessageAPI";
-  import { messageQueryFromType } from "@/type";
+  import { messageQueryFromType, systemMessageType } from "@/type";
   import { reactive, ref } from "vue";
 
   // 不传参数的情况下，就是获取所有消息。传参数的情况下可用作根据时间和是否已读来搜索
-  const systemMessageList = ref<[]>([]);
+  const systemMessageList = ref<systemMessageType[]>([]);
   let allPageCount = ref(-1); //总的页数
   let allMessageCount = ref(-1); //总消息数量
   let nowPage = ref(1); // 当前页数
@@ -46,7 +68,7 @@
     let res = await getSystemMessage(messageQueryFrom);
     console.log("系统消息=>", res);
     if (res.code == 200) {
-      systemMessageList;
+      systemMessageList.value.push(...res.data.records);
     }
   };
   getSystemMessageFun();

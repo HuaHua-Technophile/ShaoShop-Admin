@@ -131,7 +131,18 @@ export type dictDataType = {
   status?: number; //状态（0正常 1停用）
 };
 // 站内信类型
-export type systemMessageType = {};
+export type systemMessageType = {
+  createBy: string;
+  createTime: string;
+  updateBy: string;
+  updateTime: string;
+  id: number;
+  isRead: boolean; //是否已读
+  messageContent: string; //消息本体
+  messageId: number; //站内信ID
+  receiverId: number; //收件用户ID
+  receiverName: string; //收件用户
+};
 // 站内信查询类型
 export type messageQueryFromType = {
   createTime: string | null; //创建时间

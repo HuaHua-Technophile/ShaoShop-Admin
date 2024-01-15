@@ -152,6 +152,7 @@
   import { useHistoricalNavigationStore } from "@/stores/historicalNavigation";
   import { logout } from "@/api/logout";
   import { getUnReadMessage } from "@/api/SystemMessageAPI";
+  import { reLogIn } from "@/utils/reLogIn/reLogIn";
   import { ElMessage } from "element-plus";
   import { nextTick, onMounted, ref } from "vue";
   import BScroll from "@better-scroll/core"; //bs核心
@@ -179,29 +180,31 @@
   // 页面加载时就检查历史路由导航条是否存在当前路由,若不存在则表明是首次进入页面,需添加进顶部历史路由导航条
   const historicalNavigationStore = useHistoricalNavigationStore();
   const routerList = router.getRoutes();
-  let hasThisRouter = historicalNavigationStore.historicalNavigation.some(
+  const hasThisRouter = historicalNavigationStore.historicalNavigation.some(
     (i) => i.path == window.location.pathname
   );
   console.log("历史路由中存在当前windowPath", hasThisRouter);
   if (!hasThisRouter) {
-    let routerItem = routerList.find((i) => i.path == window.location.pathname);
+    const routerItem = routerList.find(
+      (i) => i.path == window.location.pathname
+    );
     historicalNavigationStore.historicalNavigation.push({
       name: routerItem!.name,
       path: routerItem!.path,
     });
   }
   // 页面渲染所需数据(左侧菜单、站内消息)----------------
-  let userInfoStore = useUserInfoStore();
+  const userInfoStore = useUserInfoStore();
   const unReadMessage = ref(0);
   const getUnReadMessageFun = async () => {
-    let res = await getUnReadMessage();
+    const res = await getUnReadMessage();
     console.log(`未读系统消息${res.data}条`);
     unReadMessage.value = res.data;
     unReadMessage.value = 0;
   };
   getUnReadMessageFun();
   // 自动调整左侧路由激活项为当前页面url(将el-menu设置为router模式)-------------
-  let active = ref(window.location.pathname);
+  const active = ref(window.location.pathname);
   /* history.replaceState和pushState不会触发popstate事件
   那么如何监听这两个行为呢。可以通过在方法里面主动的去触发popstate事件。另一种就是在方法中创建一个新的全局事件
   https://segmentfault.com/a/1190000022822185 */
@@ -220,9 +223,9 @@
     // console.log("change replaceState", e);
     active.value = e.arguments[0].forward;
   });
-  let menuSelect = async (index: string) => {
+  const menuSelect = async (index: string) => {
     /* 菜单点击回调(index: 选中菜单项的 index, indexPath: 选中菜单项的 index path, item: 选中菜单项, routeResult: vue-router 的返回值（如果 router 为 true）) */
-    let routerItem = routerList.find((i) => i.path == index);
+    const routerItem = routerList.find((i) => i.path == index);
     // 如果不在历史路由里就加进去
     if (
       !historicalNavigationStore.historicalNavigation.some(
@@ -240,7 +243,7 @@
   };
 
   // 历史路由点击事件----------------------
-  let historicalNavigationClick = async (
+  const historicalNavigationClick = async (
     e: MouseEvent,
     item: { path: string }
   ) => {
@@ -276,19 +279,10 @@
   };
 
   //点击退出登录-------------------------------
-  let logoutFun = async () => {
-    let res = await logout();
-    console.log(res);
+  const logoutFun = async () => {
+    const res = await logout();
     if (res.code == 200 || res.code == 401) {
-      localStorage.removeItem("token"); //清除本地token
-      historicalNavigationStore.historicalNavigation = []; //清除历史路由
-      userInfoStore.authMenuList = []; // 清除用户对应权限的路由列表
-      userInfoStore.removeRouterArr.forEach((i) => {
-        i();
-      }); //vueRouter通过调用回调,清除动态路由
-      console.log("动态路由已清除=>", router.getRoutes());
-      ElMessage.success(res.message);
-      router.replace({ name: "login" });
+      reLogIn(res.message);
     } else ElMessage.error(res.message);
   };
 </script>

@@ -1,5 +1,6 @@
 // 安装axios
 // $pnpm i axios -S
+import { reLogIn } from "@/utils/reLogIn/reLogIn";
 import axios from "axios";
 import {
   Axios,
@@ -48,7 +49,7 @@ const instance: AxiosInstance = axios.create({
   // withCredentials: true, //自动获取cookie信息
 });
 
-// request 拦截器 发送数据到后台拦截---------------------------
+// request 拦截器 发送数据到后台拦截--------------
 instance.interceptors.request.use(
   (config) => {
     // 添加token
@@ -65,7 +66,8 @@ instance.interceptors.request.use(
 // response 拦截器 后台返回前台拦截---------------------
 instance.interceptors.response.use(
   (config) => {
-    return config.data;
+    if (config.data.code == 401) reLogIn(config.data.message);
+    else return config.data;
   },
   (error) => {
     console.log("axios中response报错", error);
