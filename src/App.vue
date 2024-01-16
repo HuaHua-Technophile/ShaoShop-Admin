@@ -1,4 +1,4 @@
 <template>
-  <router-view class="vw-100 vh-100 overflow-x-hidden"></router-view>
+  <router-view></router-view>
 </template>
 <script setup lang="ts"></script>

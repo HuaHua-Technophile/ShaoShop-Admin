@@ -1,12 +1,22 @@
 import instance from "./instance";
 import { systemMessageType, messageQueryFromType } from "@/type/index";
 export const getSystemMessage = (params: messageQueryFromType) => {
-  return instance<{ records: systemMessageType[] }>({
+  return instance<{ records: systemMessageType[]; total: number }>({
     url: "/system/message",
     method: "GET",
     params,
   });
 };
+
+// /system/message/{messageId} 根据消息ID查看消息详情
+
+export const getSystemMessageById = (messageId: number) => {
+  return instance({
+    url: "/system/message/" + messageId,
+    method: "GET",
+  });
+};
+
 // /system/message/unReadMessage 未读消息
 
 export const getUnReadMessage = () => {

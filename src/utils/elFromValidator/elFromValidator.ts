@@ -26,3 +26,13 @@ export const emailValidator = (
     callback();
   else callback(new Error("不符合邮箱规范"));
 };
+export const passwordValidator = (
+  rule: any,
+  value: string,
+  callback: Function
+) => {
+  rule; //不用一下会Eslint提示报错,看着红色就烦
+  if (!/^[^\u4e00-\u9fa5 ]{6,16}$/.test(value)) {
+    callback(new Error("6~16位密码,不能含有中文与空格"));
+  } else callback();
+};

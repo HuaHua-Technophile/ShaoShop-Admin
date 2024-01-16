@@ -136,7 +136,7 @@ export type systemMessageType = {
   createTime: string;
   updateBy: string;
   updateTime: string;
-  id: number;
+  id: number; //可以理解为序号
   isRead: boolean; //是否已读
   messageContent: string; //消息本体
   messageId: number; //站内信ID

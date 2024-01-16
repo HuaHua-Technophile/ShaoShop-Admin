@@ -12,6 +12,7 @@ import {
   AxiosResponseHeaders,
   InternalAxiosRequestConfig,
 } from "axios";
+import { ElMessage } from "element-plus";
 
 // 重写接口-----------------------
 interface AxiosResponse<T = any, D = any> {
@@ -58,7 +59,7 @@ instance.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.log("axios中request报错", error);
+    // console.log("axios中request报错", error);
     Promise.reject(error);
   }
 );
@@ -67,10 +68,12 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   (config) => {
     if (config.data.code == 401) reLogIn(config.data.message);
-    else return config.data;
+    else if (config.data.code && config.data.code != 200)
+      ElMessage.error(config.data.message);
+    return config.data;
   },
   (error) => {
-    console.log("axios中response报错", error);
+    // console.log("axios中response报错", error);
     Promise.reject(error);
   }
 );

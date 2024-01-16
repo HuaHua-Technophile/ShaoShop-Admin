@@ -72,12 +72,12 @@
             ref="userTableRef"
             :data="allUserList"
             table-layout="auto"
+            class="bg-body rounded-4"
             header-cell-class-name="text-center"
+            row-key="userId"
             row-class-name="bg-body"
             cell-class-name="text-center"
-            class="bg-body rounded-4"
             empty-text="暂无符合查询条件的系统账户"
-            row-key="userId"
             @cell-click="cellClickFun"
             @selection-change="selectionChange">
             <el-table-column type="selection" width="30" />
@@ -109,16 +109,16 @@
             </el-table-column>
             <el-table-column prop="remark">
               <template #header>
-                <div class="d-flex align-items-center justify-content-center">
-                  跳至<el-input-number
-                    :disabled="allPageCount === -1"
-                    size="small"
-                    v-model="nowPage"
-                    :min="1"
-                    :max="allPageCount === -1 ? 1 : allPageCount"
-                    @change="jumpPage"
-                    style="width: 75px" />/{{ allPageCount }}页
-                </div>
+                <jumpPageBtn
+                  :queryFun="getUserListFun"
+                  :allPageCount="allPageCount"
+                  :nowPage="nowPage"
+                  :btnVisible="true"
+                  :bs="bs"
+                  :tableItemHeight="tableItemHeight"
+                  :tableHeaderHeight="tableHeaderHeight"
+                  :queryFrom="userQueryFrom"
+                  :defaultPageSize="defaultPageSize" />
               </template>
               <template #default="scope">
                 <el-tooltip
@@ -149,7 +149,7 @@
       v-model="dialogVisible"
       :title="dialogTitle"
       width="450px"
-      :before-close="closeConfirm"
+      :before-close="closeConfirmFun"
       class="rounded-4"
       draggable
       center>
@@ -189,9 +189,9 @@
         <el-form-item label="账号密码" prop="password" v-if="isAddUser">
           <el-input
             clearable
-            maxlength="20"
+            maxlength="16"
             v-model="userInfoForm.password"
-            placeholder="6~20位密码,不能含有中文与空格"
+            placeholder="6~16位密码,不能含有中文与空格"
             :prefix-icon="renderFontIcon('bi-shield-lock')" />
         </el-form-item>
         <el-form-item label="商户(可空)" prop="businessId">
@@ -229,19 +229,18 @@
       appear
       enter-active-class="animate__animated animate__bounceIn"
       leave-active-class="animate__animated animate__bounceOut">
-      <div
-        class="position-absolute align-items-center p-2 rounded-pill me-3 mb-3"
-        style="background: #141414; display: flex; right: 0; bottom: 0"
-        v-show="allPageCount != -1 && hoverBtnVisible">
-        跳至<el-input-number
-          :disabled="allPageCount === -1"
-          size="small"
-          v-model="nowPage"
-          :min="1"
-          :max="allPageCount === -1 ? 1 : allPageCount"
-          style="width: 75px"
-          @change="jumpPage" />/{{ allPageCount }}页
-      </div>
+      <jumpPageBtn
+        class="position-absolute p-2 rounded-pill me-3 mb-3"
+        style="background: #141414; right: 0; bottom: 0"
+        :queryFun="getUserListFun"
+        :allPageCount="allPageCount"
+        :nowPage="nowPage"
+        :btnVisible="btnVisible"
+        :bs="bs"
+        :tableItemHeight="tableItemHeight"
+        :tableHeaderHeight="tableHeaderHeight"
+        :queryFrom="userQueryFrom"
+        :defaultPageSize="defaultPageSize" />
     </Transition>
   </div>
 </template>
@@ -253,46 +252,73 @@
     delUser,
   } from "@/api/UserManagementAPI.ts";
   import { renderFontIcon } from "@/utils/fontIcon/renderFontIcon";
-  import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
+  import { ElMessage, FormInstance } from "element-plus";
   import { onMounted, reactive, ref, nextTick } from "vue";
   import { userType } from "@/type/index";
-  import { ceil, throttle, cloneDeep } from "lodash"; //lodash按需引入减少打包体积
+  import { ceil, throttle, cloneDeep } from "lodash"; //lodash按需引入减少打包体积(_.ceil(number, [precision=0])根据 precision（精度） 向上舍入 number。（注： precision（精度）可以理解为保留几位小数。）)
   import BScroll from "@better-scroll/core";
   import Pullup from "@better-scroll/pull-up"; //上拉懒加载
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
-  // 不传参数的情况下，就是获取所有用户。传参数的情况下可用作搜索
   import {
     phoneNumberValidator,
     emailValidator,
+    passwordValidator,
   } from "@/utils/elFromValidator/elFromValidator";
-  let allUserList = ref<userType[]>([]);
-  let allPageCount = ref(-1); //总的页数
-  let allUserCount = ref(-1); //总用户数量
-  let nowPage = ref(1); // 当前页数
-  let tableItemHeight = ref<number | undefined>(-1); //每一项高度
-  let tableHeaderHeight = ref<number | undefined>(-1); //表头高度
+  import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm/elMessageBoxConfirm";
+
+  // 不传参数的情况下，就是获取所有用户。传参数的情况下可用作搜索
+  const allUserList = ref<userType[]>([]);
+  const allPageCount = ref(-1); //总的页数
+  const nowPage = ref(1); // 当前页数
+  const defaultPageSize = 20;
+  let tableItemHeight: number; //每一项高度
+  let tableHeaderHeight: number; //表头高度
+  const waitQueryUser = ref(false);
   const userQueryFrom = reactive({
     userName: "", //账号
     email: "", //绑定邮箱
     phoneNumber: "", //绑定手机号
     nickName: "", //部门主体名称(账号名称)
     status: null, //状态
-    currentPage: 1, //页码
-    pageSize: 20, //每页返回的数量
+    currentPage: 1, //请求的页码
+    pageSize: defaultPageSize, //每页返回的数量
   });
-  const getUserListFun = async () => {
-    let res = await getUserList(userQueryFrom);
-    console.log("用户列表=>", res);
-    allUserList.value.push(...res.data.records);
-    allUserCount.value = res.data.total;
-    allPageCount.value = ceil(res.data.total / 20);
-    await nextTick();
-    bs?.refresh();
-    tableItemHeight.value =
-      document.querySelector(".el-table__row")?.clientHeight;
-    tableHeaderHeight.value = document.querySelector("tr")?.clientHeight;
+  const getUserListFun = async (excessDataCount?: number) => {
+    let closePullUp;
+    waitQueryUser.value = true;
+    const res = await getUserList(userQueryFrom);
+    waitQueryUser.value = false;
+    console.log(
+      `查询条件`,
+      userQueryFrom,
+      `第${userQueryFrom.currentPage}页用户列表(${res.data.records.length})=>`,
+      res
+    );
+    if (res.code == 200 && res.data.records.length > 0) {
+      if (excessDataCount) res.data.records.splice(0, excessDataCount);
+      allUserList.value.push(...res.data.records);
+      await nextTick();
+      bs.refresh();
+      // 每次请求都重新赋值总页数
+      allPageCount.value = ceil(Number(res.data.total) / defaultPageSize);
+      // 如果是页面初次加载,则获取元素高度
+      if (!tableItemHeight)
+        tableItemHeight = Number(
+          window
+            .getComputedStyle(document.querySelector(".el-table__row")!)
+            .height.replace("px", "")
+        );
+      if (!tableHeaderHeight)
+        tableHeaderHeight = Number(
+          window
+            .getComputedStyle(document.querySelector(".el-table__body-header")!)
+            .height.replace("px", "")
+        );
+      if (allUserList.value.length >= res.data.total) closePullUp = true;
+    } else bs.closePullUp();
+    return { closePullUp };
   };
   getUserListFun();
 
@@ -301,7 +327,8 @@
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
   const userListWrapper = ref();
-  let bs: BScrollConstructor<{}> | null = null;
+  const btnVisible = ref(false);
+  let bs: BScrollConstructor<{}>;
   onMounted(() => {
     bs = new BScroll(userListWrapper.value, {
       pullUpLoad: {
@@ -310,36 +337,36 @@
       scrollbar: true,
       mouseWheel: true,
     });
-    bs?.on("pullingUp", async () => {
-      userQueryFrom.currentPage++;
-      let res = await getUserList(userQueryFrom);
-      console.log(
-        `第${userQueryFrom.currentPage}页(${res.data.records.length}条)=>`,
-        res.data.records
-      );
-      if (res.data.records.length < userQueryFrom.pageSize) bs?.closePullUp();
-      else bs?.finishPullUp();
-      allUserList.value.push(...res.data.records);
-      await nextTick();
-      bs?.refresh();
+    bs.on("pullingUp", async () => {
+      userQueryFrom.currentPage++; //请求页码自增
+      console.log("触发了pullingUp,页码自增", userQueryFrom.currentPage);
+      const { closePullUp } = await getUserListFun();
+      if (closePullUp) bs!.closePullUp();
+      else bs!.finishPullUp();
     });
     bs.on(
       "scroll",
+      // 使用节流,实时刷新当前页面
       throttle((e: { x: number; y: number }) => {
-        if (-e.y > tableHeaderHeight.value!) hoverBtnVisible.value = true;
-        else hoverBtnVisible.value = false;
+        if (-e.y + 1 > tableHeaderHeight!) btnVisible.value = true;
+        else btnVisible.value = false;
+        // 滚动高度-表头高度=实际滚动内容
         nowPage.value = ceil(
-          (-e.y +
-            userListWrapper.value.clientHeight -
-            tableHeaderHeight.value!) /
-            (tableItemHeight.value! * 20)
+          (-e.y - tableHeaderHeight! + userListWrapper.value.clientHeight) /
+            (tableItemHeight! * userQueryFrom.pageSize)
         );
+        /* console.log(
+            `视窗高${userListWrapper.value.clientHeight}px,表头高${
+              tableHeaderHeight
+            }px,单格高${tableItemHeight}px,滚动了=>${-e.y}px,`,
+            nowPage.value
+          ); */
       }, 400)
     );
   });
 
   //表格点击回调-------------
-  let cellClickFun = (
+  const cellClickFun = (
     row: userType,
     column: any,
     cell: any,
@@ -350,19 +377,6 @@
     if (event.target.className.includes("bi-pencil-square"))
       editUserDialog(row);
     if (event.target.className.includes("bi-trash")) delUserFun(row);
-  };
-  //表格跳页-----------------
-  let hoverBtnVisible = ref(false);
-  let jumpPage = async () => {
-    // 如果已经加载出的数据量小于要跳转的,则直接滚动
-    if (!(userQueryFrom.currentPage >= nowPage.value)) {
-      userQueryFrom.pageSize = 20 * (nowPage.value - userQueryFrom.currentPage);
-      await getUserListFun();
-      userQueryFrom.pageSize = 20;
-      userQueryFrom.currentPage = nowPage.value;
-      await nextTick();
-    }
-    bs?.scrollTo(0, -(tableItemHeight.value! * 20 * (nowPage.value - 1)), 500);
   };
 
   //表单-----------------------
@@ -396,21 +410,8 @@
       },
     ],
     password: [
-      {
-        required: true,
-        message: "请输入密码",
-        trigger: "blur",
-      },
-      { min: 6, max: 20, message: "密码长度为6~20位", trigger: "blur" },
-      {
-        validator: (rule: any, value: string, callback: Function) => {
-          rule; //不用一下会Eslint提示报错,看着红色就烦
-          if (/^[^\u4e00-\u9fa5 ]$/.test(value)) {
-            callback(new Error("不能含有中文或空格"));
-          } else callback();
-        },
-        trigger: "blur",
-      },
+      { required: true, message: "请输入密码", trigger: "blur" },
+      { validator: passwordValidator, trigger: "blur" },
     ],
   });
 
@@ -419,43 +420,22 @@
   const dialogTitle = ref("添加用户");
   const isAddUser = ref(true);
   const waitAddOrEditUser = ref(false);
-  let closeConfirm = (done: () => void) => {
-    ElMessageBox.confirm(
-      `"确认放弃${dialogTitle.value}吗?所填内容将会被清空"`,
-      {
-        confirmButtonText: "是的",
-        cancelButtonText: "取消",
-        type: "warning",
-        draggable: true,
-        customClass: "rounded",
-      }
-    )
-      .then(() => {
-        done();
-        // dialogFromRef.value?.clearValidate();
-        // dialogFromRef.value?.resetFields();
-        ElMessage({
-          type: "info",
-          message: `放弃${dialogTitle.value}`,
-        });
-      })
-      .catch(() => {
-        ElMessage({
-          type: "info",
-          message: `继续${dialogTitle.value}`,
-        });
-      });
+  const closeConfirmFun = (done: () => void) => {
+    elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
+      done();
+      ElMessage.info(`放弃${dialogTitle.value}`);
+    });
   };
 
   // 添加/修改用户--------------------------------
-  let addUserDialog = () => {
+  const addUserDialog = () => {
     userInfoForm = reactive(cloneDeep(defaultUserInfo));
     dialogVisible.value = true;
     isAddUser.value = true;
     dialogTitle.value = "添加用户";
   };
   //修改用户--------------------------------------
-  let editUserDialog = (user: userType) => {
+  const editUserDialog = (user: userType) => {
     userInfoForm = reactive(cloneDeep(user));
     dialogVisible.value = true;
     isAddUser.value = false;
@@ -473,6 +453,7 @@
         if (res.code === 200) {
           ElMessage.success("添加成功");
           allUserList.value = [];
+          userQueryFrom.currentPage = 1;
           getUserListFun(); //重新请求数据进行用户列表渲染
           // dialogVisible.value = false; //隐藏弹出框
         } else ElMessage.error(res.message);
@@ -487,24 +468,14 @@
     phoneNumber: [{ validator: phoneNumberValidator, trigger: "change" }],
     email: [{ validator: emailValidator, trigger: "change" }],
   });
-  const waitQueryUser = ref(false);
-  let queryUserFun = async (formEl: FormInstance | undefined) => {
+  const queryUserFun = async (formEl: FormInstance | undefined) => {
     // 先验证表单
     if (!formEl) return;
     await formEl.validate(async (valid, fields) => {
       if (valid) {
         allUserList.value = [];
-        waitQueryUser.value = true;
-        console.log("查询条件=>", userQueryFrom);
-        let res = await getUserList(userQueryFrom);
-        console.log("查询结果=>", res);
-        if (res.code === 200) {
-          ElMessage.success("查询成功");
-          allUserList.value.push(...res.data.records);
-          await nextTick();
-          bs?.refresh();
-        } else ElMessage.error(res.message);
-        waitQueryUser.value = false;
+        userQueryFrom.currentPage = 1;
+        getUserListFun();
       } else console.log("error submit!", fields);
     });
   };
@@ -512,34 +483,25 @@
   //删除用户------------------------------------
   const userTableRef = ref();
   const userIdList = ref<(number | undefined)[]>([]);
-  let selectionChange = (val: userType[]) => {
+  const selectionChange = (val: userType[]) => {
     userIdList.value = val.map((i) => {
       return i.userId;
     });
   };
-  let delUserFun = (user: userType) => {
+  const delUserFun = (user: userType) => {
     userTableRef.value.toggleRowSelection(user, true);
-    ElMessageBox.confirm(
-      `确认要删除勾选的${userIdList.value.length}个用户吗?`,
-      {
-        confirmButtonText: "是的",
-        cancelButtonText: "取消",
-        type: "warning",
-        draggable: true,
-        customClass: "rounded",
-      }
-    )
-      .then(async () => {
-        let res = await delUser(userIdList.value);
+    elMessageBoxConfirm(
+      `删除勾选的${userIdList.value.length}个用户`,
+      async () => {
+        const res = await delUser(userIdList.value);
         if (res.code === 200) {
-          ElMessage.success("删除成功");
+          ElMessage.success(res.message);
           allUserList.value = [];
+          userQueryFrom.currentPage = 1;
           getUserListFun(); //重新请求数据进行用户列表渲染
         } else ElMessage.error(res.message);
-      })
-      .catch(() => {
-        ElMessage.info("取消删除");
-      });
+      }
+    );
   };
 </script>
 <style lang="scss">

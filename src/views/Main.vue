@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <el-container class="vw-100 vh-100 overflow-x-hidden">
     <!-- 左侧(菜单) -->
     <el-aside width="180px" class="d-flex flex-column">
       <div
@@ -281,7 +281,7 @@
   //点击退出登录-------------------------------
   const logoutFun = async () => {
     const res = await logout();
-    if (res.code == 200 || res.code == 401) {
+    if (res.code == 200) {
       reLogIn(res.message);
     } else ElMessage.error(res.message);
   };

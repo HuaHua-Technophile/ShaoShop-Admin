@@ -59,12 +59,12 @@
             ref="dictTableRef"
             :data="allDictList"
             table-layout="auto"
+            class="bg-body rounded-4"
             header-cell-class-name="text-center"
+            row-key="dictName"
             row-class-name="bg-body"
             cell-class-name="text-center"
-            class="bg-body rounded-4"
             empty-text="暂无符合查询条件的字典"
-            row-key="dictName"
             @cell-click="cellClickFun"
             @expand-change="expandChangeFun">
             <!-- 外层表格扩展 -->
@@ -74,16 +74,16 @@
                   <el-table
                     :data="props.row.sysDictDataList"
                     table-layout="auto"
+                    class="bg-body rounded-4"
                     header-cell-class-name="text-center text-body"
                     :header-cell-style="{
                       background: 'rgba(var(--bs-ShaoShop-rgb),0.4) !important',
                     }"
+                    row-key="dictId"
                     :row-class-name="
                       darkTheme ? 'bg-black' : 'bg-body-secondary'
                     "
                     cell-class-name="text-center"
-                    class="bg-body rounded-4"
-                    row-key="dictId"
                     @cell-click="cellClickFun"
                     @expand-change="expandChangeFun"
                     empty-text="该字典下暂无数据,请添加">
@@ -362,23 +362,32 @@
   import { storeToRefs } from "pinia";
   import { useDarkThemeStore } from "@/stores/colorTheme";
   import { cloneDeep } from "lodash";
+  import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm/elMessageBoxConfirm";
 
   //修改主题-------------------------------------------------
-  let { darkTheme } = storeToRefs(useDarkThemeStore());
+  const { darkTheme } = storeToRefs(useDarkThemeStore());
 
   // 不传参数的情况下，就是获取所有字典。传参数的情况下可用作搜索
-  let allDictList = ref<dictType[]>([]);
+  const allDictList = ref<dictType[]>([]);
+  const waitQueryDict = ref(false);
   const dictQueryFrom = reactive({
     dictName: "",
     dictType: "",
     status: null,
   });
   const getDictListFun = async () => {
-    let res = await getDictList(dictQueryFrom);
-    console.log("字典列表=>", res);
-    allDictList.value = res.data.records;
-    await nextTick();
-    bs?.refresh();
+    allDictList.value = [];
+    waitQueryDict.value = true;
+    console.log("查询条件=>", dictQueryFrom);
+    const res = await getDictList(dictQueryFrom);
+    console.log("查询结果=>", res);
+    if (res.code === 200) {
+      ElMessage.success("查询成功");
+      allDictList.value = res.data.records;
+      await nextTick();
+      bs.refresh();
+    } else ElMessage.error(res.message);
+    waitQueryDict.value = false;
   };
   getDictListFun();
 
@@ -386,18 +395,18 @@
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
   const dictListWrapper = ref();
-  let bs: BScrollConstructor<{}> | null = null;
+  let bs: BScrollConstructor<{}>;
   onMounted(() => {
     bs = new BScroll(dictListWrapper.value, {
       scrollbar: true,
       mouseWheel: true,
     });
   });
-  let timeOutArr: NodeJS.Timeout[] = [];
+  const timeOutArr: NodeJS.Timeout[] = [];
   const expandChangeFun = async () => {
     timeOutArr.push(
       setTimeout(() => {
-        bs?.refresh();
+        bs.refresh();
       }, 150)
     );
   };
@@ -408,7 +417,7 @@
   });
 
   //表格点击回调-------------
-  let cellClickFun = (
+  const cellClickFun = (
     row: dictType & dictDataType,
     column: any,
     cell: any,
@@ -468,29 +477,11 @@
   const waitAddOrEdit = ref(false);
   const isAdd = ref(true);
   const isDict = ref(true);
-  let closeConfirm = (done: () => void) => {
-    ElMessageBox.confirm(`确认放弃${dialogTitle.value}吗?所填内容将会清空`, {
-      confirmButtonText: "是的",
-      cancelButtonText: "取消",
-      type: "warning",
-      draggable: true,
-      customClass: "rounded",
-    })
-      .then(() => {
-        done();
-        // dialogFormRef.value?.resetFields();
-        // dialogFormRef.value?.clearValidate();
-        ElMessage({
-          type: "info",
-          message: `放弃${dialogTitle.value}`,
-        });
-      })
-      .catch(() => {
-        ElMessage({
-          type: "info",
-          message: `继续${dialogTitle.value}`,
-        });
-      });
+  const closeConfirm = (done: () => void) => {
+    elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
+      done();
+      ElMessage.info(`放弃${dialogTitle.value}`);
+    });
   };
 
   //添加/修改字典类型/字典数据-----------------
@@ -509,7 +500,7 @@
     dialogTitle.value = "修改字典类型";
   };
   const addDictDataDialog = (dict: dictType) => {
-    let DictDataInfo = cloneDeep(defaultDictDataInfo);
+    const DictDataInfo = cloneDeep(defaultDictDataInfo);
     DictDataInfo.dictType = dict.dictType;
     console.log("添加字典数据的默认值=>", DictDataInfo);
     dictDataInfoForm = reactive(DictDataInfo);
@@ -553,25 +544,12 @@
 
   //查询用户-------------------------------------
   const dictQueryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
-  const waitQueryDict = ref(false);
-  let queryDictFun = async (formEl: FormInstance | undefined) => {
+  const queryDictFun = async (formEl: FormInstance | undefined) => {
     // 先验证表单
     if (!formEl) return;
-    await formEl.validate(async (valid, fields) => {
-      if (valid) {
-        allDictList.value = [];
-        waitQueryDict.value = true;
-        console.log("查询条件=>", dictQueryFrom);
-        let res = await getDictList(dictQueryFrom);
-        console.log("查询结果=>", res);
-        if (res.code === 200) {
-          ElMessage.success("查询成功");
-          allDictList.value = res.data.records;
-          await nextTick();
-          bs?.refresh();
-        } else ElMessage.error(res.message);
-        waitQueryDict.value = false;
-      } else console.log("error submit!", fields);
+    await formEl.validate((valid, fields) => {
+      if (valid) getDictListFun();
+      else console.log("error submit!", fields);
     });
   };
 
@@ -585,7 +563,7 @@
       customClass: "rounded",
     })
       .then(async () => {
-        let res = await delDict(dictId);
+        const res = await delDict(dictId);
         if (res.code == 200) {
           ElMessage.success(res.message);
           getDictListFun();
@@ -604,7 +582,7 @@
       customClass: "rounded",
     })
       .then(async () => {
-        let res = await delDictData(dictCode);
+        const res = await delDictData(dictCode);
         if (res.code == 200) {
           ElMessage.success(res.message);
           getDictListFun();

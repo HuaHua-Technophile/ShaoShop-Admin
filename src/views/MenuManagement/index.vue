@@ -44,17 +44,17 @@
                     <el-table
                       :data="props.row.children"
                       table-layout="auto"
+                      class="bg-body rounded-4 border-start border-end"
                       header-cell-class-name="text-center text-body"
                       :header-cell-style="{
                         background:
                           'rgba(var(--bs-ShaoShop-rgb),0.4) !important',
                       }"
+                      row-key="menuId"
                       :row-class-name="
                         darkTheme ? 'bg-black' : 'bg-body-secondary'
                       "
                       cell-class-name="text-center"
-                      class="bg-body rounded-4 border-start border-end"
-                      row-key="menuId"
                       @cell-click="cellClickFun"
                       @expand-change="expandChangeFun">
                       <!-- 内层表格扩展 -->
@@ -314,7 +314,7 @@
       :title="dialogTitle"
       v-model="menuDialogVisible"
       width="445px"
-      :before-close="closeConfirm"
+      :before-close="closeConfirmFun"
       class="rounded-4"
       draggable
       center>
@@ -435,12 +435,13 @@
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //bs类型
   import { nextTick, onMounted, onUnmounted, reactive, ref } from "vue";
-  import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
+  import { ElMessage, FormInstance } from "element-plus";
   import { storeToRefs } from "pinia";
   import { useDarkThemeStore } from "@/stores/colorTheme";
   import { cloneDeep } from "lodash";
-  //修改主题-------------------------------------------------
-  let { darkTheme } = storeToRefs(useDarkThemeStore());
+  import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm/elMessageBoxConfirm";
+  //修改主题------------------------------------------
+  const { darkTheme } = storeToRefs(useDarkThemeStore());
   //获取菜单-----------------------
   const menuList = ref<roleMenuType[]>();
   const getMenuListFun = async () => {
@@ -448,7 +449,7 @@
     console.log("获取菜单列表=>", res);
     menuList.value = res.data;
     await nextTick();
-    bs?.refresh();
+    bs.refresh();
   };
   getMenuListFun();
 
@@ -456,18 +457,18 @@
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
   const menuListWrapper = ref();
-  let bs: BScrollConstructor<{}> | null = null;
+  let bs: BScrollConstructor<{}>;
   onMounted(() => {
     bs = new BScroll(menuListWrapper.value, {
       scrollbar: true,
       mouseWheel: true,
     });
   });
-  let timeOutArr: NodeJS.Timeout[] = [];
+  const timeOutArr: NodeJS.Timeout[] = [];
   const expandChangeFun = async () => {
     timeOutArr.push(
       setTimeout(() => {
-        bs?.refresh();
+        bs.refresh();
       }, 150)
     );
   };
@@ -478,7 +479,7 @@
   });
 
   //表格点击回调-------------
-  let cellClickFun = async (
+  const cellClickFun = async (
     row: roleMenuType,
     column: any,
     cell: any,
@@ -523,29 +524,11 @@
   const dialogTitle = ref("添加菜单");
   const waitAddOrEditMenu = ref(false);
   const isAddMenu = ref(true);
-  let closeConfirm = (done: () => void) => {
-    ElMessageBox.confirm(`确认放弃${dialogTitle.value}吗?所填内容将会清空`, {
-      confirmButtonText: "是的",
-      cancelButtonText: "取消",
-      type: "warning",
-      draggable: true,
-      customClass: "rounded",
-    })
-      .then(() => {
-        done();
-        // dialogFormRef.value?.resetFields();
-        // dialogFormRef.value?.clearValidate();
-        ElMessage({
-          type: "info",
-          message: `放弃${dialogTitle.value}`,
-        });
-      })
-      .catch(() => {
-        ElMessage({
-          type: "info",
-          message: `继续${dialogTitle.value}`,
-        });
-      });
+  const closeConfirmFun = (done: () => void) => {
+    elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
+      done();
+      ElMessage.info(`放弃${dialogTitle.value}`);
+    });
   };
 
   //添加/修改菜单------------------------
@@ -583,23 +566,13 @@
 
   // 删除菜单
   const delMenuFun = (menuId: number, menuName: string) => {
-    ElMessageBox.confirm(`确认删除ID为 ${menuId} 的菜单"${menuName}"吗?`, {
-      confirmButtonText: "删除",
-      cancelButtonText: "取消",
-      type: "warning",
-      draggable: true,
-      customClass: "rounded",
-    })
-      .then(async () => {
-        let res = await delMenu(menuId);
-        if (res.code == 200) {
-          ElMessage.success(res.message);
-          getMenuListFun();
-        } else ElMessage.error(res.message);
-      })
-      .catch(() => {
-        ElMessage.info("取消删除");
-      });
+    elMessageBoxConfirm(`删除ID为 ${menuId} 的菜单"${menuName}"`, async () => {
+      let res = await delMenu(menuId);
+      if (res.code == 200) {
+        ElMessage.success(res.message);
+        getMenuListFun();
+      } else ElMessage.error(res.message);
+    });
   };
 </script>
 <style lang="scss">

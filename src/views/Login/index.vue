@@ -20,23 +20,27 @@
             <el-form-item prop="userName">
               <el-input
                 v-model="loginForm.userName"
+                maxlength="12"
                 placeholder="账号"
                 clearable
+                @keydown="enterLogin"
                 :prefix-icon="renderFontIcon('bi bi-person')"></el-input>
             </el-form-item>
             <el-form-item prop="password">
               <el-input
                 v-model="loginForm.password"
+                maxlength="16"
                 placeholder="密码"
                 clearable
                 show-password
+                @keydown="enterLogin"
                 :prefix-icon="renderFontIcon('bi  bi-shield-lock')"></el-input>
             </el-form-item>
             <el-form-item>
               <el-button
                 type="primary"
                 class="w-100"
-                @click="loginFun(ruleFormRef)"
+                @click="loginFun(ruleFormRef!)"
                 :loading="waitLogin">
                 <span class="me-2">登录</span>
                 <FontIcon icon="fa-solid fa-arrow-right-to-bracket"></FontIcon>
@@ -59,6 +63,7 @@
   import { useUserInfoStore } from "@/stores/userInfo";
   import { loginFormType } from "@/type";
   import router from "@/router";
+  import { passwordValidator } from "@/utils/elFromValidator/elFromValidator";
 
   // 获取登录图片--------------------------------
   let loginSvg = ref();
@@ -79,20 +84,11 @@
     password: "123456",
   });
   const rules = reactive({
-    userName: [
-      { required: true, message: "请输入账号", trigger: "blur" },
-      { min: 0, max: 12, message: "长度在12位以内", trigger: "blur" },
-    ],
+    userName: [{ required: true, message: "请输入账号", trigger: "blur" }],
     password: [
       { required: true, message: "请输入密码", trigger: "blur" },
-      { min: 6, max: 12, message: "密码为6~12位", trigger: "blur" },
       {
-        validator: (rule: any, value: any, callback: any) => {
-          rule; //不用一下会Eslint提示报错,看着红色就烦
-          if (!/^[^\u4e00-\u9fa5 ]{6,16}$/.test(value)) {
-            callback(new Error("不能含有中文与空格"));
-          } else callback();
-        },
+        validator: passwordValidator,
         trigger: "blur",
       },
     ],
@@ -102,7 +98,7 @@
   // 表单提交前验证,验证不通过不发送请求-----------------
   const userInfoStore = useUserInfoStore();
 
-  const loginFun = async (formEl: FormInstance | undefined) => {
+  const loginFun = async (formEl: FormInstance) => {
     if (!formEl) return;
     await formEl.validate(async (valid, fields) => {
       if (valid) {
@@ -117,7 +113,6 @@
           localStorage.setItem("token", loginRes.data.authentication); //token放入本地存储
           userInfoStore.userName = loginRes.data.username;
           userInfoStore.userId = loginRes.data.userId; //userName和Id存入pinia跨组件通讯
-          // addMenuRouter(true);
           let res = await getAuthMenuList();
           console.log(`${loginRes.data.username}用户的路由列表=>`, res);
           if (res.code == 200 && res.data.length > 0) {
@@ -130,6 +125,12 @@
         } else ElMessage.error(loginRes.message);
       } else console.log("error submit!", fields);
     });
+  };
+
+  // 回车登录
+  const enterLogin = (e: KeyboardEvent) => {
+    if (e.key === "Enter") loginFun(ruleFormRef.value!);
+    // 处理回车事件
   };
 </script>
 @/utils/addMenuRouter/addMenuRouter2

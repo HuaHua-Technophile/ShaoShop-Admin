@@ -10,12 +10,12 @@
           ref="roleTableRef"
           :data="roleList"
           table-layout="auto"
+          class="bg-body rounded-4"
           header-cell-class-name="text-center"
+          row-key="roleId"
           row-class-name="bg-body"
           cell-class-name="text-center"
-          class="bg-body rounded-4"
           empty-text="接口错误,查询角色失败"
-          row-key="roleId"
           @cell-click="cellClickFun"
           @expand-change="expandChangeFun">
           <!-- 外层表格扩展 -->
@@ -65,18 +65,18 @@
                       userTableRefs[props.row.roleId] = el;}"
                       :data="props.row.userList"
                       table-layout="auto"
+                      class="bg-body rounded-4"
                       header-cell-class-name="text-center text-body"
                       :header-cell-style="{
                         background:
                           'rgba(var(--bs-ShaoShop-rgb),0.4) !important',
                       }"
+                      row-key="userName"
                       :row-class-name="
                         darkTheme ? 'bg-black' : 'bg-body-secondary'
                       "
                       cell-class-name="text-center"
-                      class="bg-body rounded-4"
                       empty-text="暂未查询到绑定该角色的用户"
-                      row-key="userName"
                       @selection-change="
                         cancelUserSelectionChange($event, props.row.roleId)
                       ">
@@ -377,26 +377,22 @@
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //bs类型
   import { nextTick, onMounted, onUnmounted, reactive, ref } from "vue";
   import { roleType, treeListType, userType } from "@/type";
-  import {
-    ElMessage,
-    ElMessageBox,
-    FormInstance,
-    TableInstance,
-  } from "element-plus";
+  import { ElMessage, FormInstance, TableInstance } from "element-plus";
   import { cloneDeep } from "lodash";
   import { storeToRefs } from "pinia";
   import { useDarkThemeStore } from "@/stores/colorTheme";
+  import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm/elMessageBoxConfirm";
 
   //修改主题-----------------------------------------
-  let { darkTheme } = storeToRefs(useDarkThemeStore());
+  const { darkTheme } = storeToRefs(useDarkThemeStore());
   //获取数据-----------------------
   const roleList = ref<roleType[]>();
   const getRoleListFun = async () => {
-    let res = await getRoleList();
+    const res = await getRoleList();
     console.log("获取的角色列表=>", res);
     roleList.value = res.data;
     await nextTick();
-    bsOuter?.refresh();
+    bsOuter.refresh();
   };
   getRoleListFun();
 
@@ -405,8 +401,8 @@
   BScroll.use(MouseWheel);
   BScroll.use(NestedScroll);
   const roleListWrapper = ref();
-  let bsOuter: BScrollConstructor<{}> | null = null;
-  let bsInners = ref<{ [key: number]: BScrollConstructor }>({}); //bs实例
+  let bsOuter: BScrollConstructor<{}>;
+  const bsInners = ref<{ [key: number]: BScrollConstructor }>({}); //bs实例
   onMounted(() => {
     bsOuter = new BScroll(roleListWrapper.value, {
       scrollbar: true,
@@ -416,7 +412,7 @@
       },
     });
   });
-  let timeOutArr: NodeJS.Timeout[] = [];
+  const timeOutArr: NodeJS.Timeout[] = [];
   const expandChangeFun = async (row: roleType, expandedRows: roleType[]) => {
     // 如果是展开就重载数据,并且延迟实例化内层BetterScroll
     if (expandedRows.includes(row)) getAllocatedListFun(row.roleId!);
@@ -424,7 +420,7 @@
     // 不管展开还是收起,都需要重新刷新BS
     timeOutArr.push(
       setTimeout(() => {
-        bsOuter?.refresh();
+        bsOuter.refresh();
       }, 150)
     );
   };
@@ -435,7 +431,7 @@
   });
 
   //表格点击回调-------------
-  let cellClickFun = (
+  const cellClickFun = (
     row: roleType,
     column: any,
     cell: any,
@@ -476,31 +472,10 @@
   const menuTreeList = ref<treeListType[]>([]);
   const closeConfirmTitle = ref("");
   const closeConfirm = (done: () => void) => {
-    ElMessageBox.confirm(
-      `确认放弃${closeConfirmTitle.value}吗?所填内容将会清空`,
-      {
-        confirmButtonText: "是的",
-        cancelButtonText: "取消",
-        type: "warning",
-        draggable: true,
-        customClass: "rounded",
-      }
-    )
-      .then(() => {
-        done();
-        // dialogFromRef.value?.resetFields();
-        // dialogFromRef.value?.clearValidate();
-        ElMessage({
-          type: "info",
-          message: `放弃${closeConfirmTitle.value}`,
-        });
-      })
-      .catch(() => {
-        ElMessage({
-          type: "info",
-          message: `继续${closeConfirmTitle.value}`,
-        });
-      });
+    elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
+      done();
+      ElMessage.info(`放弃${dialogTitle.value}`);
+    });
   };
 
   //添加/修改角色-----------------------
@@ -509,7 +484,7 @@
     isAddRole.value = true;
     roleDialogVisible.value = true;
     dialogTitle.value = closeConfirmTitle.value = "添加角色";
-    let res = await getMenuTreeList();
+    const res = await getMenuTreeList();
     if (res.code == 200) {
       console.log("获取的菜单树=>", res.data);
       menuTreeList.value = res.data;
@@ -520,7 +495,7 @@
     roleDialogVisible.value = true;
     isAddRole.value = false;
     dialogTitle.value = closeConfirmTitle.value = "修改角色";
-    let res = await getRoleMenuTreeSelect(role.roleId!);
+    const res = await getRoleMenuTreeSelect(role.roleId!);
     if (res.code == 200) {
       console.log(`id${role.roleId}的菜单树=>`, res.data);
       menuTreeList.value = res.data.menus;
@@ -550,23 +525,13 @@
 
   // 删除角色---------------------------------
   const delRoleFun = (roleId: number, roleName: string) => {
-    ElMessageBox.confirm(`确认删除ID为 ${roleId} 的角色"${roleName}"吗?`, {
-      confirmButtonText: "删除",
-      cancelButtonText: "取消",
-      type: "warning",
-      draggable: true,
-      customClass: "rounded",
-    })
-      .then(async () => {
-        let res = await delRole(roleId);
-        if (res.code == 200) {
-          ElMessage.success(res.message);
-          getRoleListFun();
-        } else ElMessage.error(res.message);
-      })
-      .catch(() => {
-        ElMessage.info("取消删除");
-      });
+    elMessageBoxConfirm(`删除ID为 ${roleId} 的角色"${roleName}"`, async () => {
+      const res = await delRole(roleId);
+      if (res.code == 200) {
+        ElMessage.success(res.message);
+        getRoleListFun();
+      } else ElMessage.error(res.message);
+    });
   };
 
   // 抽屉---------------------------------
@@ -584,10 +549,10 @@
 
   //查询授权用户------------------------------
   const getAllocatedListFun = async (roleId: number) => {
-    let res = await getAllocatedList(roleId!);
+    const res = await getAllocatedList(roleId!);
     console.log(`ID${roleId}已挂载用户=>`, res);
     if (res.code === 200) {
-      let index = roleList.value?.findIndex((i) => i.roleId === roleId);
+      const index = roleList.value?.findIndex((i) => i.roleId === roleId);
       roleList.value![index!].userList = res.data;
       bsInners.value[roleId] = new BScroll(`#BSRef${roleId}`, {
         scrollbar: true,
@@ -610,13 +575,13 @@
     revokeUserDrawerTitle.value = roleName;
     revokeUserForRoleId.value = roleId;
     closeConfirmTitle.value = `为'${roleName}'授权用户`;
-    let res = await getUnallocatedList(roleId);
+    const res = await getUnallocatedList(roleId);
     console.log(`'${roleName}'未分配用户=>`, res);
     UnallocatedList.value = res.data;
   };
   const revokeUserFun = async () => {
     waitRevokeUser.value = true;
-    let res = await revokeUser(
+    const res = await revokeUser(
       revokeUserForRoleId.value,
       revokeUserSelectList.value
     );
@@ -629,42 +594,32 @@
   };
 
   // 取消授权用户----------------
-  // const userTableRef = ref();
   const userTableRefs = ref<{ [key: number]: TableInstance }>({});
   const cancelUserSelectionChange = (val: userType[], roleId: number) => {
-    let index = roleList.value?.findIndex((i) => i.roleId === roleId);
+    const index = roleList.value?.findIndex((i) => i.roleId === roleId);
     roleList.value![index!].selectList = val.map((i) => {
       return i.userId;
     });
   };
-  let cancelUserFun = (roleId: number, user: userType) => {
+  const cancelUserFun = (roleId: number, user: userType) => {
     console.log("已授权用户的元素实例=>", userTableRefs.value[roleId]);
     userTableRefs.value[roleId].toggleRowSelection(user, true);
-    let index = roleList.value?.findIndex((i) => i.roleId === roleId);
-    ElMessageBox.confirm(
-      `确认要取消授权勾选的${
-        roleList.value![index!].selectList?.length
-      }个用户吗?`,
-      {
-        confirmButtonText: "是的",
-        cancelButtonText: "取消",
-        type: "warning",
-        draggable: true,
-        customClass: "rounded",
-      }
-    )
-      .then(async () => {
-        let res = await cancelUser(roleId, roleList.value![index!].selectList!);
+    const index = roleList.value?.findIndex((i) => i.roleId === roleId);
+    elMessageBoxConfirm(
+      `取消授权勾选的${roleList.value![index!].selectList?.length}个用户`,
+      async () => {
+        const res = await cancelUser(
+          roleId,
+          roleList.value![index!].selectList!
+        );
         if (res.code === 200) {
           ElMessage.success(
             `取消授权${roleList.value![index!].selectList?.length}个用户成功`
           );
           getAllocatedListFun(roleId);
         } else ElMessage.error(res.message);
-      })
-      .catch(() => {
-        ElMessage.info("取消操作");
-      });
+      }
+    );
   };
 </script>
 <style lang="scss">
