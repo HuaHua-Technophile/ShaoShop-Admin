@@ -293,7 +293,7 @@
     console.log(
       `查询条件`,
       userQueryFrom,
-      `第${userQueryFrom.currentPage}页用户列表(${res.data.records.length})=>`,
+      `\n第${userQueryFrom.currentPage}页用户列表(${res.data?.records?.length})=>`,
       res
     );
     if (res.code == 200 && res.data.records.length > 0) {

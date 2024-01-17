@@ -88,22 +88,26 @@
           <!-- 右侧控件 -->
           <div class="flex-shrink-0 d-flex align-items-center">
             <!-- 站内信 -->
-            <div
-              class="position-relative px-2 me-3 d-flex align-items-center justify-content-center">
-              <fontIcon icon="fa-regular fa-bell fs-4"></fontIcon>
-              <!-- 未读消息红字 -->
+            <routerLink
+              to="/main/SystemMessage"
+              class="text-decoration-none text-body">
               <div
-                class="position-absolute lh-1 top-0 rounded"
-                :class="[
-                  unReadMessage == 0
-                    ? 'bg-body fs-6 p-0 '
-                    : 'bg-danger end-0 px-1',
-                ]"
-                style="font-size: 10.6px; padding: 1.8px 0 1.6px 0"
-                :style="[unReadMessage == 0 ? 'right:7px' : '']">
-                {{ unReadMessage }}
+                class="position-relative px-2 me-3 d-flex align-items-center justify-content-center">
+                <fontIcon icon="fa-regular fa-bell fs-4"></fontIcon>
+                <!-- 未读消息红字 -->
+                <div
+                  class="position-absolute lh-1 top-0 rounded"
+                  :class="[
+                    unReadMessage == 0
+                      ? 'bg-body fs-6 p-0 '
+                      : 'bg-danger end-0 px-1',
+                  ]"
+                  style="font-size: 10.6px; padding: 1.8px 0 1.6px 0"
+                  :style="[unReadMessage == 0 ? 'right:7px' : '']">
+                  {{ unReadMessage }}
+                </div>
               </div>
-            </div>
+            </routerLink>
             <!-- 用户 -->
             <el-dropdown>
               <div class="d-flex align-items-center me-3">

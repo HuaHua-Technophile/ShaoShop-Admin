@@ -1,7 +1,40 @@
 <template>
   <div class="w-100 h-100 d-flex flex-column">
     <!-- 根据时间/是否已读 筛选消息 -->
-    <el-form></el-form>
+    <el-form
+      :model="messageQueryFromRef"
+      ref="messageQueryFromRef"
+      :rules="queryRules"
+      class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
+      <el-form-item label="发送日期" prop="createTime" class="me-5">
+        <el-config-provider :locale="locale">
+          <el-date-picker
+            v-model="messageQueryFrom.createTime"
+            type="date"
+            :disabled-date="disabledDate"
+            format="YYYY/MM/DD"
+            value-format="YYYY-MM-DD"
+            placeholder="请选择发送日期" />
+        </el-config-provider>
+      </el-form-item>
+      <el-form-item class="flex-shrink-0 me-5" label="是否已读" prop="status">
+        <el-select
+          v-model="messageQueryFrom.read"
+          placeholder="已读/未读"
+          clearable
+          style="width: 113px">
+          <el-option label="已读" :value="true" />
+          <el-option label="未读" :value="false" />
+        </el-select>
+      </el-form-item>
+      <el-form-item class="me-5">
+        <el-button
+          :loading="waitQueryMessage"
+          @click="queryMessageFun(messageQueryFromRef)"
+          >查询</el-button
+        >
+      </el-form-item>
+    </el-form>
     <!-- 消息列表模块 -->
     <div class="flex-grow-1 overflow-hidden p-3">
       <div
@@ -26,7 +59,11 @@
             <el-table-column label="序号" type="index" width="55" />
             <el-table-column prop="messageId" label="ID" />
             <el-table-column prop="receiverName" label="收件人" />
-            <el-table-column prop="messageContent" label="内容概览">
+            <el-table-column
+              prop="messageContent"
+              label="内容概览(点击即可侧栏查看具体内容)">
+            </el-table-column>
+            <el-table-column prop="isRead" label="状态">
               <template #header>
                 <jumpPageBtn
                   class="justify-content-center"
@@ -39,6 +76,11 @@
                   :tableHeaderHeight="tableHeaderHeight"
                   :queryFrom="messageQueryFrom"
                   :defaultPageSize="defaultPageSize" />
+              </template>
+              <template #default="scope">
+                <el-tag :type="scope.row.isRead == 0 ? 'success' : 'danger'">{{
+                  scope.row.isRead ? "已读" : "未读"
+                }}</el-tag>
               </template>
             </el-table-column>
             <el-table-column prop="updateBy" label="更新者" />
@@ -102,6 +144,8 @@
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
+  import { FormInstance } from "element-plus";
+  import { zhCn } from "element-plus/es/locale/index.mjs"; // import zhCn from "element-plus/dist/locale/zh-cn.mjs"; //国际化
 
   // 不传参数的情况下，就是获取所有消息。传参数的情况下可用作根据时间和是否已读来搜索
   const systemMessageList = ref<systemMessageType[]>([]);
@@ -110,6 +154,7 @@
   const defaultPageSize = 20;
   let tableItemHeight: number; //每一项高度
   let tableHeaderHeight: number; //表头高度
+  const waitQueryMessage = ref(false);
   const messageQueryFrom = reactive<messageQueryFromType>({
     createTime: null, //发送时间
     read: null, //是否已读
@@ -118,11 +163,13 @@
   });
   const getSystemMessageFun = async (excessDataCount?: number) => {
     let closePullUp;
+    waitQueryMessage.value = true;
     const res = await getSystemMessage(messageQueryFrom);
+    waitQueryMessage.value = false;
     console.log(
       `查询条件`,
       messageQueryFrom,
-      `第${messageQueryFrom.currentPage}页消息(${res.data.records.length})=>`,
+      `\n第${messageQueryFrom.currentPage}页消息(${res.data?.records?.length})=>`,
       res
     );
     if (res.code == 200 && res.data.records.length > 0) {
@@ -206,5 +253,22 @@
     }
   };
 
-  //表格跳页-----------------
+  //查询消息-------------------------------------
+  const messageQueryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const queryRules = reactive({});
+  const locale = zhCn;
+  const disabledDate = (time: Date) => {
+    return time.getTime() > Date.now();
+  };
+  const queryMessageFun = async (formEl: FormInstance | undefined) => {
+    // 先验证表单
+    if (!formEl) return;
+    await formEl.validate(async (valid, fields) => {
+      if (valid) {
+        systemMessageList.value = [];
+        messageQueryFrom.currentPage = 1;
+        getSystemMessageFun();
+      } else console.log("error submit!", fields);
+    });
+  };
 </script>
