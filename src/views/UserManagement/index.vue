@@ -316,7 +316,10 @@
             .getComputedStyle(document.querySelector(".el-table__body-header")!)
             .height.replace("px", "")
         );
-      if (allUserList.value.length >= res.data.total) closePullUp = true;
+      if (allUserList.value.length >= res.data.total) {
+        bs.closePullUp();
+        closePullUp = true;
+      }
     } else bs.closePullUp();
     return { closePullUp };
   };
@@ -341,8 +344,7 @@
       userQueryFrom.currentPage++; //请求页码自增
       console.log("触发了pullingUp,页码自增", userQueryFrom.currentPage);
       const { closePullUp } = await getUserListFun();
-      if (closePullUp) bs!.closePullUp();
-      else bs!.finishPullUp();
+      if (!closePullUp) bs!.finishPullUp();
     });
     bs.on(
       "scroll",

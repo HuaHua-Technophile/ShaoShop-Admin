@@ -6,28 +6,34 @@
       ref="messageQueryFromRef"
       :rules="queryRules"
       class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
-      <el-form-item label="发送日期" prop="createTime" class="me-5">
+      <el-form-item
+        label="发送日期"
+        prop="createTime"
+        class="flex-grow-1 overflow-hidden">
         <el-config-provider :locale="locale">
           <el-date-picker
-            v-model="messageQueryFrom.createTime"
-            type="date"
+            v-model="messageQueryFrom.timePeriod"
+            type="datetimerange"
+            start-placeholder="初始时间"
+            end-placeholder="截止时间"
             :disabled-date="disabledDate"
-            format="YYYY/MM/DD"
-            value-format="YYYY-MM-DD"
-            placeholder="请选择发送日期" />
+            format="YYYY-MM-DD dddd A HH:mm:ss"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            date-format="YYYY/MM/DD dddd"
+            time-format="A hh:mm:ss" />
         </el-config-provider>
       </el-form-item>
-      <el-form-item class="flex-shrink-0 me-5" label="是否已读" prop="status">
+      <el-form-item class="flex-shrink-0 px-3" label="是否未读" prop="status">
         <el-select
           v-model="messageQueryFrom.read"
           placeholder="已读/未读"
           clearable
           style="width: 113px">
-          <el-option label="已读" :value="true" />
-          <el-option label="未读" :value="false" />
+          <el-option label="未读" :value="0" />
+          <el-option label="已读" :value="1" />
         </el-select>
       </el-form-item>
-      <el-form-item class="me-5">
+      <el-form-item>
         <el-button
           :loading="waitQueryMessage"
           @click="queryMessageFun(messageQueryFromRef)"
@@ -156,7 +162,7 @@
   let tableHeaderHeight: number; //表头高度
   const waitQueryMessage = ref(false);
   const messageQueryFrom = reactive<messageQueryFromType>({
-    createTime: null, //发送时间
+    timePeriod: null, //发送时间
     read: null, //是否已读
     currentPage: 1, //页码
     pageSize: 20, //每页返回的数量
@@ -192,7 +198,10 @@
             .getComputedStyle(document.querySelector(".el-table__body-header")!)
             .height.replace("px", "")
         );
-      if (systemMessageList.value.length >= res.data.total) closePullUp = true;
+      if (systemMessageList.value.length >= res.data.total) {
+        bs!.closePullUp();
+        closePullUp = true;
+      }
     } else bs.closePullUp();
     return { closePullUp };
   };
@@ -217,8 +226,7 @@
       messageQueryFrom.currentPage++; //请求页码自增
       console.log("触发了pullingUp,页码自增", messageQueryFrom.currentPage);
       const { closePullUp } = await getSystemMessageFun();
-      if (closePullUp) bs!.closePullUp();
-      else bs!.finishPullUp();
+      if (!closePullUp) bs!.finishPullUp();
     });
     bs.on(
       "scroll",

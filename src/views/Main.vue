@@ -87,7 +87,7 @@
           </div>
           <!-- 右侧控件 -->
           <div class="flex-shrink-0 d-flex align-items-center">
-            <!-- 站内信 -->
+            <!-- 站内信未读消息数量 -->
             <routerLink
               to="/main/SystemMessage"
               class="text-decoration-none text-body">
@@ -108,7 +108,7 @@
                 </div>
               </div>
             </routerLink>
-            <!-- 用户 -->
+            <!-- 用户退出登录 -->
             <el-dropdown>
               <div class="d-flex align-items-center me-3">
                 <el-avatar
@@ -119,6 +119,9 @@
               </div>
               <template #dropdown>
                 <el-dropdown-menu>
+                  <el-dropdown-item @click="showUserInfo">
+                    <span class="me-1">个人信息</span>
+                  </el-dropdown-item>
                   <el-dropdown-item @click="logoutFun">
                     <span class="me-1">退出登录</span>
                     <FontIcon
@@ -149,6 +152,8 @@
       </el-main>
     </el-container>
   </el-container>
+  <el-drawer v-model="drawerVisible" title="I am the title" direction="rtl">
+  </el-drawer>
 </template>
 <script setup lang="ts">
   import router from "@/router/index";
@@ -158,11 +163,13 @@
   import { getUnReadMessage } from "@/api/SystemMessageAPI";
   import { reLogIn } from "@/utils/reLogIn/reLogIn";
   import { ElMessage } from "element-plus";
-  import { nextTick, onMounted, ref } from "vue";
+  import { nextTick, onMounted, reactive, ref } from "vue";
   import BScroll from "@better-scroll/core"; //bs核心
   import MouseWheel from "@better-scroll/mouse-wheel"; //引入鼠标滚动插件
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条插件
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //betterscroll的TS类型
+  import { getUserInfo } from "@/api/UserManagementAPI";
+  import { userType } from "@/type";
 
   // better scroll----------------------
   const historicalNavigationScroll = ref();
@@ -197,21 +204,20 @@
       path: routerItem!.path,
     });
   }
-  // 页面渲染所需数据(左侧菜单、站内消息)----------------
+  // 页面渲染所需数据(左侧菜单、站内未读消息数量)----------------
   const userInfoStore = useUserInfoStore();
   const unReadMessage = ref(0);
   const getUnReadMessageFun = async () => {
     const res = await getUnReadMessage();
     console.log(`未读系统消息${res.data}条`);
     unReadMessage.value = res.data;
-    unReadMessage.value = 0;
   };
   getUnReadMessageFun();
   // 自动调整左侧路由激活项为当前页面url(将el-menu设置为router模式)-------------
   const active = ref(window.location.pathname);
   /* history.replaceState和pushState不会触发popstate事件
-  那么如何监听这两个行为呢。可以通过在方法里面主动的去触发popstate事件。另一种就是在方法中创建一个新的全局事件
-  https://segmentfault.com/a/1190000022822185 */
+    那么如何监听这两个行为呢。可以通过在方法里面主动的去触发popstate事件。另一种就是在方法中创建一个新的全局事件
+    https://segmentfault.com/a/1190000022822185 */
   const _historyWrap = (type: keyof History) => {
     const orig = history[type];
     const e = new Event(type) as any;
@@ -288,6 +294,21 @@
     if (res.code == 200) {
       reLogIn(res.message);
     } else ElMessage.error(res.message);
+  };
+  const drawerVisible = ref(false);
+  const personalInfoFrom = reactive<userType>({
+    nickName: "",
+    userName: "",
+    email: "",
+    phoneNumber: "",
+  });
+  const showUserInfo = async () => {
+    const res = await getUserInfo();
+    console.log("个人信息=>", res);
+    if (res.code == 200) {
+      drawerVisible.value = true;
+      // personalInfoFrom;
+    }
   };
 </script>
 

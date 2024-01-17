@@ -145,8 +145,8 @@ export type systemMessageType = {
 };
 // 站内信查询类型
 export type messageQueryFromType = {
-  createTime: string | null; //创建时间
-  read: boolean | null; //是否已读
+  timePeriod: string[] | null; //创建时间
+  read: number | null; //是否已读
   pageSize: number; //每页条数
   currentPage: number; //当前页码
 };

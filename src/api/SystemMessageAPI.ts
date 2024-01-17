@@ -4,7 +4,13 @@ export const getSystemMessage = (params: messageQueryFromType) => {
   return instance<{ records: systemMessageType[]; total: number }>({
     url: "/system/message",
     method: "GET",
-    params,
+    params: {
+      currentPage: params.currentPage,
+      pageSize: params.pageSize,
+      read: params.read,
+      startTime: params.timePeriod ? params.timePeriod[0] : null,
+      endTime: params.timePeriod ? params.timePeriod[1] : null,
+    },
   });
 };
 

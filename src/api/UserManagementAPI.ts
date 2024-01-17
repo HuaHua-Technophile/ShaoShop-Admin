@@ -31,3 +31,11 @@ export const delUser = (userIdList: (number | undefined)[]) => {
     method: "DELETE",
   });
 };
+
+// /system/user/userInfo 获取个人信息
+export const getUserInfo = () => {
+  return instance({
+    url: "/system/user/userInfo",
+    method: "GET",
+  });
+};
