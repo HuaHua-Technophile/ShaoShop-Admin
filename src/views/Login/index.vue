@@ -80,7 +80,7 @@
   // 登录信息表单---------------------------------
   const ruleFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const loginForm = reactive<loginFormType>({
-    userName: "test",
+    userName: "admin",
     password: "123456",
   });
   const rules = reactive({
