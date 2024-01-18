@@ -1,7 +1,7 @@
 export const phoneNumberValidator = (
   rule: any,
   value: string,
-  callback: Function
+  callback: (arg0?: Error) => void
 ) => {
   rule; //不用一下会Eslint提示报错,看着红色就烦
   if (
@@ -16,7 +16,7 @@ export const phoneNumberValidator = (
 export const emailValidator = (
   rule: any,
   value: string,
-  callback: Function
+  callback: (arg0?: Error) => void
 ) => {
   rule; //不用一下会Eslint提示报错,看着红色就烦
   if (
@@ -29,10 +29,9 @@ export const emailValidator = (
 export const passwordValidator = (
   rule: any,
   value: string,
-  callback: Function
+  callback: (arg0?: Error) => void
 ) => {
   rule; //不用一下会Eslint提示报错,看着红色就烦
-  if (!/^[^\u4e00-\u9fa5 ]{6,16}$/.test(value)) {
-    callback(new Error("6~16位密码,不能含有中文与空格"));
-  } else callback();
+  if (/^[^\u4e00-\u9fa5 ]{6,16}$/.test(value)) callback();
+  else callback(new Error("6~16位密码,不能含有中文与空格"));
 };

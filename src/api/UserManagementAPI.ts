@@ -32,10 +32,27 @@ export const delUser = (userIdList: (number | undefined)[]) => {
   });
 };
 
-// /system/user/userInfo 获取个人信息
+//  获取个人信息
 export const getUserInfo = () => {
-  return instance({
+  return instance<userType>({
     url: "/system/user/userInfo",
     method: "GET",
+  });
+};
+//  用户修改个人信息
+export const updateUserInfo = (data: userType) => {
+  return instance({
+    url: "/system/user/updateUserInfo",
+    method: "PUT",
+    data,
+  });
+};
+//  修改密码
+export const updateUserPassword = (data: any) => {
+  console.log("准备修改密码", data);
+  return instance({
+    url: "/system/user/updateUserPassword",
+    method: "PUT",
+    data,
   });
 };

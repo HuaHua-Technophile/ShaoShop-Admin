@@ -18,7 +18,8 @@ export type loginInfoType = {
 };
 //每一个后台管理系统用户(账号)的信息
 export type userType = {
-  businessId?: string;
+  createTime?: string; //注册时间
+  businessId?: number | null;
   // companyName: string; //商户名称用不到
   email: string; //绑定邮箱
   nickName: string; //部门主体名称
@@ -28,6 +29,7 @@ export type userType = {
   userName: string; //账号
   userId?: number; //
   remark?: string; //备注
+  roleName?: string[];
 };
 //分页查询用户列表所需参数
 export type userListParamsType = userType & {

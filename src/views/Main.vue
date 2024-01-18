@@ -152,7 +152,171 @@
       </el-main>
     </el-container>
   </el-container>
-  <el-drawer v-model="drawerVisible" title="I am the title" direction="rtl">
+  <el-drawer
+    v-model="drawerVisible"
+    direction="rtl"
+    class="rounded-5"
+    :before-close="closeDrawerFun">
+    <template #header>
+      <h2 class="text-body">账号信息</h2>
+    </template>
+    <el-form
+      ref="personalInfoFormRef"
+      :model="personalInfoFrom"
+      :rules="personalInfoRules">
+      <el-form-item label="注册时间" prop="createTime">
+        {{ personalInfoFrom.createTime || "暂无" }}
+      </el-form-item>
+      <el-form-item label="绑定商户" prop="businessId">
+        {{ personalInfoFrom.businessId || "暂无" }}
+      </el-form-item>
+      <el-form-item label="用户昵称" prop="userName" class="overflow-hidden">
+        <Transition
+          mode="out-in"
+          enter-active-class="animate__animated animate__fadeInUp"
+          leave-active-class="animate__animated animate__fadeOutUp">
+          <el-input
+            clearable
+            maxlength="12"
+            v-model="personalInfoFrom.userName"
+            placeholder="每个后台主体唯一名称"
+            :prefix-icon="renderFontIcon('bi bi-123')"
+            v-if="editStatus" />
+          <span style="padding-bottom: 2px" v-else>{{
+            personalInfoFrom.userName || "暂无"
+          }}</span>
+        </Transition>
+      </el-form-item>
+      <el-form-item label="部门主体" prop="nickName" class="overflow-hidden">
+        <Transition
+          mode="out-in"
+          enter-active-class="animate__animated animate__fadeInUp"
+          leave-active-class="animate__animated animate__fadeOutUp">
+          <el-input
+            clearable
+            maxlength="12"
+            v-model="personalInfoFrom.nickName"
+            placeholder="运营部/物流部/..."
+            :prefix-icon="renderFontIcon('bi bi-people')"
+            v-if="editStatus" />
+          <span style="padding-bottom: 2px" v-else>{{
+            personalInfoFrom.nickName || "暂无"
+          }}</span>
+        </Transition>
+      </el-form-item>
+      <el-form-item label="绑定电话" prop="phoneNumber" class="overflow-hidden">
+        <Transition
+          mode="out-in"
+          enter-active-class="animate__animated animate__fadeInUp"
+          leave-active-class="animate__animated animate__fadeOutUp">
+          <el-input
+            clearable
+            maxlength="11"
+            v-model="personalInfoFrom.phoneNumber"
+            placeholder="每个后台主体唯一手机号"
+            :prefix-icon="renderFontIcon('bi bi-telephone')"
+            v-if="editStatus" />
+          <span style="padding-bottom: 2px" v-else>{{
+            personalInfoFrom.phoneNumber || "暂无"
+          }}</span>
+        </Transition>
+      </el-form-item>
+      <el-form-item label="绑定邮箱" prop="email" class="overflow-hidden">
+        <Transition
+          mode="out-in"
+          enter-active-class="animate__animated animate__fadeInUp"
+          leave-active-class="animate__animated animate__fadeOutUp">
+          <el-input
+            clearable
+            maxlength="20"
+            v-model="personalInfoFrom.email"
+            placeholder="每个后台主体唯一邮箱"
+            :prefix-icon="renderFontIcon('bi bi-envelope')"
+            v-if="editStatus" />
+          <span style="padding-bottom: 2px" v-else>{{
+            personalInfoFrom.email || "暂无"
+          }}</span>
+        </Transition>
+      </el-form-item>
+    </el-form>
+    <!-- 密码 -->
+    <Transition
+      enter-active-class="animate__animated animate__fadeInUp"
+      leave-active-class="animate__animated animate__fadeOutRight">
+      <el-form
+        ref="passwordFormRef"
+        :model="passwordForm"
+        :rules="passwordRules"
+        v-if="editPasswordStatus">
+        <el-form-item label="当前密码" prop="oldPassword">
+          <el-input
+            clearable
+            maxlength="16"
+            v-model="passwordForm.oldPassword"
+            placeholder="当前旧密码"
+            :prefix-icon="renderFontIcon('fa-solid fa-key')" />
+        </el-form-item>
+        <el-form-item label="新的密码" prop="newPassword">
+          <el-input
+            clearable
+            maxlength="16"
+            v-model="passwordForm.newPassword"
+            placeholder="新的密码(6~16位,不能含有中文与空格)"
+            :prefix-icon="renderFontIcon('fa-solid fa-unlock')" />
+        </el-form-item>
+        <el-form-item label="确认密码" prop="confirmPassword">
+          <el-input
+            clearable
+            maxlength="16"
+            v-model="passwordForm.confirmPassword"
+            placeholder="请再次输入新的密码(6~16位,不能含有中文与空格)"
+            :prefix-icon="renderFontIcon('fa-solid fa-lock')" />
+        </el-form-item>
+      </el-form>
+    </Transition>
+    <template #footer>
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <Transition
+            mode="out-in"
+            enter-active-class="animate__animated animate__fadeInUp"
+            leave-active-class="animate__animated animate__fadeOutUp">
+            <Transition
+              v-if="!editStatus"
+              mode="out-in"
+              enter-active-class="animate__animated animate__fadeInUp"
+              leave-active-class="animate__animated animate__fadeOutUp">
+              <el-button @click="savePassword" v-if="editPasswordStatus"
+                >确认修改</el-button
+              >
+              <el-button @click="editPassword" v-else>修改密码</el-button>
+            </Transition>
+          </Transition>
+        </div>
+        <div>
+          <Transition
+            mode="out-in"
+            enter-active-class="animate__animated animate__fadeInUp"
+            leave-active-class="animate__animated animate__fadeOutUp">
+            <Transition
+              v-if="!editPasswordStatus"
+              mode="out-in"
+              enter-active-class="animate__animated animate__fadeInUp"
+              leave-active-class="animate__animated animate__fadeOutUp">
+              <el-button
+                @click="savePersonalInfo"
+                v-if="editStatus"
+                :loading="waitEditPersonalInfo"
+                >确认保存修改</el-button
+              >
+              <el-button @click="editPersonalInfo" v-else
+                >修改个人信息</el-button
+              >
+            </Transition>
+          </Transition>
+        </div>
+      </div>
+    </template>
   </el-drawer>
 </template>
 <script setup lang="ts">
@@ -161,15 +325,26 @@
   import { useHistoricalNavigationStore } from "@/stores/historicalNavigation";
   import { logout } from "@/api/logout";
   import { getUnReadMessage } from "@/api/SystemMessageAPI";
+  import {
+    getUserInfo,
+    updateUserInfo,
+    updateUserPassword,
+  } from "@/api/UserManagementAPI";
+  import { userType } from "@/type";
   import { reLogIn } from "@/utils/reLogIn/reLogIn";
-  import { ElMessage } from "element-plus";
+  import { renderFontIcon } from "@/utils/fontIcon/renderFontIcon";
+  import {
+    phoneNumberValidator,
+    emailValidator,
+    passwordValidator,
+  } from "@/utils/elFromValidator/elFromValidator";
+  import { ElMessage, FormInstance } from "element-plus";
   import { nextTick, onMounted, reactive, ref } from "vue";
   import BScroll from "@better-scroll/core"; //bs核心
   import MouseWheel from "@better-scroll/mouse-wheel"; //引入鼠标滚动插件
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条插件
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //betterscroll的TS类型
-  import { getUserInfo } from "@/api/UserManagementAPI";
-  import { userType } from "@/type";
+  import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm/elMessageBoxConfirm";
 
   // better scroll----------------------
   const historicalNavigationScroll = ref();
@@ -216,8 +391,8 @@
   // 自动调整左侧路由激活项为当前页面url(将el-menu设置为router模式)-------------
   const active = ref(window.location.pathname);
   /* history.replaceState和pushState不会触发popstate事件
-    那么如何监听这两个行为呢。可以通过在方法里面主动的去触发popstate事件。另一种就是在方法中创建一个新的全局事件
-    https://segmentfault.com/a/1190000022822185 */
+      那么如何监听这两个行为呢。可以通过在方法里面主动的去触发popstate事件。另一种就是在方法中创建一个新的全局事件
+      https://segmentfault.com/a/1190000022822185 */
   const _historyWrap = (type: keyof History) => {
     const orig = history[type];
     const e = new Event(type) as any;
@@ -295,20 +470,130 @@
       reLogIn(res.message);
     } else ElMessage.error(res.message);
   };
+
+  // 个人信息----------------------
   const drawerVisible = ref(false);
-  const personalInfoFrom = reactive<userType>({
+  const closeDrawerFun = (done: () => void) => {
+    if (editStatus.value)
+      elMessageBoxConfirm(`放弃修改个人信息`, () => {
+        done();
+        ElMessage.info(`放弃放弃修改个人信息`);
+        editStatus.value = false;
+      });
+    if (editPasswordStatus.value)
+      elMessageBoxConfirm(`放弃修改密码`, () => {
+        done();
+        ElMessage.info(`放弃修改密码`);
+        editPasswordStatus.value = false;
+        passwordFormRef.value!.clearValidate();
+        passwordFormRef.value!.resetFields();
+      });
+  };
+  let personalInfoFrom = reactive<userType>({
+    businessId: null,
+    createTime: "",
     nickName: "",
+    phoneNumber: "",
+    roleName: [],
     userName: "",
     email: "",
-    phoneNumber: "",
   });
+  const personalInfoRules = reactive({
+    userName: [{ required: true, message: "请输入账号", trigger: "blur" }],
+    email: [
+      { required: true, message: "请输入绑定邮箱", trigger: "blur" },
+      { validator: emailValidator, trigger: "blur" },
+    ],
+    phoneNumber: [
+      { required: true, message: "请输入绑定手机号", trigger: "blur" },
+      { validator: phoneNumberValidator, trigger: "blur" },
+    ],
+    nickName: [
+      {
+        required: true,
+        message: "请输入部门主体名称(账号名称)",
+        trigger: "blur",
+      },
+    ],
+  });
+  const personalInfoFormRef = ref<FormInstance>();
+  const editStatus = ref(false);
+  const waitEditPersonalInfo = ref(false);
   const showUserInfo = async () => {
     const res = await getUserInfo();
-    console.log("个人信息=>", res);
+    console.log("个人信息=>", res.data);
     if (res.code == 200) {
       drawerVisible.value = true;
-      // personalInfoFrom;
+      personalInfoFrom = reactive(res.data);
     }
+  };
+  const editPersonalInfo = () => {
+    editStatus.value = true;
+  };
+  const savePersonalInfo = () => {
+    personalInfoFormRef.value!.validate(async (valid, fields) => {
+      if (valid) {
+        waitEditPersonalInfo.value = true;
+        let res = await updateUserInfo(personalInfoFrom);
+        if (res.code === 200) {
+          ElMessage.success("修改成功");
+          showUserInfo();
+          editStatus.value = false;
+        } else ElMessage.error(res.message);
+        waitEditPersonalInfo.value = false;
+      } else console.log("error submit!", fields);
+    });
+  };
+
+  // 修改密码---------------
+  const passwordForm = reactive({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const passwordFormRef = ref<FormInstance>();
+  const passwordRules = reactive({
+    oldPassword: [
+      { required: true, message: "请输入旧密码", trigger: "blur" },
+      { validator: passwordValidator, trigger: "blur" },
+    ],
+    newPassword: [
+      { required: true, message: "请输入新密码", trigger: "blur" },
+      { validator: passwordValidator, trigger: "blur" },
+    ],
+    confirmPassword: [
+      { required: true, message: "请重复输入新密码", trigger: "blur" },
+      {
+        validator: (
+          rule: any,
+          value: string,
+          callback: (arg0?: Error) => void
+        ) => {
+          rule;
+          if (value == passwordForm.newPassword) callback();
+          else callback(new Error("两次输入密码不一致!"));
+        },
+        trigger: "blur",
+      },
+    ],
+  });
+  const editPasswordStatus = ref(false);
+  const waitEditPassword = ref(false);
+  const editPassword = () => {
+    editPasswordStatus.value = true;
+  };
+  const savePassword = () => {
+    passwordFormRef.value!.validate(async (valid, fields) => {
+      if (valid) {
+        waitEditPassword.value = true;
+        let res = await updateUserPassword(passwordForm);
+        if (res.code === 200) {
+          ElMessage.success("修改成功");
+          editPasswordStatus.value = false;
+        } else ElMessage.error(res.message);
+        waitEditPassword.value = false;
+      } else console.log("error submit!", fields);
+    });
   };
 </script>
 
@@ -348,7 +633,9 @@
       transform: scale(1.1) rotate(90deg) !important;
     }
   }
-
+  :root {
+    --animate-duration: 350ms;
+  }
   /* .custom-horizontal-scrollbar {
     position: absolute;
     left: 0%;

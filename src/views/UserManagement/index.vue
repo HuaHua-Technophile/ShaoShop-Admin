@@ -384,7 +384,7 @@
   //表单-----------------------
   const dialogFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const defaultUserInfo: userType = {
-    businessId: "", //商户
+    businessId: null, //商户id
     userName: "", //账号
     email: "", //绑定邮箱
     phoneNumber: "", //绑定手机号
