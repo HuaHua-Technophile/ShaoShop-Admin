@@ -155,7 +155,7 @@
   <el-drawer
     v-model="drawerVisible"
     direction="rtl"
-    class="rounded-5"
+    class="rounded-start-5 bg-body"
     :before-close="closeDrawerFun">
     <template #header>
       <h2 class="text-body">账号信息</h2>
@@ -480,7 +480,7 @@
         ElMessage.info(`放弃放弃修改个人信息`);
         editStatus.value = false;
       });
-    if (editPasswordStatus.value)
+    else if (editPasswordStatus.value)
       elMessageBoxConfirm(`放弃修改密码`, () => {
         done();
         ElMessage.info(`放弃修改密码`);
@@ -488,6 +488,7 @@
         passwordFormRef.value!.clearValidate();
         passwordFormRef.value!.resetFields();
       });
+    else done();
   };
   let personalInfoFrom = reactive<userType>({
     businessId: null,
