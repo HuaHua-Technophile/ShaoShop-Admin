@@ -31,17 +31,17 @@ export const editPSN = (data?: PSNEditType) => {
 };
 
 // 获取该specificationsId所有的商品规格和属性
-export const getPSNificationList = (specificationsId: string) => {
+export const getPSNificationList = (PSNId: string) => {
   return instance<PSNEditType>({
-    url: `/specification/getPSNificationList/${specificationsId}`,
+    url: `/specification/getProductSpecificationList/${PSNId}`,
     method: "GET",
   });
 };
 
 // /specification/{specificationsIds} 删除商品规格
-export const delPSN = (specificationsIds: string) => {
+export const delPSN = (PSNId: string) => {
   return instance({
-    url: `/specification/${specificationsIds}`,
+    url: `/specification/${PSNId}`,
     method: "put",
   });
 };

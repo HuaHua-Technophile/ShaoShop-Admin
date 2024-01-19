@@ -6,11 +6,11 @@
       ref="PSNQueryFromRef"
       :rules="queryRules"
       class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
-      <el-form-item label="商品规格名称" prop="PSN" class="flex-grow-1">
+      <el-form-item label="商品规格名称" prop="productSpec" class="flex-grow-1">
         <el-input
           clearable
           maxlength="10"
-          v-model.trim="PSNQueryFrom.PSN"
+          v-model.trim="PSNQueryFrom.productSpec"
           placeholder="商品规格名称"
           :prefix-icon="renderFontIcon('fa-solid fa-ruler-combined')" />
       </el-form-item>
@@ -109,9 +109,11 @@
             :prefix-icon="renderFontIcon('fa-solid fa-ruler-combined')">
           </el-input>
         </el-form-item>
-        <el-collapse class="w-100" v-if="PSNForm.PSNificationsList.length > 0">
+        <el-collapse
+          class="w-100"
+          v-if="PSNForm.productSpecificationsList.length > 0">
           <el-collapse-item
-            v-for="(i, index) in PSNForm.PSNificationsList"
+            v-for="(i, index) in PSNForm.productSpecificationsList"
             :name="i.keyName">
             <template #title>
               <Transition
@@ -194,7 +196,7 @@
     editPSN,
     getPSNificationList,
     delPSN,
-  } from "@/api/PSNificationsAPI";
+  } from "@/api/ProductSpecificationsAPI";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm/elMessageBoxConfirm";
   import { renderFontIcon } from "@/utils/fontIcon/renderFontIcon";
 
@@ -216,7 +218,7 @@
   let tableHeaderHeight: number; //表头高度
   const waitQueryPSN = ref(false);
   const PSNQueryFrom = reactive<PSNQueryType>({
-    PSN: "", //商品规格名称
+    productSpec: "", //商品规格名称
     currentPage: 1, //请求的页码
     pageSize: defaultPageSize, //每页返回的数量
   });
@@ -322,7 +324,7 @@
   //dialog弹出框表单-----------------------
   const dialogFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const defaultPSN: PSNEditType = {
-    PSNificationsList: [],
+    productSpecificationsList: [],
     specName: "",
   };
   let PSNForm = reactive(defaultPSN);
@@ -345,14 +347,18 @@
       ElMessage.info(`放弃${dialogTitle.value}`);
     });
   };
-  const enterConfirm = (e: KeyboardEvent, collapseIndex?: number) => {
+  const enterConfirm = (e: KeyboardEvent, ind?: number) => {
     // 添加二级规格
-    if (e.key === "Enter" && collapseIndex === undefined) {
-      if (PSNForm.PSNificationsList.some((i) => i.keyName == keyName.value))
+    if (e.key === "Enter" && ind === undefined) {
+      if (
+        PSNForm.productSpecificationsList.some(
+          (i) => i.keyName == keyName.value
+        )
+      )
         ElMessage.error(`已存在二级规格:'${keyName.value}'`);
       else if (keyName.value == "") ElMessage.error(`不可为空`);
       else {
-        PSNForm.PSNificationsList.push({
+        PSNForm.productSpecificationsList.push({
           keyName: keyName.value,
           valueList: [],
         });
@@ -360,52 +366,51 @@
       }
     }
     // 修改二级规格或添加三级规格
-    if (e.key === "Enter" && collapseIndex !== undefined) {
+    if (e.key === "Enter" && ind !== undefined) {
       // 如果是编辑状态,说明是修改二级规格
-      if (PSNForm.PSNificationsList[collapseIndex].editStatus) {
-        if (PSNForm.PSNificationsList[collapseIndex].keyName == "")
+      if (PSNForm.productSpecificationsList[ind].editStatus) {
+        if (PSNForm.productSpecificationsList[ind].keyName == "")
           ElMessage.error(`不可为空`);
-        else delete PSNForm.PSNificationsList[collapseIndex].editStatus; //直接删除临时属性
+        else delete PSNForm.productSpecificationsList[ind].editStatus; //直接删除临时属性
       }
       // 不在编辑状态,说明是添加三级规格
       else {
         if (
-          PSNForm.PSNificationsList[collapseIndex].valueList.some(
-            (i) => i == PSNForm.PSNificationsList[collapseIndex].tag
+          PSNForm.productSpecificationsList[ind].valueList.some(
+            (i) => i == PSNForm.productSpecificationsList[ind].tag
           )
         )
           ElMessage.error(
-            `'${PSNForm.PSNificationsList[collapseIndex].keyName}'上已存在规格值:'${PSNForm.PSNificationsList[collapseIndex].tag}'`
+            `'${PSNForm.productSpecificationsList[ind].keyName}'上已存在规格值:'${PSNForm.productSpecificationsList[ind].tag}'`
           );
         else if (
-          PSNForm.PSNificationsList[collapseIndex].tag == "" ||
-          PSNForm.PSNificationsList[collapseIndex].tag == undefined
+          PSNForm.productSpecificationsList[ind].tag == "" ||
+          PSNForm.productSpecificationsList[ind].tag == undefined
         )
           ElMessage.error(`不可为空`);
         else {
-          PSNForm.PSNificationsList[collapseIndex].valueList.push(
-            PSNForm.PSNificationsList[collapseIndex].tag!
+          PSNForm.productSpecificationsList[ind].valueList.push(
+            PSNForm.productSpecificationsList[ind].tag!
           );
-          delete PSNForm.PSNificationsList[collapseIndex].tag; //直接删除临时属性,避免传参时出错
+          delete PSNForm.productSpecificationsList[ind].tag; //直接删除临时属性,避免传参时出错
         }
       }
     }
   };
-  const editCollapse = (collapseIndex: number) => {
-    PSNForm.PSNificationsList[collapseIndex].editStatus = true;
+  const editCollapse = (ind: number) => {
+    PSNForm.productSpecificationsList[ind].editStatus = true;
   };
   const delCollapse = (keyName: string) => {
     elMessageBoxConfirm(`删除二级规格:'${keyName}'`, () => {
-      PSNForm.PSNificationsList = PSNForm.PSNificationsList.filter(
-        (i) => i.keyName != keyName
-      );
+      PSNForm.productSpecificationsList =
+        PSNForm.productSpecificationsList.filter((i) => i.keyName != keyName);
       ElMessage.success(`删除二级规格:'${keyName}'`);
     });
   };
-  const delTag = (tag: string, collapseIndex: number) => {
+  const delTag = (tag: string, ind: number) => {
     elMessageBoxConfirm(`删除规格值:'${tag}'`, () => {
-      PSNForm.PSNificationsList[collapseIndex].valueList =
-        PSNForm.PSNificationsList[collapseIndex].valueList.filter(
+      PSNForm.productSpecificationsList[ind].valueList =
+        PSNForm.productSpecificationsList[ind].valueList.filter(
           (i) => i != tag
         );
       ElMessage.success(`删除规格值:'${tag}'`);
@@ -420,7 +425,6 @@
     dialogTitle.value = "添加商品规格";
   };
   const editPSNDialog = async (PSN: PSNType) => {
-    //
     let res = await getPSNificationList(PSN.specificationsId);
     if (res.code == 200) {
       console.log(`获取到ID${PSN.specificationsId}的商品规格=>`, res.data);
@@ -434,7 +438,7 @@
     dialogFromRef.value?.validate(async (valid, fields) => {
       if (valid) {
         // 验证二级规格名称是否有空值
-        if (!PSNForm.PSNificationsList.some((i) => i.keyName == "")) {
+        if (!PSNForm.productSpecificationsList.some((i) => i.keyName == "")) {
           waitAddOrEditPSN.value = true;
           let res;
           if (isAddPSN.value) res = await addPSN(PSNForm);

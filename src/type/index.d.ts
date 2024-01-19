@@ -153,7 +153,7 @@ export type messageQueryType = {
 } & QueryType;
 //商品规格查询类型
 export type PSNQueryType = {
-  PSN: ""; //商品规格
+  productSpec: ""; //商品规格
 } & QueryType;
 //商品规格类型
 export type PSNType = {
@@ -164,7 +164,7 @@ export type PSNType = {
 };
 //添加/编辑商品规格传参
 export type PSNEditType = {
-  PSNificationsList: {
+  productSpecificationsList: {
     keyName: string;
     valueList: string[];
     tag?: string;
@@ -176,10 +176,10 @@ export type PSNEditType = {
 };
 //商品分类查询类型
 export type PCQueryType = {
-  classificationLevel: number;
+  classificationLevel: number | null;
   classificationName: string;
   id: number; //分类编号
-  parentClassificationNumber: number; //父级分类编号
+  parentClassificationNumber: number | null; //父级分类编号
   status: number; //状态（0正常 1停用）
 } & QueryType;
 // 商品分类类型
