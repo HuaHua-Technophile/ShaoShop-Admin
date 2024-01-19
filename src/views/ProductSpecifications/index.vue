@@ -360,6 +360,7 @@
     });
   };
   const enterConfirm = (e: KeyboardEvent, collapseIndex?: number) => {
+    // 添加二级规格
     if (e.key === "Enter" && collapseIndex === undefined) {
       if (
         productSpecForm.productSpecificationsList.some(
@@ -376,16 +377,20 @@
         keyName.value = "";
       }
     }
+    // 修改二级规格或添加三级规格
     if (e.key === "Enter" && collapseIndex !== undefined) {
+      // 如果是编辑状态,说明是修改二级规格
       if (productSpecForm.productSpecificationsList[collapseIndex].editStatus) {
         if (
           productSpecForm.productSpecificationsList[collapseIndex].keyName == ""
         )
           ElMessage.error(`不可为空`);
         else
-          productSpecForm.productSpecificationsList[collapseIndex].editStatus =
-            false;
-      } else {
+          delete productSpecForm.productSpecificationsList[collapseIndex]
+            .editStatus; //直接删除临时属性
+      }
+      // 不在编辑状态,说明是添加三级规格
+      else {
         if (
           productSpecForm.productSpecificationsList[
             collapseIndex
