@@ -325,7 +325,7 @@
             maxlength="10"
             v-model.trim="menuInfoForm.menuName"
             placeholder="在左侧导航与顶部导航显示(建议4字)"
-            :prefix-icon="renderFontIcon('bi bi-123')">
+            :prefix-icon="renderFontIcon('fa-solid fa-quote-left')">
           </el-input>
         </el-form-item>
         <el-form-item label="菜单路径" prop="path">
@@ -334,7 +334,7 @@
             maxlength="30"
             v-model.trim="menuInfoForm.path"
             placeholder="路由地址"
-            :prefix-icon="renderFontIcon('bi bi-geo-alt')">
+            :prefix-icon="renderFontIcon('fa-solid fa-code')">
           </el-input>
         </el-form-item>
         <el-form-item label="父级菜单" prop="parentId">

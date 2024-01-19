@@ -204,7 +204,7 @@
             maxlength="10"
             v-model.trim="roleInfoForm.roleName"
             placeholder="角色称呼"
-            :prefix-icon="renderFontIcon('bi bi-123')">
+            :prefix-icon="renderFontIcon('fa-solid fa-quote-left')">
           </el-input>
         </el-form-item>
         <el-form-item label="权限字符" prop="roleKey">
@@ -213,7 +213,7 @@
             maxlength="20"
             v-model.trim="roleInfoForm.roleKey"
             placeholder="权限标识/权限字符"
-            :prefix-icon="renderFontIcon('bi bi-key')">
+            :prefix-icon="renderFontIcon('fa-solid fa-code')">
           </el-input>
         </el-form-item>
         <el-form-item
@@ -236,7 +236,7 @@
             clearable
             v-model.trim="roleInfoForm.remark"
             placeholder="角色备注"
-            :prefix-icon="renderFontIcon('bi bi-bookmark')">
+            :prefix-icon="renderFontIcon('fa-solid fa-marker')">
           </el-input>
         </el-form-item>
         <el-form-item label="关联菜单" style="padding-left: 10.18px">

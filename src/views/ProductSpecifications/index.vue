@@ -6,6 +6,21 @@
       ref="productSpecQueryFromRef"
       :rules="queryRules"
       class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
+      <el-form-item label="商品规格名称" prop="productSpec" class="flex-grow-1">
+        <el-input
+          clearable
+          maxlength="10"
+          v-model.trim="productSpecQueryFrom.productSpec"
+          placeholder="商品规格名称"
+          :prefix-icon="renderFontIcon('fa-solid fa-ruler-combined')" />
+      </el-form-item>
+      <el-form-item class="ms-3">
+        <el-button
+          :loading="waitAddOrEditProductSpec"
+          @click="queryProductSpecFun"
+          >查询</el-button
+        >
+      </el-form-item>
     </el-form>
     <!-- 商品规格列表 -->
     <div class="flex-grow-1 overflow-hidden p-3">
@@ -415,6 +430,18 @@
           // dialogVisible.value = false; //隐藏弹出框
         } else ElMessage.error(res.message);
         waitAddOrEditProductSpec.value = false;
+      } else console.log("error submit!", fields);
+    });
+  };
+
+  //查询商品规格-------------------------------------
+  const productSpecQueryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const queryProductSpecFun = async () => {
+    productSpecQueryFromRef.value?.validate(async (valid, fields) => {
+      if (valid) {
+        allProductSpecList.value = [];
+        productSpecQueryFrom.currentPage = 1;
+        getProductSpecListFun(); //重新请求数据进行商品规格列表渲染
       } else console.log("error submit!", fields);
     });
   };

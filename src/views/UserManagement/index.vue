@@ -13,7 +13,7 @@
             maxlength="12"
             v-model.trim="userQueryFrom.userName"
             placeholder="每个后台主体唯一名称"
-            :prefix-icon="renderFontIcon('bi bi-123')" />
+            :prefix-icon="renderFontIcon('bi bi-person')" />
         </el-form-item>
         <el-form-item class="col-3 pe-3" label="绑定邮箱" prop="email">
           <el-input
@@ -160,7 +160,7 @@
             maxlength="12"
             v-model.trim="userInfoForm.userName"
             placeholder="每个后台主体唯一名称"
-            :prefix-icon="renderFontIcon('bi bi-123')" />
+            :prefix-icon="renderFontIcon('bi bi-person')" />
         </el-form-item>
         <el-form-item label="绑定邮箱" prop="email">
           <el-input
