@@ -1,13 +1,9 @@
-import {
-  productSpecEditType,
-  productSpecQueryType,
-  productSpecType,
-} from "@/type";
+import { PSNEditType, PSNQueryType, PSNType } from "@/type";
 import instance from "./instance";
 
-export const getProductSpecList = (params?: productSpecQueryType) => {
+export const getPSNList = (params?: PSNQueryType) => {
   return instance<{
-    records: Array<productSpecType>;
+    records: Array<PSNType>;
     total: number;
   }>({
     url: "/specification/list",
@@ -17,7 +13,7 @@ export const getProductSpecList = (params?: productSpecQueryType) => {
 };
 
 //  添加商品规格
-export const addProductSpec = (data?: productSpecEditType) => {
+export const addPSN = (data?: PSNEditType) => {
   return instance({
     url: "/specification",
     method: "POST",
@@ -25,7 +21,7 @@ export const addProductSpec = (data?: productSpecEditType) => {
   });
 };
 
-export const editProductSpec = (data?: productSpecEditType) => {
+export const editPSN = (data?: PSNEditType) => {
   console.log("准备修=>", data);
   return instance({
     url: "/specification",
@@ -35,15 +31,15 @@ export const editProductSpec = (data?: productSpecEditType) => {
 };
 
 // 获取该specificationsId所有的商品规格和属性
-export const getProductSpecificationList = (specificationsId: string) => {
-  return instance<productSpecEditType>({
-    url: `/specification/getProductSpecificationList/${specificationsId}`,
+export const getPSNificationList = (specificationsId: string) => {
+  return instance<PSNEditType>({
+    url: `/specification/getPSNificationList/${specificationsId}`,
     method: "GET",
   });
 };
 
 // /specification/{specificationsIds} 删除商品规格
-export const delProductSpec = (specificationsIds: string) => {
+export const delPSN = (specificationsIds: string) => {
   return instance({
     url: `/specification/${specificationsIds}`,
     method: "put",

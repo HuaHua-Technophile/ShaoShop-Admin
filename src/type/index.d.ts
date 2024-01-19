@@ -1,3 +1,7 @@
+export type QueryType = {
+  pageSize: number; //每页条数
+  currentPage: number; //当前页码
+};
 // 左侧用户菜单
 export type authMenuListType = {
   path: string;
@@ -32,10 +36,7 @@ export type userType = {
   roleName?: string[];
 };
 //分页查询用户列表所需参数
-export type userQueryType = userType & {
-  pageSize?: number;
-  currentPage?: number;
-};
+export type userQueryType = userType & QueryType;
 //字体图标
 export type iconType = {
   // iconify (https://docs.iconify.design/icon-components/vue/#properties)
@@ -149,25 +150,21 @@ export type systemMessageType = {
 export type messageQueryType = {
   timePeriod: string[] | null; //创建时间
   read: number | null; //是否已读
-  pageSize: number; //每页条数
-  currentPage: number; //当前页码
-};
+} & QueryType;
 //商品规格查询类型
-export type productSpecQueryType = {
-  productSpec: ""; //商品规格
-  pageSize: number; //每页条数
-  currentPage: number; //当前页码
-};
+export type PSNQueryType = {
+  PSN: ""; //商品规格
+} & QueryType;
 //商品规格类型
-export type productSpecType = {
+export type PSNType = {
   keyName: string;
   specName: string;
   specificationsId: string;
   valueName: string;
 };
 //添加/编辑商品规格传参
-export type productSpecEditType = {
-  productSpecificationsList: {
+export type PSNEditType = {
+  PSNificationsList: {
     keyName: string;
     valueList: string[];
     tag?: string;
@@ -177,3 +174,13 @@ export type productSpecEditType = {
   specNameId?: string;
   specificationsId?: string;
 };
+//商品分类查询类型
+export type PCQueryType = {
+  classificationLevel: number;
+  classificationName: string;
+  id: number; //分类编号
+  parentClassificationNumber: number; //父级分类编号
+  status: number; //状态（0正常 1停用）
+} & QueryType;
+// 商品分类类型
+export type PCType = {};

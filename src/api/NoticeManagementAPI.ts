@@ -1,14 +1,14 @@
 import instance from "./instance";
-import { messageType } from "@/type/index";
+import { systemMessageType } from "@/type/index";
 
 export const getMessage = () => {
-  return instance<messageType[]>({
+  return instance<systemMessageType[]>({
     url: "/message",
     method: "GET",
   });
 };
 
-export const sendMessage = (data: messageType) => {
+export const sendMessage = (data: systemMessageType) => {
   return instance({
     url: "/message",
     method: "POST",
