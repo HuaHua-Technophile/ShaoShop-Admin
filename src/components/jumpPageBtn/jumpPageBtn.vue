@@ -2,7 +2,7 @@
   <div
     class="align-items-center"
     style="display: flex"
-    v-show="allPageCount != -1 && btnVisible">
+    v-show="allPageCount != -1 && visible">
     跳至<el-input-number
       :disabled="allPageCount === -1"
       size="small"
@@ -32,7 +32,7 @@
       default: 1,
       required: true,
     },
-    btnVisible: {
+    visible: {
       type: Boolean,
       default: true,
       required: true,

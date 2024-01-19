@@ -323,7 +323,7 @@
           <el-input
             clearable
             maxlength="10"
-            v-model="menuInfoForm.menuName"
+            v-model.trim="menuInfoForm.menuName"
             placeholder="在左侧导航与顶部导航显示(建议4字)"
             :prefix-icon="renderFontIcon('bi bi-123')">
           </el-input>
@@ -332,7 +332,7 @@
           <el-input
             clearable
             maxlength="30"
-            v-model="menuInfoForm.path"
+            v-model.trim="menuInfoForm.path"
             placeholder="路由地址"
             :prefix-icon="renderFontIcon('bi bi-geo-alt')">
           </el-input>
@@ -341,7 +341,7 @@
           <el-input
             clearable
             maxlength="12"
-            v-model="menuInfoForm.parentId"
+            v-model.trim="menuInfoForm.parentId"
             placeholder="挂靠的父级菜单id"
             :prefix-icon="renderFontIcon('bi bi-diagram-3')">
           </el-input>
@@ -352,7 +352,7 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model="menuInfoForm.icon"
+            v-model.trim="menuInfoForm.icon"
             placeholder="BSicon/FontAwesome支持,请填入class类名"
             :prefix-icon="renderFontIcon('fa-solid fa-icons')">
           </el-input>

@@ -202,7 +202,7 @@
           <el-input
             clearable
             maxlength="10"
-            v-model="roleInfoForm.roleName"
+            v-model.trim="roleInfoForm.roleName"
             placeholder="角色称呼"
             :prefix-icon="renderFontIcon('bi bi-123')">
           </el-input>
@@ -211,7 +211,7 @@
           <el-input
             clearable
             maxlength="20"
-            v-model="roleInfoForm.roleKey"
+            v-model.trim="roleInfoForm.roleKey"
             placeholder="权限标识/权限字符"
             :prefix-icon="renderFontIcon('bi bi-key')">
           </el-input>
@@ -223,7 +223,7 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model="roleInfoForm.businessId"
+            v-model.trim="roleInfoForm.businessId"
             placeholder="商户ID,不填写则为管理员角色"
             :prefix-icon="renderFontIcon('bi bi-shop-window')">
           </el-input>
@@ -234,7 +234,7 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model="roleInfoForm.remark"
+            v-model.trim="roleInfoForm.remark"
             placeholder="角色备注"
             :prefix-icon="renderFontIcon('bi bi-bookmark')">
           </el-input>

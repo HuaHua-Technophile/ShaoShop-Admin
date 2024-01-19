@@ -1,7 +1,7 @@
 import instance from "./instance";
-import { userType, userListParamsType } from "@/type/index";
-export const getUserList = (params?: userListParamsType) => {
-  return instance<{ records: Array<userType>; pages: number; total: number }>({
+import { userType, userQueryType } from "@/type/index";
+export const getUserList = (params?: userQueryType) => {
+  return instance<{ records: Array<userType>; total: number }>({
     url: "/system/user/list",
     method: "GET",
     params,

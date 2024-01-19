@@ -76,7 +76,7 @@
                   :queryFun="getSystemMessageFun"
                   :allPageCount="allPageCount"
                   :nowPage="nowPage"
-                  :btnVisible="true"
+                  :visible="true"
                   :bs="bs"
                   :tableItemHeight="tableItemHeight"
                   :tableHeaderHeight="tableHeaderHeight"
@@ -117,7 +117,7 @@
         :queryFun="getSystemMessageFun"
         :allPageCount="allPageCount"
         :nowPage="nowPage"
-        :btnVisible="btnVisible"
+        :visible="jumpPageBtnVisible"
         :bs="bs"
         :tableItemHeight="tableItemHeight"
         :tableHeaderHeight="tableHeaderHeight"
@@ -142,7 +142,7 @@
     getSystemMessage,
     getSystemMessageById,
   } from "@/api/SystemMessageAPI";
-  import { messageQueryFromType, systemMessageType } from "@/type";
+  import { messageQueryType, systemMessageType } from "@/type";
   import { ceil, throttle } from "lodash";
   import { nextTick, onMounted, reactive, ref } from "vue";
   import BScroll from "@better-scroll/core";
@@ -161,7 +161,7 @@
   let tableItemHeight: number; //每一项高度
   let tableHeaderHeight: number; //表头高度
   const waitQueryMessage = ref(false);
-  const messageQueryFrom = reactive<messageQueryFromType>({
+  const messageQueryFrom = reactive<messageQueryType>({
     timePeriod: null, //发送时间
     read: null, //是否已读
     currentPage: 1, //页码
@@ -212,7 +212,7 @@
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
   const systemMessageListWrapper = ref();
-  const btnVisible = ref(false);
+  const jumpPageBtnVisible = ref(false);
   let bs: BScrollConstructor<{}>;
   onMounted(() => {
     bs = new BScroll(systemMessageListWrapper.value, {
@@ -232,8 +232,8 @@
       "scroll",
       // 使用节流,实时刷新当前页面
       throttle((e: { x: number; y: number }) => {
-        if (-e.y + 1 > tableHeaderHeight) btnVisible.value = true;
-        else btnVisible.value = false;
+        if (-e.y + 1 > tableHeaderHeight) jumpPageBtnVisible.value = true;
+        else jumpPageBtnVisible.value = false;
         // 滚动高度-表头高度=实际滚动内容
         nowPage.value = ceil(
           (-e.y -

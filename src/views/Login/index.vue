@@ -19,7 +19,7 @@
             style="width: 300px">
             <el-form-item prop="userName">
               <el-input
-                v-model="loginForm.userName"
+                v-model.trim="loginForm.userName"
                 maxlength="12"
                 placeholder="账号"
                 clearable
@@ -28,7 +28,7 @@
             </el-form-item>
             <el-form-item prop="password">
               <el-input
-                v-model="loginForm.password"
+                v-model.trim="loginForm.password"
                 maxlength="16"
                 placeholder="密码"
                 clearable

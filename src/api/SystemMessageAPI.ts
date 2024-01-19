@@ -1,6 +1,6 @@
 import instance from "./instance";
-import { systemMessageType, messageQueryFromType } from "@/type/index";
-export const getSystemMessage = (params: messageQueryFromType) => {
+import { systemMessageType, messageQueryType } from "@/type/index";
+export const getSystemMessage = (params: messageQueryType) => {
   return instance<{ records: systemMessageType[]; total: number }>({
     url: "/system/message",
     method: "GET",

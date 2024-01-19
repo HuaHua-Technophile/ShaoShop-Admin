@@ -90,23 +90,12 @@
             <!-- 站内信未读消息数量 -->
             <routerLink
               to="/main/SystemMessage"
-              class="text-decoration-none text-body">
-              <div
-                class="position-relative px-2 me-3 d-flex align-items-center justify-content-center">
+              class="text-decoration-none text-body me-4">
+              <el-badge
+                :value="unReadMessage"
+                :type="unReadMessage == 0 ? 'info' : ''">
                 <fontIcon icon="fa-regular fa-bell fs-4"></fontIcon>
-                <!-- 未读消息红字 -->
-                <div
-                  class="position-absolute lh-1 top-0 rounded"
-                  :class="[
-                    unReadMessage == 0
-                      ? 'bg-body fs-6 p-0 '
-                      : 'bg-danger end-0 px-1',
-                  ]"
-                  style="font-size: 10.6px; padding: 1.8px 0 1.6px 0"
-                  :style="[unReadMessage == 0 ? 'right:7px' : '']">
-                  {{ unReadMessage }}
-                </div>
-              </div>
+              </el-badge>
             </routerLink>
             <!-- 用户退出登录 -->
             <el-dropdown>
@@ -588,9 +577,10 @@
       if (valid) {
         waitEditPassword.value = true;
         let res = await updateUserPassword(passwordForm);
+        console.log(res);
         if (res.code === 200) {
-          ElMessage.success("修改成功");
           editPasswordStatus.value = false;
+          reLogIn("修改成功,请重新登录");
         } else ElMessage.error(res.message);
         waitEditPassword.value = false;
       } else console.log("error submit!", fields);

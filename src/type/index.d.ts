@@ -32,7 +32,7 @@ export type userType = {
   roleName?: string[];
 };
 //分页查询用户列表所需参数
-export type userListParamsType = userType & {
+export type userQueryType = userType & {
   pageSize?: number;
   currentPage?: number;
 };
@@ -146,9 +146,33 @@ export type systemMessageType = {
   receiverName: string; //收件用户
 };
 // 站内信查询类型
-export type messageQueryFromType = {
+export type messageQueryType = {
   timePeriod: string[] | null; //创建时间
   read: number | null; //是否已读
   pageSize: number; //每页条数
   currentPage: number; //当前页码
+};
+//商品规格查询类型
+export type productSpecQueryType = {
+  productSpec: ""; //商品规格
+  pageSize: number; //每页条数
+  currentPage: number; //当前页码
+};
+//商品规格类型
+export type productSpecType = {
+  keyName: string;
+  specName: string;
+  specificationsId: string;
+  valueName: string;
+};
+//添加/编辑商品规格传参
+export type productSpecEditType = {
+  productSpecificationsList: {
+    keyName: string;
+    valueList: string[];
+    tag?: string;
+  }[];
+  specName: StringIterator;
+  specNameId?: string;
+  specificationsId?: string;
 };

@@ -12,7 +12,7 @@
         <el-input
           clearable
           maxlength="10"
-          v-model="dictQueryFrom.dictName"
+          v-model.trim="dictQueryFrom.dictName"
           placeholder="字典名称"
           :prefix-icon="renderFontIcon('fa-solid fa-quote-left')" />
       </el-form-item>
@@ -23,7 +23,7 @@
         <el-input
           clearable
           maxlength="20"
-          v-model="dictQueryFrom.dictType"
+          v-model.trim="dictQueryFrom.dictType"
           placeholder="字典类型"
           :prefix-icon="renderFontIcon('fa-solid fa-code')" />
       </el-form-item>
@@ -218,7 +218,7 @@
           <el-input
             clearable
             maxlength="10"
-            v-model="dictInfoForm.dictName"
+            v-model.trim="dictInfoForm.dictName"
             placeholder="在选框外呈现给用户"
             :prefix-icon="renderFontIcon('fa-solid fa-quote-left')">
           </el-input>
@@ -227,7 +227,7 @@
           <el-input
             clearable
             maxlength="20"
-            v-model="dictInfoForm.dictType"
+            v-model.trim="dictInfoForm.dictType"
             placeholder="在数据库中的标识"
             :prefix-icon="renderFontIcon('fa-solid fa-code')">
           </el-input>
@@ -238,7 +238,7 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model="dictInfoForm.remark"
+            v-model.trim="dictInfoForm.remark"
             placeholder="备注"
             :prefix-icon="renderFontIcon('fa-solid fa-marker')">
           </el-input>
@@ -257,7 +257,7 @@
           <el-input
             clearable
             disabled
-            v-model="dictDataInfoForm.dictType"
+            v-model.trim="dictDataInfoForm.dictType"
             :prefix-icon="renderFontIcon('fa-solid fa-code-fork')">
           </el-input>
         </el-form-item>
@@ -265,7 +265,7 @@
           <el-input
             clearable
             maxlength="20"
-            v-model="dictDataInfoForm.dictLabel"
+            v-model.trim="dictDataInfoForm.dictLabel"
             placeholder="字典数据呈现出的选项名称"
             :prefix-icon="renderFontIcon('fa-solid fa-tag')">
           </el-input>
@@ -274,7 +274,7 @@
           <el-input
             clearable
             maxlength="20"
-            v-model="dictDataInfoForm.dictValue"
+            v-model.trim="dictDataInfoForm.dictValue"
             placeholder="字典数据传递的值"
             :prefix-icon="renderFontIcon('bi bi-123')">
           </el-input>
@@ -285,7 +285,7 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model="dictDataInfoForm.cssClass"
+            v-model.trim="dictDataInfoForm.cssClass"
             placeholder="cssClass样式属性（其他样式扩展）"
             :prefix-icon="renderFontIcon('fa-brands fa-bootstrap')">
           </el-input>
@@ -296,7 +296,7 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model="dictDataInfoForm.listClass"
+            v-model.trim="dictDataInfoForm.listClass"
             placeholder="listClass 表格回显样式"
             :prefix-icon="renderFontIcon('fa-brands fa-bootstrap')">
           </el-input>
@@ -307,7 +307,7 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model="dictDataInfoForm.remark"
+            v-model.trim="dictDataInfoForm.remark"
             placeholder="备注"
             :prefix-icon="renderFontIcon('fa-solid fa-marker')">
           </el-input>
@@ -317,7 +317,7 @@
           prop="dictSort"
           style="padding-left: 10.18px">
           <el-input-number
-            v-model="dictDataInfoForm.dictSort"
+            v-model.trim="dictDataInfoForm.dictSort"
             :min="0"
             :max="999" />
         </el-form-item>

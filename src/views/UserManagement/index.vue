@@ -11,7 +11,7 @@
           <el-input
             clearable
             maxlength="12"
-            v-model="userQueryFrom.userName"
+            v-model.trim="userQueryFrom.userName"
             placeholder="每个后台主体唯一名称"
             :prefix-icon="renderFontIcon('bi bi-123')" />
         </el-form-item>
@@ -19,7 +19,7 @@
           <el-input
             clearable
             maxlength="20"
-            v-model="userQueryFrom.email"
+            v-model.trim="userQueryFrom.email"
             placeholder="每个后台主体唯一邮箱"
             :prefix-icon="renderFontIcon('bi bi-envelope')" />
         </el-form-item>
@@ -27,7 +27,7 @@
           <el-input
             clearable
             maxlength="11"
-            v-model="userQueryFrom.phoneNumber"
+            v-model.trim="userQueryFrom.phoneNumber"
             placeholder="每个后台主体唯一手机号"
             :prefix-icon="renderFontIcon('bi bi-telephone')" />
         </el-form-item>
@@ -35,7 +35,7 @@
           <el-input
             clearable
             maxlength="12"
-            v-model="userQueryFrom.nickName"
+            v-model.trim="userQueryFrom.nickName"
             placeholder="运营部/物流部/..."
             :prefix-icon="renderFontIcon('bi bi-people')" />
         </el-form-item>
@@ -113,7 +113,7 @@
                   :queryFun="getUserListFun"
                   :allPageCount="allPageCount"
                   :nowPage="nowPage"
-                  :btnVisible="true"
+                  :visible="true"
                   :bs="bs"
                   :tableItemHeight="tableItemHeight"
                   :tableHeaderHeight="tableHeaderHeight"
@@ -158,7 +158,7 @@
           <el-input
             clearable
             maxlength="12"
-            v-model="userInfoForm.userName"
+            v-model.trim="userInfoForm.userName"
             placeholder="每个后台主体唯一名称"
             :prefix-icon="renderFontIcon('bi bi-123')" />
         </el-form-item>
@@ -166,7 +166,7 @@
           <el-input
             clearable
             maxlength="20"
-            v-model="userInfoForm.email"
+            v-model.trim="userInfoForm.email"
             placeholder="每个后台主体唯一邮箱"
             :prefix-icon="renderFontIcon('bi bi-envelope')" />
         </el-form-item>
@@ -174,7 +174,7 @@
           <el-input
             clearable
             maxlength="11"
-            v-model="userInfoForm.phoneNumber"
+            v-model.trim="userInfoForm.phoneNumber"
             placeholder="每个后台主体唯一手机号"
             :prefix-icon="renderFontIcon('bi bi-telephone')" />
         </el-form-item>
@@ -182,7 +182,7 @@
           <el-input
             clearable
             maxlength="12"
-            v-model="userInfoForm.nickName"
+            v-model.trim="userInfoForm.nickName"
             placeholder="运营部/物流部/..."
             :prefix-icon="renderFontIcon('bi bi-people')" />
         </el-form-item>
@@ -190,7 +190,7 @@
           <el-input
             clearable
             maxlength="16"
-            v-model="userInfoForm.password"
+            v-model.trim="userInfoForm.password"
             placeholder="6~16位密码,不能含有中文与空格"
             :prefix-icon="renderFontIcon('bi-shield-lock')" />
         </el-form-item>
@@ -198,7 +198,7 @@
           <el-input
             clearable
             maxlength="12"
-            v-model="userInfoForm.businessId"
+            v-model.trim="userInfoForm.businessId"
             placeholder="填写以绑定对应商户"
             :prefix-icon="renderFontIcon('bi bi-shop-window')" />
         </el-form-item>
@@ -208,7 +208,7 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model="userInfoForm.remark"
+            v-model.trim="userInfoForm.remark"
             placeholder="备注"
             :prefix-icon="renderFontIcon('fa-solid fa-marker')" />
         </el-form-item>
@@ -235,7 +235,7 @@
         :queryFun="getUserListFun"
         :allPageCount="allPageCount"
         :nowPage="nowPage"
-        :btnVisible="btnVisible"
+        :visible="jumpPageBtnVisible"
         :bs="bs"
         :tableItemHeight="tableItemHeight"
         :tableHeaderHeight="tableHeaderHeight"
@@ -252,21 +252,22 @@
     delUser,
   } from "@/api/UserManagementAPI.ts";
   import { renderFontIcon } from "@/utils/fontIcon/renderFontIcon";
-  import { ElMessage, FormInstance } from "element-plus";
-  import { onMounted, reactive, ref, nextTick } from "vue";
-  import { userType } from "@/type/index";
-  import { ceil, throttle, cloneDeep } from "lodash"; //lodash按需引入减少打包体积(_.ceil(number, [precision=0])根据 precision（精度） 向上舍入 number。（注： precision（精度）可以理解为保留几位小数。）)
-  import BScroll from "@better-scroll/core";
-  import Pullup from "@better-scroll/pull-up"; //上拉懒加载
-  import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
-  import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
-  import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
   import {
     phoneNumberValidator,
     emailValidator,
     passwordValidator,
   } from "@/utils/elFromValidator/elFromValidator";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm/elMessageBoxConfirm";
+  import { userType } from "@/type/index";
+
+  import { ElMessage, FormInstance } from "element-plus";
+  import { onMounted, reactive, ref, nextTick } from "vue";
+  import { ceil, throttle, cloneDeep } from "lodash"; //lodash按需引入减少打包体积(_.ceil(number, [precision=0])根据 precision（精度） 向上舍入 number。（注： precision（精度）可以理解为保留几位小数。）)
+  import BScroll from "@better-scroll/core";
+  import Pullup from "@better-scroll/pull-up"; //上拉懒加载
+  import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
+  import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
+  import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
 
   // 不传参数的情况下，就是获取所有用户。传参数的情况下可用作搜索
   const allUserList = ref<userType[]>([]);
@@ -330,7 +331,7 @@
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
   const userListWrapper = ref();
-  const btnVisible = ref(false);
+  const jumpPageBtnVisible = ref(false);
   let bs: BScrollConstructor<{}>;
   onMounted(() => {
     bs = new BScroll(userListWrapper.value, {
@@ -350,8 +351,8 @@
       "scroll",
       // 使用节流,实时刷新当前页面
       throttle((e: { x: number; y: number }) => {
-        if (-e.y + 1 > tableHeaderHeight!) btnVisible.value = true;
-        else btnVisible.value = false;
+        if (-e.y + 1 > tableHeaderHeight!) jumpPageBtnVisible.value = true;
+        else jumpPageBtnVisible.value = false;
         // 滚动高度-表头高度=实际滚动内容
         nowPage.value = ceil(
           (-e.y - tableHeaderHeight! + userListWrapper.value.clientHeight) /
@@ -436,7 +437,6 @@
     isAddUser.value = true;
     dialogTitle.value = "添加用户";
   };
-  //修改用户--------------------------------------
   const editUserDialog = (user: userType) => {
     userInfoForm = reactive(cloneDeep(user));
     dialogVisible.value = true;
