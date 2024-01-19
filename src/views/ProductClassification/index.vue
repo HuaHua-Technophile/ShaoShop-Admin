@@ -1,16 +1,130 @@
 <template>
-  <h1>"ProductClassification"</h1>
+  <div class="w-100 h-100 d-flex flex-column">
+    <!-- 根据分类名称搜索 -->
+    <el-form
+      :model="PCQueryFrom"
+      ref="PCQueryFromRef"
+      :rules="queryRules"
+      class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4"></el-form>
+    <!-- 商品分类列表 -->
+    <div class="flex-grow-1 overflow-hidden p-3">
+      <div
+        ref="PCWrapper"
+        class="PCWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
+        <div
+          style="
+            min-height: calc(100% + 1px) !important;
+            padding: 1px 0 !important;
+          ">
+          <el-table
+            ref="PCTableRef"
+            :data="allPCList"
+            table-layout="auto"
+            class="bg-body rounded-4"
+            header-cell-class-name="text-center"
+            row-key="--------------"
+            row-class-name="bg-body"
+            cell-class-name="text-center"
+            empty-text="暂无符合查询条件的商品分类"
+            @cell-click="cellClickFun">
+            <el-table-column>
+              <template #header>
+                <el-button @click="addPCDialog">添加分类</el-button>
+              </template>
+              <template #default>
+                <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
+                <fontIcon icon="bi bi-trash fs-6 text-danger" role="button" />
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+    </div>
+    <!-- 添加/修改商品分类弹窗 -->
+    <el-dialog
+      v-model="dialogVisible"
+      width="450px"
+      :before-close="closeConfirmFun"
+      class="rounded-4"
+      draggable
+      center>
+      <template #header>
+        <el-button @click="addOrEditPCFun" :loading="waitAddOrEditPC"
+          >确认{{ dialogTitle
+          }}<span v-if="!isAddPC">ID: {{ PCForm.specNameId }}</span></el-button
+        >
+      </template>
+      <el-form :model="PCForm" ref="dialogFromRef" :rules="PCRules">
+        <el-form-item label="分类名称" prop="classificationName">
+          <el-input
+            clearable
+            maxlength="10"
+            v-model.trim="PCForm.classificationName"
+            placeholder="商品分类名称"
+            :prefix-icon="renderFontIcon('')">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="分类编号" prop="id">
+          <el-input
+            clearable
+            maxlength="20"
+            v-model.trim.number="PCForm.id"
+            placeholder="商品分类编号"
+            :prefix-icon="renderFontIcon('')">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="父级编号" prop="parentClassificationNumber">
+          <el-input
+            clearable
+            maxlength="20"
+            v-model.trim.number="PCForm.parentClassificationNumber"
+            placeholder="父级商品分类编号"
+            :prefix-icon="renderFontIcon('')">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="分类备注" prop="remark">
+          <el-input
+            clearable
+            v-model.trim="PCForm.remark"
+            placeholder="备注"
+            :prefix-icon="renderFontIcon('')">
+          </el-input>
+        </el-form-item>
+        <el-form-item
+          label="分类等级"
+          prop="classificationLevel"
+          style="padding-left: 10.18px">
+          <el-input-number
+            v-model="PCForm.classificationLevel"
+            :min="0"
+            :max="999" />
+        </el-form-item>
+        <el-form-item
+          label="分类排序"
+          prop="classificationSort"
+          style="padding-left: 10.18px">
+          <el-input-number
+            v-model="PCForm.classificationSort"
+            :min="0"
+            :max="999" />
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+  </div>
 </template>
 <script lang="ts" setup>
   import { getPCList } from "@/api/ProductClassificationAPI";
   import { PCQueryType, PCType } from "@/type";
+  import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm/elMessageBoxConfirm";
+  import { renderFontIcon } from "@/utils/fontIcon/renderFontIcon";
   import BScroll from "@better-scroll/core";
   import Pullup from "@better-scroll/pull-up"; //上拉懒加载
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
-  import { ceil, throttle } from "lodash";
+  import { ceil, cloneDeep, throttle } from "lodash";
   import { nextTick, onMounted, reactive, ref } from "vue";
+  import { ElMessage, FormInstance } from "element-plus";
 
   // 不传参数的情况下，就是获取所有商品分类。传参数的情况下可用作搜索
   const allPCList = ref<PCType[]>([]);
@@ -106,7 +220,7 @@
             (tableItemHeight! * PCQueryFrom.pageSize)
         );
         /* console.log(
-              `视窗高${PSNListWrapper.value.clientHeight}px,表头高${
+              `视窗高${PCListWrapper.value.clientHeight}px,表头高${
                 tableHeaderHeight
               }px,单格高${tableItemHeight}px,滚动了=>${-e.y}px,`,
               nowPage.value
@@ -114,4 +228,62 @@
       }, 400)
     );
   });
+
+  //表格点击回调----------------------
+  const cellClickFun = (
+    row: PCType,
+    column: any,
+    cell: any,
+    event: { target: HTMLElement }
+  ) => {
+    column;
+    cell;
+    if (event.target.className.includes("bi-pencil-square")) editPCDialog(row);
+    if (event.target.className.includes("bi-trash")) delPCFun(row);
+  };
+
+  //dialog弹出框表单-----------------------
+  const dialogFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const defaultPC: PCType = {
+    classificationLevel: null,
+    classificationName: "",
+    classificationSort: 0,
+    id: -1,
+    parentClassificationNumber: null,
+    remark: "",
+  };
+  let PCForm = reactive(defaultPC);
+  const keyName = ref("");
+  const PCRules = reactive({});
+  //dialog弹出框-----------------------
+  const dialogVisible = ref(false);
+  const dialogTitle = ref("添加商品分类");
+  const isAddPC = ref(true);
+  const waitAddOrEditPC = ref(false);
+  const closeConfirmFun = (done: () => void) => {
+    elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
+      done();
+      dialogFromRef.value?.resetFields();
+      dialogFromRef.value?.clearValidate();
+      ElMessage.info(`放弃${dialogTitle.value}`);
+    });
+  };
+
+  //添加/修改商品分类----------------
+  const addPCDialog = () => {
+    PCForm = reactive(cloneDeep(defaultPC));
+    dialogVisible.value = true;
+    isAddPC.value = true;
+    dialogTitle.value = "添加商品分类";
+  };
+  const editPCDialog = async (PC: PCType) => {
+    let res = await getPCificationList(PC.specificationsId);
+    if (res.code == 200) {
+      console.log(`获取到ID${PC.specificationsId}的商品分类=>`, res.data);
+      PCForm = reactive(cloneDeep(res.data));
+      dialogVisible.value = true;
+      isAddPC.value = false;
+      dialogTitle.value = "修改商品分类";
+    }
+  };
 </script>

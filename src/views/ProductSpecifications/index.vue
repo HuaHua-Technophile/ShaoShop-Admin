@@ -308,7 +308,7 @@
     );
   });
 
-  //表格点击回调-------------
+  //表格点击回调----------------------
   const cellClickFun = (
     row: PSNType,
     column: any,
@@ -456,7 +456,7 @@
     });
   };
 
-  //查询商品规格-------------------------------------
+  //查询商品规格------------------------------
   const PSNQueryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const queryPSNFun = async () => {
     PSNQueryFromRef.value?.validate(async (valid, fields) => {

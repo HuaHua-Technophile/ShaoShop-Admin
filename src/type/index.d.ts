@@ -183,4 +183,20 @@ export type PCQueryType = {
   status: number; //状态（0正常 1停用）
 } & QueryType;
 // 商品分类类型
-export type PCType = {};
+export type PCType = {
+  classificationLevel: number | null;
+  classificationName: string;
+  classificationSort: number;
+  id: number;
+  parentClassificationNumber: number | null;
+  remark: string;
+};
+// 商品分类编辑类型
+/* export type PCEditType = {
+  classificationLevel: number | null;
+  classificationName: string;
+  classificationSort: number;
+  id: number;
+  parentClassificationNumber: number | null;
+  remark: number;
+}; */

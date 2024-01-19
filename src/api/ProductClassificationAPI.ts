@@ -5,7 +5,7 @@ export const getPCList = (params?: PCQueryType) => {
     records: Array<PCType>;
     total: number;
   }>({
-    url: "/specification/list",
+    url: "/product-classification/list",
     method: "GET",
     params,
   });
