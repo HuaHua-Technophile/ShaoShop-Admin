@@ -135,11 +135,11 @@
   let tableHeaderHeight: number; //表头高度
   const waitQueryPC = ref(false);
   const PCQueryFrom = reactive<PCQueryType>({
+    id: null, //分类编号
+    parentClassificationNumber: null, //父级分类编号
     classificationLevel: null,
     classificationName: "",
-    id: -1, //分类编号
-    parentClassificationNumber: null, //父级分类编号
-    status: 0, //状态（0正常 1停用）
+    status: null, //状态（0正常 1停用）
     currentPage: 1, //请求的页码
     pageSize: defaultPageSize, //每页返回的数量
   });

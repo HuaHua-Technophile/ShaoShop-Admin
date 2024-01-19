@@ -178,9 +178,9 @@ export type PSNEditType = {
 export type PCQueryType = {
   classificationLevel: number | null;
   classificationName: string;
-  id: number; //分类编号
+  id: number | null; //分类编号
   parentClassificationNumber: number | null; //父级分类编号
-  status: number; //状态（0正常 1停用）
+  status: number | null; //状态（0正常 1停用）
 } & QueryType;
 // 商品分类类型
 export type PCType = {
