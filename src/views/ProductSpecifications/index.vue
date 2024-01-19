@@ -421,7 +421,7 @@
 
   // 删除------------------
   const delProductSpecFun = (productSpec: productSpecType) => {
-    elMessageBoxConfirm(`删除规格${productSpec.keyName}`, async () => {
+    elMessageBoxConfirm(`删除规格'${productSpec.specName}'`, async () => {
       const res = await delProductSpec(productSpec.specificationsId);
       if (res.code === 200) {
         ElMessage.success(res.message);
