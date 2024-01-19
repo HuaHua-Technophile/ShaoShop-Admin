@@ -108,7 +108,7 @@
             :prefix-icon="renderFontIcon('fa-solid fa-pen-ruler')">
           </el-input>
         </el-form-item>
-        <el-form-item label="二级商品规格">
+        <el-form-item label="二级商品规格" style="padding-left: 10.18px">
           <el-input
             clearable
             maxlength="10"
@@ -118,20 +118,41 @@
             :prefix-icon="renderFontIcon('fa-solid fa-ruler-combined')">
           </el-input>
         </el-form-item>
-        <el-collapse class="w-100">
+        <el-collapse
+          class="w-100"
+          v-if="productSpecForm.productSpecificationsList.length > 0">
           <el-collapse-item
             v-for="(i, index) in productSpecForm.productSpecificationsList"
             :name="i.keyName">
             <template #title>
-              <div class="d-flex align-items-center">
-                <span class="me-3"
-                  >{{ i.keyName }} ({{ i.valueList.length }})</span
-                >
-                <fontIcon
-                  @click="delCollapse(i.keyName)"
-                  icon="bi bi-trash fs-6 text-danger"
-                  role="button" />
-              </div>
+              <Transition
+                enter-active-class="animate__animated animate__fadeInUp"
+                leave-active-class="animate__animated animate__fadeOutUp">
+                <div v-if="i.editStatus" class="position-absolute">
+                  <el-input
+                    clearable
+                    maxlength="10"
+                    v-model.trim="i.keyName"
+                    placeholder="二级规格名称"
+                    @keydown="enterConfirm($event, index)"
+                    :prefix-icon="
+                      renderFontIcon('fa-solid fa-ruler-combined')
+                    "></el-input>
+                </div>
+                <div class="d-flex align-items-center" v-else>
+                  <span class="me-3"
+                    >{{ i.keyName }} ({{ i.valueList.length }})</span
+                  >
+                  <fontIcon
+                    @click="editCollapse(index)"
+                    icon="bi-pencil-square  fs-6 me-2"
+                    role="button" />
+                  <fontIcon
+                    @click="delCollapse(i.keyName)"
+                    icon="bi bi-trash fs-6 text-danger"
+                    role="button" />
+                </div>
+              </Transition>
             </template>
             <div class="d-flex align-items-center flex-wrap">
               <el-tag
@@ -322,7 +343,11 @@
   };
   let productSpecForm = reactive(defaultProductSpec);
   const keyName = ref("");
-  const productSpecRules = reactive({});
+  const productSpecRules = reactive({
+    specName: [
+      { required: true, message: "请输入商品规格名称", trigger: "blur" },
+    ],
+  });
   //dialog弹出框-----------------------
   const dialogVisible = ref(false);
   const dialogTitle = ref("添加商品规格");
@@ -331,6 +356,8 @@
   const closeConfirmFun = (done: () => void) => {
     elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
       done();
+      dialogFromRef.value?.resetFields();
+      dialogFromRef.value?.clearValidate();
       ElMessage.info(`放弃${dialogTitle.value}`);
     });
   };
@@ -352,28 +379,45 @@
       }
     }
     if (e.key === "Enter" && collapseIndex !== undefined) {
-      if (
-        productSpecForm.productSpecificationsList[collapseIndex].valueList.some(
-          (i) =>
-            i == productSpecForm.productSpecificationsList[collapseIndex].tag
+      if (productSpecForm.productSpecificationsList[collapseIndex].editStatus) {
+        if (
+          productSpecForm.productSpecificationsList[collapseIndex].keyName == ""
         )
-      )
-        ElMessage.error(
-          `'${productSpecForm.productSpecificationsList[collapseIndex].keyName}'上已存在规格值:'${productSpecForm.productSpecificationsList[collapseIndex].tag}'`
-        );
-      else if (
-        productSpecForm.productSpecificationsList[collapseIndex].tag == "" ||
-        productSpecForm.productSpecificationsList[collapseIndex].tag ==
-          undefined
-      )
-        ElMessage.error(`不可为空`);
-      else {
-        productSpecForm.productSpecificationsList[collapseIndex].valueList.push(
-          productSpecForm.productSpecificationsList[collapseIndex].tag!
-        );
-        delete productSpecForm.productSpecificationsList[collapseIndex].tag; //直接删除临时属性,避免传参时出错
+          ElMessage.error(`不可为空`);
+        else
+          productSpecForm.productSpecificationsList[collapseIndex].editStatus =
+            false;
+      } else {
+        if (
+          productSpecForm.productSpecificationsList[
+            collapseIndex
+          ].valueList.some(
+            (i) =>
+              i == productSpecForm.productSpecificationsList[collapseIndex].tag
+          )
+        )
+          ElMessage.error(
+            `'${productSpecForm.productSpecificationsList[collapseIndex].keyName}'上已存在规格值:'${productSpecForm.productSpecificationsList[collapseIndex].tag}'`
+          );
+        else if (
+          productSpecForm.productSpecificationsList[collapseIndex].tag == "" ||
+          productSpecForm.productSpecificationsList[collapseIndex].tag ==
+            undefined
+        )
+          ElMessage.error(`不可为空`);
+        else {
+          productSpecForm.productSpecificationsList[
+            collapseIndex
+          ].valueList.push(
+            productSpecForm.productSpecificationsList[collapseIndex].tag!
+          );
+          delete productSpecForm.productSpecificationsList[collapseIndex].tag; //直接删除临时属性,避免传参时出错
+        }
       }
     }
+  };
+  const editCollapse = (collapseIndex: number) => {
+    productSpecForm.productSpecificationsList[collapseIndex].editStatus = true;
   };
   const delCollapse = (keyName: string) => {
     elMessageBoxConfirm(`删除二级规格:'${keyName}'`, () => {
@@ -418,18 +462,26 @@
   const addOrEditProductSpecFun = () => {
     dialogFromRef.value?.validate(async (valid, fields) => {
       if (valid) {
-        waitAddOrEditProductSpec.value = true;
-        let res;
-        if (isAddProductSpec.value) res = await addProductSpec(productSpecForm);
-        else res = await editProductSpec(productSpecForm);
-        if (res.code === 200) {
-          ElMessage.success(`${dialogTitle.value}成功`);
-          allProductSpecList.value = [];
-          productSpecQueryFrom.currentPage = 1;
-          getProductSpecListFun(); //重新请求数据进行商品规格列表渲染
-          // dialogVisible.value = false; //隐藏弹出框
-        } else ElMessage.error(res.message);
-        waitAddOrEditProductSpec.value = false;
+        // 验证二级规格名称是否有空值
+        if (
+          !productSpecForm.productSpecificationsList.some(
+            (i) => i.keyName == ""
+          )
+        ) {
+          waitAddOrEditProductSpec.value = true;
+          let res;
+          if (isAddProductSpec.value)
+            res = await addProductSpec(productSpecForm);
+          else res = await editProductSpec(productSpecForm);
+          if (res.code === 200) {
+            ElMessage.success(`${dialogTitle.value}成功`);
+            allProductSpecList.value = [];
+            productSpecQueryFrom.currentPage = 1;
+            getProductSpecListFun(); //重新请求数据进行商品规格列表渲染
+            // dialogVisible.value = false; //隐藏弹出框
+          } else ElMessage.error(res.message);
+          waitAddOrEditProductSpec.value = false;
+        } else ElMessage.error("二级规格名称不可为空");
       } else console.log("error submit!", fields);
     });
   };

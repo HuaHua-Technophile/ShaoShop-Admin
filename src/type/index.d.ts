@@ -171,8 +171,9 @@ export type productSpecEditType = {
     keyName: string;
     valueList: string[];
     tag?: string;
+    editStatus?: boolean;
   }[];
-  specName: StringIterator;
+  specName: string;
   specNameId?: string;
   specificationsId?: string;
 };
