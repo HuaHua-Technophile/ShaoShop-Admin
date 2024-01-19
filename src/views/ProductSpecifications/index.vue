@@ -21,6 +21,18 @@
           >查询</el-button
         >
       </el-form-item>
+      <el-form-item class="ms-3">
+        <jumpPageBtn
+          :queryFun="getProductSpecListFun"
+          :allPageCount="allPageCount"
+          :nowPage="nowPage"
+          :visible="true"
+          :bs="bs"
+          :tableItemHeight="tableItemHeight"
+          :tableHeaderHeight="tableHeaderHeight"
+          :queryFrom="productSpecQueryFrom"
+          :defaultPageSize="defaultPageSize" />
+      </el-form-item>
     </el-form>
     <!-- 商品规格列表 -->
     <div class="flex-grow-1 overflow-hidden p-3">
@@ -50,20 +62,6 @@
             <el-table-column prop="specName" label="规格名称" />
             <el-table-column prop="keyName" label="keyName" />
             <el-table-column prop="valueName" label="valueName" />
-            <el-table-column>
-              <template #header>
-                <jumpPageBtn
-                  :queryFun="getProductSpecListFun"
-                  :allPageCount="allPageCount"
-                  :nowPage="nowPage"
-                  :visible="true"
-                  :bs="bs"
-                  :tableItemHeight="tableItemHeight"
-                  :tableHeaderHeight="tableHeaderHeight"
-                  :queryFrom="productSpecQueryFrom"
-                  :defaultPageSize="defaultPageSize" />
-              </template>
-            </el-table-column>
             <el-table-column>
               <template #header>
                 <el-button @click="addProductSpecDialog">添加规格</el-button>
