@@ -52,6 +52,7 @@
             padding: 1px 0 !important;
           ">
           <el-table
+            v-loading="waitQueryMessage"
             :data="systemMessageList"
             table-layout="auto"
             class="bg-body rounded-4"

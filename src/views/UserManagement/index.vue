@@ -69,6 +69,7 @@
             padding: 1px 0 !important;
           ">
           <el-table
+            v-loading="waitQueryUser"
             ref="userTableRef"
             :data="allUserList"
             table-layout="auto"
@@ -477,7 +478,7 @@
       if (valid) {
         allUserList.value = [];
         userQueryFrom.currentPage = 1;
-        getUserListFun();
+        await getUserListFun();
       } else console.log("error submit!", fields);
     });
   };

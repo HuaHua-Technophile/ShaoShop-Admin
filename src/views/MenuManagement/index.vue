@@ -8,6 +8,7 @@
           padding: 1px 0 !important;
         ">
         <el-table
+          v-loading="waitQueryMenu"
           :data="menuList"
           table-layout="auto"
           header-cell-class-name="text-center text-body"
@@ -16,8 +17,7 @@
           class="bg-body rounded-4"
           empty-text="查询菜单异常"
           row-key="menuId"
-          @cell-click="cellClickFun"
-          @expand-change="expandChangeFun">
+          @cell-click="cellClickFun">
           <!-- 外层表格扩展 -->
           <el-table-column type="expand">
             <template #default="props">
@@ -55,8 +55,7 @@
                         darkTheme ? 'bg-black' : 'bg-body-secondary'
                       "
                       cell-class-name="text-center"
-                      @cell-click="cellClickFun"
-                      @expand-change="expandChangeFun">
+                      @cell-click="cellClickFun">
                       <!-- 内层表格扩展 -->
                       <el-table-column type="expand">
                         <template #default="props2">
@@ -434,7 +433,8 @@
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //bs类型
-  import { nextTick, onMounted, onUnmounted, reactive, ref } from "vue";
+  import ObserveDOM from "@better-scroll/observe-dom";
+  import { nextTick, onMounted, reactive, ref } from "vue";
   import { ElMessage, FormInstance } from "element-plus";
   import { storeToRefs } from "pinia";
   import { useDarkThemeStore } from "@/stores/colorTheme";
@@ -443,38 +443,30 @@
   //修改主题------------------------------------------
   const { darkTheme } = storeToRefs(useDarkThemeStore());
   //获取菜单-----------------------
+  const waitQueryMenu = ref(false);
   const menuList = ref<roleMenuType[]>();
   const getMenuListFun = async () => {
+    waitQueryMenu.value = true;
     let res = await getMenuList();
     console.log("获取菜单列表=>", res);
     menuList.value = res.data;
     await nextTick();
     bs.refresh();
+    waitQueryMenu.value = false;
   };
   getMenuListFun();
 
   // better scroll-------------------------
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
+  BScroll.use(ObserveDOM);
   const menuListWrapper = ref();
   let bs: BScrollConstructor<{}>;
   onMounted(() => {
     bs = new BScroll(menuListWrapper.value, {
       scrollbar: true,
       mouseWheel: true,
-    });
-  });
-  const timeOutArr: NodeJS.Timeout[] = [];
-  const expandChangeFun = async () => {
-    timeOutArr.push(
-      setTimeout(() => {
-        bs.refresh();
-      }, 150)
-    );
-  };
-  onUnmounted(() => {
-    timeOutArr.forEach((i) => {
-      clearTimeout(i);
+      observeDOM: true,
     });
   });
 

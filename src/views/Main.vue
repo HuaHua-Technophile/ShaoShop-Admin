@@ -93,7 +93,7 @@
               class="text-decoration-none text-body me-4">
               <el-badge
                 :value="unReadMessage"
-                :type="unReadMessage == 0 ? 'info' : ''">
+                :type="unReadMessage == 0 ? 'info' : 'danger'">
                 <fontIcon icon="fa-regular fa-bell fs-4"></fontIcon>
               </el-badge>
             </routerLink>

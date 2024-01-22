@@ -1,4 +1,4 @@
-import { PSNEditType, PSNQueryType, PSNType } from "@/type";
+import { PSNQueryType, PSNType } from "@/type";
 import instance from "./instance";
 
 export const getPSNList = (params?: PSNQueryType) => {
@@ -13,7 +13,8 @@ export const getPSNList = (params?: PSNQueryType) => {
 };
 
 //  添加商品规格
-export const addPSN = (data?: PSNEditType) => {
+export const addPSN = (data?: PSNType) => {
+  console.log("准备添加规格=>", data);
   return instance({
     url: "/specification",
     method: "POST",
@@ -21,8 +22,8 @@ export const addPSN = (data?: PSNEditType) => {
   });
 };
 
-export const editPSN = (data?: PSNEditType) => {
-  console.log("准备修=>", data);
+export const editPSN = (data?: PSNType) => {
+  console.log("准备修改规格=>", data);
   return instance({
     url: "/specification",
     method: "PUT",
@@ -31,15 +32,15 @@ export const editPSN = (data?: PSNEditType) => {
 };
 
 // 获取该specificationsId所有的商品规格和属性
-export const getPSNificationList = (PSNId: string) => {
-  return instance<PSNEditType>({
+export const getPSNificationList = (PSNId: number) => {
+  return instance<PSNType>({
     url: `/specification/getProductSpecificationList/${PSNId}`,
     method: "GET",
   });
 };
 
 // /specification/{specificationsIds} 删除商品规格
-export const delPSN = (PSNId: string) => {
+export const delPSN = (PSNId: number) => {
   return instance({
     url: `/specification/${PSNId}`,
     method: "put",

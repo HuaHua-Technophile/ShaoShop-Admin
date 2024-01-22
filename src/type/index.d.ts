@@ -157,31 +157,20 @@ export type PSNQueryType = {
 } & QueryType;
 //商品规格类型
 export type PSNType = {
-  keyName: string;
+  keyName?: string;
   specName: string;
-  specificationsId: string;
-  valueName: string;
-};
-//添加/编辑商品规格传参
-export type PSNEditType = {
-  productSpecificationsList: {
+  specificationsId?: number;
+  valueName?: string;
+  productSpecificationsList?: {
     keyName: string;
     valueList: string[];
     tag?: string;
     editStatus?: boolean;
   }[];
-  specName: string;
   specNameId?: string;
-  specificationsId?: string;
 };
 //商品分类查询类型
-export type PCQueryType = {
-  classificationLevel: number | null;
-  classificationName: string;
-  id: number | null; //分类编号
-  parentClassificationNumber: number | null; //父级分类编号
-  status: number | null; //状态（0正常 1停用）
-} & QueryType;
+export type PCQueryType = PCType & QueryType;
 // 商品分类类型
 export type PCType = {
   classificationLevel: number | null;

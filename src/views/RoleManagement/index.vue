@@ -7,6 +7,7 @@
           padding: 1px 0 !important;
         ">
         <el-table
+          v-loading="loading"
           ref="roleTableRef"
           :data="roleList"
           table-layout="auto"
@@ -375,7 +376,7 @@
   import NestedScroll from "@better-scroll/nested-scroll";
   //嵌套滚动
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //bs类型
-  import { nextTick, onMounted, onUnmounted, reactive, ref } from "vue";
+  import { nextTick, onMounted, reactive, ref } from "vue";
   import { roleType, treeListType, userType } from "@/type";
   import { ElMessage, FormInstance, TableInstance } from "element-plus";
   import { cloneDeep } from "lodash";
@@ -387,12 +388,16 @@
   const { darkTheme } = storeToRefs(useDarkThemeStore());
   //获取数据-----------------------
   const roleList = ref<roleType[]>();
+  const loading = ref(false);
+
   const getRoleListFun = async () => {
+    loading.value = true;
     const res = await getRoleList();
     console.log("获取的角色列表=>", res);
     roleList.value = res.data;
     await nextTick();
     bsOuter.refresh();
+    loading.value = false;
   };
   getRoleListFun();
 
@@ -412,23 +417,19 @@
       },
     });
   });
-  const timeOutArr: NodeJS.Timeout[] = [];
   const expandChangeFun = async (row: roleType, expandedRows: roleType[]) => {
     // 如果是展开就重载数据,并且延迟实例化内层BetterScroll
-    if (expandedRows.includes(row)) getAllocatedListFun(row.roleId!);
-    else bsInners.value[row.roleId!]?.destroy();
+    loading.value = true;
+    if (expandedRows.includes(row))
+      await getAllocatedListFun(row.roleId!, Boolean(row.userList));
+    else {
+      bsInners.value[row.roleId!]?.destroy();
+      loading.value = false;
+    }
     // 不管展开还是收起,都需要重新刷新BS
-    timeOutArr.push(
-      setTimeout(() => {
-        bsOuter.refresh();
-      }, 150)
-    );
+    console.log("外层BS刷新了");
+    bsOuter.refresh();
   };
-  onUnmounted(() => {
-    timeOutArr.forEach((i) => {
-      clearTimeout(i);
-    });
-  });
 
   //表格点击回调-------------
   const cellClickFun = (
@@ -548,25 +549,26 @@
   };
 
   //查询授权用户------------------------------
-  const getAllocatedListFun = async (roleId: number) => {
-    const res = await getAllocatedList(roleId!);
-    console.log(`ID${roleId}已挂载用户=>`, res);
-    if (res.code === 200) {
-      const index = roleList.value?.findIndex((i) => i.roleId === roleId);
-      roleList.value![index!].userList = res.data;
-      bsInners.value[roleId] = new BScroll(`#BSRef${roleId}`, {
-        scrollbar: true,
-        mouseWheel: true,
-        nestedScroll: {
-          groupId: 1, // string or number
-        },
-      });
-      timeOutArr.push(
-        setTimeout(() => {
-          bsInners.value[roleId]?.refresh();
-        }, 150)
-      );
+  const getAllocatedListFun = async (roleId: number, dontLoad?: boolean) => {
+    if (!dontLoad) {
+      const res = await getAllocatedList(roleId!);
+      console.log(`ID${roleId}已挂载用户=>`, res);
+      if (res.code === 200) {
+        const index = roleList.value?.findIndex((i) => i.roleId === roleId);
+        roleList.value![index!].userList = res.data;
+      }
     }
+    await nextTick();
+    bsInners.value[roleId] = new BScroll(`#BSRef${roleId}`, {
+      scrollbar: true,
+      mouseWheel: true,
+      nestedScroll: {
+        groupId: 1, // string or number
+      },
+    });
+    console.log(`内层BS${roleId}刷新了=>`, bsInners.value[roleId]);
+    bsInners.value[roleId]?.refresh();
+    loading.value = false;
   };
 
   // 授权用户-----------------------------
@@ -608,10 +610,12 @@
     elMessageBoxConfirm(
       `取消授权勾选的${roleList.value![index!].selectList?.length}个用户`,
       async () => {
+        loading.value = true;
         const res = await cancelUser(
           roleId,
           roleList.value![index!].selectList!
         );
+        loading.value = false;
         if (res.code === 200) {
           ElMessage.success(
             `取消授权${roleList.value![index!].selectList?.length}个用户成功`

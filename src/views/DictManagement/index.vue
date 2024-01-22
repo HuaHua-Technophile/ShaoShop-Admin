@@ -56,6 +56,7 @@
             padding: 1px 0 !important;
           ">
           <el-table
+            v-loading="waitQueryDict"
             ref="dictTableRef"
             :data="allDictList"
             table-layout="auto"
@@ -65,12 +66,11 @@
             row-class-name="bg-body"
             cell-class-name="text-center"
             empty-text="暂无符合查询条件的字典"
-            @cell-click="cellClickFun"
-            @expand-change="expandChangeFun">
+            @cell-click="cellClickFun">
             <!-- 外层表格扩展 -->
             <el-table-column type="expand">
               <template #default="props">
-                <div class="px-3">
+                <div class="px-3" v-if="props.row.sysDictDataList.length > 0">
                   <el-table
                     :data="props.row.sysDictDataList"
                     table-layout="auto"
@@ -85,7 +85,6 @@
                     "
                     cell-class-name="text-center"
                     @cell-click="cellClickFun"
-                    @expand-change="expandChangeFun"
                     empty-text="该字典下暂无数据,请添加">
                     <el-table-column label="序号" type="index" width="55" />
                     <el-table-column prop="dictCode" label="数据编码" />
@@ -158,6 +157,13 @@
                       </template>
                     </el-table-column>
                   </el-table>
+                </div>
+                <div v-else class="text-center">
+                  <el-button
+                    class="text-center"
+                    @click="addDictDataDialog(props.row)"
+                    >该字典下暂无数据,请添加</el-button
+                  >
                 </div>
               </template>
             </el-table-column>
@@ -355,8 +361,9 @@
   import BScroll from "@better-scroll/core";
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
+  import ObserveDOM from "@better-scroll/observe-dom"; //开启对 content 以及 content 子元素 DOM 改变的探测
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
-  import { nextTick, onMounted, reactive, ref, onUnmounted } from "vue";
+  import { nextTick, onMounted, reactive, ref } from "vue";
   import { dictDataType, dictType } from "@/type/index";
   import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
   import { storeToRefs } from "pinia";
@@ -378,9 +385,9 @@
   const getDictListFun = async () => {
     allDictList.value = [];
     waitQueryDict.value = true;
-    console.log("查询条件=>", dictQueryFrom);
+    console.log("字典查询条件=>", dictQueryFrom);
     const res = await getDictList(dictQueryFrom);
-    console.log("查询结果=>", res);
+    console.log("字典查询结果=>", res);
     if (res.code === 200) {
       ElMessage.success("查询成功");
       allDictList.value = res.data.records;
@@ -394,25 +401,14 @@
   // better scroll-------------------------
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
+  BScroll.use(ObserveDOM);
   const dictListWrapper = ref();
   let bs: BScrollConstructor<{}>;
   onMounted(() => {
     bs = new BScroll(dictListWrapper.value, {
       scrollbar: true,
       mouseWheel: true,
-    });
-  });
-  const timeOutArr: NodeJS.Timeout[] = [];
-  const expandChangeFun = async () => {
-    timeOutArr.push(
-      setTimeout(() => {
-        bs.refresh();
-      }, 150)
-    );
-  };
-  onUnmounted(() => {
-    timeOutArr.forEach((i) => {
-      clearTimeout(i);
+      observeDOM: true,
     });
   });
 
