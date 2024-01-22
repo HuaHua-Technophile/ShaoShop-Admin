@@ -295,9 +295,7 @@
         </el-form-item>
       </el-form>
       <div class="d-flex justify-content-center">
-        <el-button
-          @click="addOrEditRoleFun(dialogFormRef)"
-          :loading="waitAddOrEditRole"
+        <el-button @click="addOrEditRoleFun" :loading="waitAddOrEditRole"
           >确认{{ dialogTitle
           }}<span v-if="!isAddRole"
             >ID: {{ roleInfoForm.roleId }}</span
@@ -375,6 +373,7 @@
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import NestedScroll from "@better-scroll/nested-scroll";
   //嵌套滚动
+  import ObserveDOM from "@better-scroll/observe-dom"; //自动重载
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //bs类型
   import { nextTick, onMounted, reactive, ref } from "vue";
   import { roleType, treeListType, userType } from "@/type";
@@ -395,8 +394,6 @@
     const res = await getRoleList();
     console.log("获取的角色列表=>", res);
     roleList.value = res.data;
-    await nextTick();
-    bsOuter.refresh();
     loading.value = false;
   };
   getRoleListFun();
@@ -405,6 +402,7 @@
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
   BScroll.use(NestedScroll);
+  BScroll.use(ObserveDOM);
   const roleListWrapper = ref();
   let bsOuter: BScrollConstructor<{}>;
   const bsInners = ref<{ [key: number]: BScrollConstructor }>({}); //bs实例
@@ -415,6 +413,7 @@
       nestedScroll: {
         groupId: 1, // string or number
       },
+      observeDOM: true,
     });
   });
   const expandChangeFun = async (row: roleType, expandedRows: roleType[]) => {
@@ -426,9 +425,6 @@
       bsInners.value[row.roleId!]?.destroy();
       loading.value = false;
     }
-    // 不管展开还是收起,都需要重新刷新BS
-    console.log("外层BS刷新了");
-    bsOuter.refresh();
   };
 
   //表格点击回调-------------
@@ -503,10 +499,8 @@
       roleInfoForm.menuIds = res.data.checkedKeys;
     }
   };
-  const addOrEditRoleFun = async (dialogFromRef: FormInstance | undefined) => {
-    // 先进行表单验证
-    if (!dialogFromRef) return;
-    await dialogFromRef.validate(async (valid, fields) => {
+  const addOrEditRoleFun = async () => {
+    dialogFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
         waitAddOrEditRole.value = true;
         let res;
@@ -529,7 +523,7 @@
     elMessageBoxConfirm(`删除ID为 ${roleId} 的角色"${roleName}"`, async () => {
       const res = await delRole(roleId);
       if (res.code == 200) {
-        ElMessage.success(res.message);
+        ElMessage.success(`删除ID为 ${roleId} 的角色"${roleName}"成功`);
         getRoleListFun();
       } else ElMessage.error(res.message);
     });
@@ -565,9 +559,8 @@
       nestedScroll: {
         groupId: 1, // string or number
       },
+      observeDOM: true,
     });
-    console.log(`内层BS${roleId}刷新了=>`, bsInners.value[roleId]);
-    bsInners.value[roleId]?.refresh();
     loading.value = false;
   };
 

@@ -40,7 +40,7 @@
               <el-button
                 type="primary"
                 class="w-100"
-                @click="loginFun(ruleFormRef!)"
+                @click="loginFun"
                 :loading="waitLogin">
                 <span class="me-2">登录</span>
                 <FontIcon icon="fa-solid fa-arrow-right-to-bracket"></FontIcon>
@@ -98,9 +98,8 @@
   // 表单提交前验证,验证不通过不发送请求-----------------
   const userInfoStore = useUserInfoStore();
 
-  const loginFun = async (formEl: FormInstance) => {
-    if (!formEl) return;
-    await formEl.validate(async (valid, fields) => {
+  const loginFun = async () => {
+    ruleFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
         waitLogin.value = true;
         let loginRes = await login({
@@ -129,7 +128,7 @@
 
   // 回车登录
   const enterLogin = (e: KeyboardEvent) => {
-    if (e.key === "Enter") loginFun(ruleFormRef.value!);
+    if (e.key === "Enter") loginFun();
     // 处理回车事件
   };
 </script>

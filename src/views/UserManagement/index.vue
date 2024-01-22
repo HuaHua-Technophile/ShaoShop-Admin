@@ -51,9 +51,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button
-          :loading="waitQueryUser"
-          @click="queryUserFun(userQueryFromRef)"
+        <el-button :loading="waitQueryUser" @click="queryUserFun"
           >查询</el-button
         >
       </el-form-item>
@@ -215,9 +213,7 @@
         </el-form-item>
       </el-form>
       <div class="d-flex justify-content-center">
-        <el-button
-          @click="addOrEditUserFun(dialogFromRef)"
-          :loading="waitAddOrEditUser"
+        <el-button @click="addOrEditUserFun" :loading="waitAddOrEditUser"
           >确认{{ dialogTitle
           }}<span v-if="!isAddUser"
             >ID: {{ userInfoForm.userId }}</span
@@ -268,6 +264,7 @@
   import Pullup from "@better-scroll/pull-up"; //上拉懒加载
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
+  import ObserveDOM from "@better-scroll/observe-dom"; //自动重载
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
 
   // 不传参数的情况下，就是获取所有用户。传参数的情况下可用作搜索
@@ -291,7 +288,6 @@
     let closePullUp;
     waitQueryUser.value = true;
     const res = await getUserList(userQueryFrom);
-    waitQueryUser.value = false;
     console.log(
       `查询条件`,
       userQueryFrom,
@@ -302,7 +298,6 @@
       if (excessDataCount) res.data.records.splice(0, excessDataCount);
       allUserList.value.push(...res.data.records);
       await nextTick();
-      bs.refresh();
       // 每次请求都重新赋值总页数
       allPageCount.value = ceil(Number(res.data.total) / defaultPageSize);
       // 如果是页面初次加载,则获取元素高度
@@ -323,6 +318,7 @@
         closePullUp = true;
       }
     } else bs.closePullUp();
+    waitQueryUser.value = false;
     return { closePullUp };
   };
   getUserListFun();
@@ -331,6 +327,7 @@
   BScroll.use(Pullup);
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
+  BScroll.use(ObserveDOM);
   const userListWrapper = ref();
   const jumpPageBtnVisible = ref(false);
   let bs: BScrollConstructor<{}>;
@@ -341,6 +338,7 @@
       },
       scrollbar: true,
       mouseWheel: true,
+      observeDOM: true,
     });
     bs.on("pullingUp", async () => {
       userQueryFrom.currentPage++; //请求页码自增
@@ -444,10 +442,8 @@
     isAddUser.value = false;
     dialogTitle.value = "修改用户";
   };
-  const addOrEditUserFun = async (formEl: FormInstance | undefined) => {
-    // 先进行表单验证
-    if (!formEl) return;
-    await formEl.validate(async (valid, fields) => {
+  const addOrEditUserFun = async () => {
+    dialogFromRef.value!.validate(async (valid, fields) => {
       if (valid) {
         waitAddOrEditUser.value = true;
         let res;
@@ -471,10 +467,8 @@
     phoneNumber: [{ validator: phoneNumberValidator, trigger: "change" }],
     email: [{ validator: emailValidator, trigger: "change" }],
   });
-  const queryUserFun = async (formEl: FormInstance | undefined) => {
-    // 先验证表单
-    if (!formEl) return;
-    await formEl.validate(async (valid, fields) => {
+  const queryUserFun = async () => {
+    userQueryFromRef.value!.validate(async (valid, fields) => {
       if (valid) {
         allUserList.value = [];
         userQueryFrom.currentPage = 1;
@@ -497,8 +491,8 @@
       `删除勾选的${userIdList.value.length}个用户`,
       async () => {
         const res = await delUser(userIdList.value);
-        if (res.code === 200) {
-          ElMessage.success(res.message);
+        if (res.code == 200) {
+          ElMessage.success("删除用户成功");
           allUserList.value = [];
           userQueryFrom.currentPage = 1;
           getUserListFun(); //重新请求数据进行用户列表渲染

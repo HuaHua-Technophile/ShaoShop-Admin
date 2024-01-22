@@ -408,9 +408,7 @@
         </el-form-item>
       </el-form>
       <div class="d-flex justify-content-center">
-        <el-button
-          @click="addOrEditMenuFun(dialogFormRef)"
-          :loading="waitAddOrEditMenu"
+        <el-button @click="addOrEditMenuFun" :loading="waitAddOrEditMenu"
           >确认{{ dialogTitle
           }}<span v-if="!isAddMenu"
             >ID: {{ menuInfoForm.menuId }}</span
@@ -434,7 +432,7 @@
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //bs类型
   import ObserveDOM from "@better-scroll/observe-dom";
-  import { nextTick, onMounted, reactive, ref } from "vue";
+  import { onMounted, reactive, ref } from "vue";
   import { ElMessage, FormInstance } from "element-plus";
   import { storeToRefs } from "pinia";
   import { useDarkThemeStore } from "@/stores/colorTheme";
@@ -450,8 +448,6 @@
     let res = await getMenuList();
     console.log("获取菜单列表=>", res);
     menuList.value = res.data;
-    await nextTick();
-    bs.refresh();
     waitQueryMenu.value = false;
   };
   getMenuListFun();
@@ -536,10 +532,8 @@
     isAddMenu.value = false;
     dialogTitle.value = "修改菜单";
   };
-  const addOrEditMenuFun = async (formEl: FormInstance | undefined) => {
-    // 先进行表单验证
-    if (!formEl) return;
-    await formEl.validate(async (valid, fields) => {
+  const addOrEditMenuFun = async () => {
+    dialogFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
         waitAddOrEditMenu.value = true;
         let res;
@@ -548,9 +542,8 @@
         if (res.code == 200) {
           getMenuListFun();
           menuDialogVisible.value = false; //隐藏弹出框
-        } else {
-          ElMessage.error(res.message);
-        }
+          ElMessage.success(`${dialogTitle.value}成功`);
+        } else ElMessage.error(res.message);
         waitAddOrEditMenu.value = false;
       } else console.log("error submit!", fields);
     });
@@ -561,7 +554,7 @@
     elMessageBoxConfirm(`删除ID为 ${menuId} 的菜单"${menuName}"`, async () => {
       let res = await delMenu(menuId);
       if (res.code == 200) {
-        ElMessage.success(res.message);
+        ElMessage.success(`删除ID为 ${menuId} 的菜单"${menuName}成功`);
         getMenuListFun();
       } else ElMessage.error(res.message);
     });

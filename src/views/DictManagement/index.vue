@@ -38,9 +38,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button
-          :loading="waitQueryDict"
-          @click="queryDictFun(dictQueryFromRef)"
+        <el-button :loading="waitQueryDict" @click="queryDictFun"
           >查询</el-button
         >
       </el-form-item>
@@ -330,13 +328,7 @@
       </el-form>
       <!-- 通用确认按钮 -->
       <div class="d-flex justify-content-center">
-        <el-button
-          @click="
-            addOrEdit_DictOrDictDataFun(
-              isDict ? dictDialogFormRef : dictDataDialogFormRef
-            )
-          "
-          :loading="waitAddOrEdit"
+        <el-button @click="addOrEdit_DictOrDictDataFun" :loading="waitAddOrEdit"
           >确认{{ dialogTitle }}
           <span v-if="!isAdd && isDict">ID: {{ dictInfoForm.dictId }}</span>
           <span v-if="!isAdd && !isDict"
@@ -363,9 +355,9 @@
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import ObserveDOM from "@better-scroll/observe-dom"; //开启对 content 以及 content 子元素 DOM 改变的探测
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
-  import { nextTick, onMounted, reactive, ref } from "vue";
+  import { onMounted, reactive, ref } from "vue";
   import { dictDataType, dictType } from "@/type/index";
-  import { ElMessage, ElMessageBox, FormInstance } from "element-plus";
+  import { ElMessage, FormInstance } from "element-plus";
   import { storeToRefs } from "pinia";
   import { useDarkThemeStore } from "@/stores/colorTheme";
   import { cloneDeep } from "lodash";
@@ -389,10 +381,8 @@
     const res = await getDictList(dictQueryFrom);
     console.log("字典查询结果=>", res);
     if (res.code === 200) {
-      ElMessage.success("查询成功");
+      ElMessage.success("字典查询成功");
       allDictList.value = res.data.records;
-      await nextTick();
-      bs.refresh();
     } else ElMessage.error(res.message);
     waitQueryDict.value = false;
   };
@@ -512,12 +502,12 @@
     isDict.value = false;
     dialogTitle.value = "修改字典数据";
   };
-  const addOrEdit_DictOrDictDataFun = async (
-    formEl: FormInstance | undefined
-  ) => {
+  const addOrEdit_DictOrDictDataFun = async () => {
+    let formEl = isDict.value
+      ? dictDialogFormRef.value
+      : dictDataDialogFormRef.value;
     // 先进行表单验证
-    if (!formEl) return;
-    await formEl.validate(async (valid, fields) => {
+    formEl!.validate(async (valid, fields) => {
       if (valid) {
         waitAddOrEdit.value = true;
         let res;
@@ -540,10 +530,8 @@
 
   //查询用户-------------------------------------
   const dictQueryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
-  const queryDictFun = async (formEl: FormInstance | undefined) => {
-    // 先验证表单
-    if (!formEl) return;
-    await formEl.validate((valid, fields) => {
+  const queryDictFun = async () => {
+    dictQueryFromRef.value!.validate((valid, fields) => {
       if (valid) getDictListFun();
       else console.log("error submit!", fields);
     });
@@ -551,41 +539,27 @@
 
   //删除字典/字典数据-----------------------
   const delDictFun = (dictId: number, dictName: string) => {
-    ElMessageBox.confirm(`确认删除ID为 ${dictId} 的字典类型"${dictName}"吗?`, {
-      confirmButtonText: "删除",
-      cancelButtonText: "取消",
-      type: "warning",
-      draggable: true,
-      customClass: "rounded",
-    })
-      .then(async () => {
+    elMessageBoxConfirm(
+      `删除ID为 ${dictId} 的字典类型"${dictName}"`,
+      async () => {
         const res = await delDict(dictId);
         if (res.code == 200) {
-          ElMessage.success(res.message);
+          ElMessage.success(`删除ID为 ${dictId} 的字典类型"${dictName}"成功`);
           getDictListFun();
         } else ElMessage.error(res.message);
-      })
-      .catch(() => {
-        ElMessage.info("取消删除");
-      });
+      }
+    );
   };
   const delDictDataFun = (dictCode: number, dictLabel: string) => {
-    ElMessageBox.confirm(`确认删除Code为 ${dictCode} 的选项"${dictLabel}"吗?`, {
-      confirmButtonText: "删除",
-      cancelButtonText: "取消",
-      type: "warning",
-      draggable: true,
-      customClass: "rounded",
-    })
-      .then(async () => {
+    elMessageBoxConfirm(
+      `删除Code为 ${dictCode} 的选项"${dictLabel}"`,
+      async () => {
         const res = await delDictData(dictCode);
         if (res.code == 200) {
-          ElMessage.success(res.message);
+          ElMessage.success(`删除Code为 ${dictCode} 的选项"${dictLabel}成功"`);
           getDictListFun();
         } else ElMessage.error(res.message);
-      })
-      .catch(() => {
-        ElMessage.info("取消删除");
-      });
+      }
+    );
   };
 </script>

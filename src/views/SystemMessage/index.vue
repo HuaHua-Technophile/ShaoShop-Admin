@@ -34,9 +34,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button
-          :loading="waitQueryMessage"
-          @click="queryMessageFun(messageQueryFromRef)"
+        <el-button :loading="waitQueryMessage" @click="queryMessageFun"
           >查询</el-button
         >
       </el-form-item>
@@ -150,6 +148,7 @@
   import Pullup from "@better-scroll/pull-up"; //上拉懒加载
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
+  import ObserveDOM from "@better-scroll/observe-dom"; //自动重载
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
   import { FormInstance } from "element-plus";
   import { zhCn } from "element-plus/es/locale/index.mjs"; // import zhCn from "element-plus/dist/locale/zh-cn.mjs"; //国际化
@@ -183,7 +182,6 @@
       if (excessDataCount) res.data.records.splice(0, excessDataCount);
       systemMessageList.value.push(...res.data.records);
       await nextTick();
-      bs.refresh();
       // 每次请求都重新赋值总页数和总用户数量
       allPageCount.value = ceil(Number(res.data.total) / defaultPageSize);
       // 如果是页面初次加载,则获取元素高度
@@ -212,6 +210,7 @@
   BScroll.use(Pullup);
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
+  BScroll.use(ObserveDOM);
   const systemMessageListWrapper = ref();
   const jumpPageBtnVisible = ref(false);
   let bs: BScrollConstructor<{}>;
@@ -222,6 +221,7 @@
       },
       scrollbar: true,
       mouseWheel: true,
+      observeDOM: true,
     });
     bs.on("pullingUp", async () => {
       messageQueryFrom.currentPage++; //请求页码自增
@@ -269,10 +269,8 @@
   const disabledDate = (time: Date) => {
     return time.getTime() > Date.now();
   };
-  const queryMessageFun = async (formEl: FormInstance | undefined) => {
-    // 先验证表单
-    if (!formEl) return;
-    await formEl.validate(async (valid, fields) => {
+  const queryMessageFun = async () => {
+    messageQueryFromRef.value!.validate(async (valid, fields) => {
       if (valid) {
         systemMessageList.value = [];
         messageQueryFrom.currentPage = 1;

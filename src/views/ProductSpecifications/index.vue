@@ -365,7 +365,6 @@
   });
   // 内层bs------------------
   const bsInners = ref<{ [key: number]: BScrollConstructor }>({}); //bs实例
-  const timeOutArr: NodeJS.Timeout[] = [];
   const expandChangeFun = async (row: PSNType, expandedRows: PSNType[]) => {
     // 如果是展开,就检查是否已有二级规格数据(没有就添加)
     if (expandedRows.includes(row)) {
@@ -382,11 +381,6 @@
       // else bsInners.value[row.roleId!]?.destroy();
     }
     // 不管展开还是收起,都需要重新刷新BS
-    /* timeOutArr.push(
-      setTimeout(() => {
-        bs.refresh();
-      }, 1000)
-    ); */
   };
   //表格点击回调----------------------
   const cellClickFun = (
@@ -556,7 +550,7 @@
     elMessageBoxConfirm(`删除规格'${PSN.specName}'`, async () => {
       const res = await delPSN(PSN.specificationsId!);
       if (res.code === 200) {
-        ElMessage.success(res.message);
+        ElMessage.success(`删除规格'${PSN.specName}'成功`);
         allPSNList.value = [];
         PSNQueryFrom.currentPage = 1;
         getPSNListFun(); //重新请求数据进行商品规格列表渲染
