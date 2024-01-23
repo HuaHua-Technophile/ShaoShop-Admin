@@ -1,7 +1,7 @@
 <template>
   <div class="w-100 h-100 p-3 position-relative">
     <!-- 角色列表 -->
-    <div ref="roleListWrapper" class="w-100 h-100 overflow-hidden rounded-4">
+    <div ref="bsWrapper" class="w-100 h-100 overflow-hidden rounded-4">
       <div
         style="
           min-height: calc(100% + 1px) !important;
@@ -180,7 +180,7 @@
           </el-table-column>
           <el-table-column>
             <template #header>
-              <el-button @click="addRoleDialog">添加角色</el-button>
+              <el-button @click="toAdd">添加角色</el-button>
             </template>
             <template #default>
               <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
@@ -192,19 +192,19 @@
     </div>
     <!-- 添加/修改角色弹窗 -->
     <el-dialog
-      :title="dialogTitle"
-      v-model="roleDialogVisible"
+      :title="A_ETitle"
+      v-model="A_EVisible"
       width="445px"
       :before-close="closeConfirm"
       class="rounded-4"
       draggable
       center>
-      <el-form :model="roleInfoForm" ref="dialogFormRef" :rules="rules">
+      <el-form :model="A_EForm" ref="A_EFormRef" :rules="A_ERules">
         <el-form-item label="角色称呼" prop="roleName">
           <el-input
             clearable
             maxlength="10"
-            v-model.trim="roleInfoForm.roleName"
+            v-model.trim="A_EForm.roleName"
             placeholder="角色称呼"
             :prefix-icon="renderFontIcon('fa-solid fa-quote-left')">
           </el-input>
@@ -213,7 +213,7 @@
           <el-input
             clearable
             maxlength="20"
-            v-model.trim="roleInfoForm.roleKey"
+            v-model.trim="A_EForm.roleKey"
             placeholder="权限标识/权限字符"
             :prefix-icon="renderFontIcon('fa-solid fa-code')">
           </el-input>
@@ -225,7 +225,7 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model.trim="roleInfoForm.businessId"
+            v-model.trim="A_EForm.businessId"
             placeholder="商户ID,不填写则为管理员角色"
             :prefix-icon="renderFontIcon('bi bi-shop-window')">
           </el-input>
@@ -236,15 +236,15 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model.trim="roleInfoForm.remark"
+            v-model.trim="A_EForm.remark"
             placeholder="角色备注"
             :prefix-icon="renderFontIcon('fa-solid fa-marker')">
           </el-input>
         </el-form-item>
         <el-form-item label="关联菜单" style="padding-left: 10.18px">
           <el-tree-select
-            v-model="roleInfoForm.menuIds"
-            :data="roleInfoForm.menuTreeList"
+            v-model="A_EForm.menuIds"
+            :data="A_EForm.menuTreeList"
             show-checkbox
             multiple
             check-strictly
@@ -256,22 +256,19 @@
           label="权限范围"
           prop="dataScope"
           style="padding-left: 10.18px">
-          <el-input-number v-model="roleInfoForm.dataScope" :min="1" :max="5" />
+          <el-input-number v-model="A_EForm.dataScope" :min="1" :max="5" />
         </el-form-item>
         <el-form-item
           label="角色排序"
           prop="roleSort"
           style="padding-left: 10.18px">
-          <el-input-number
-            v-model="roleInfoForm.roleSort"
-            :min="0"
-            :max="999" />
+          <el-input-number v-model="A_EForm.roleSort" :min="0" :max="999" />
         </el-form-item>
         <el-form-item
           label="公司树选择项关联显示"
           style="padding-left: 10.18px"
           class="align-items-center">
-          <el-radio-group v-model="roleInfoForm.companyCheckStrictly">
+          <el-radio-group v-model="A_EForm.companyCheckStrictly">
             <el-radio :label="true" size="large">是</el-radio>
             <el-radio :label="false" size="large">否</el-radio>
           </el-radio-group>
@@ -280,7 +277,7 @@
           label="菜单树选择项关联显示"
           style="padding-left: 10.18px"
           class="align-items-center">
-          <el-radio-group v-model="roleInfoForm.menuCheckStrictly">
+          <el-radio-group v-model="A_EForm.menuCheckStrictly">
             <el-radio :label="true" size="large">是</el-radio>
             <el-radio :label="false" size="large">否</el-radio>
           </el-radio-group>
@@ -289,33 +286,29 @@
           label="角色状态"
           style="padding-left: 10.18px"
           class="align-items-center">
-          <el-radio-group v-model="roleInfoForm.status">
+          <el-radio-group v-model="A_EForm.status">
             <el-radio :label="0" size="large">正常</el-radio>
             <el-radio :label="1" size="large">停用</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
       <div class="d-flex justify-content-center">
-        <el-button @click="addOrEditRoleFun" :loading="loading"
-          >确认{{ dialogTitle
-          }}<span v-if="!isAddRole"
-            >ID: {{ roleInfoForm.roleId }}</span
-          ></el-button
+        <el-button @click="A_EFun" :loading="loading"
+          >确认{{ A_ETitle
+          }}<span v-if="!isAdd">ID: {{ A_EForm.roleId }}</span></el-button
         >
       </div>
     </el-dialog>
     <!-- 授权用户抽屉 -->
     <el-drawer
-      v-model="revokeUserDrawerVisible"
+      v-model="drawerVisible"
       direction="rtl"
       size="50%"
       class="bg-body-secondary rounded-start-5"
       :before-close="closeConfirm">
       <template #header>
         <div class="d-flex align-items-center">
-          <span class="text-body">{{
-            `为'${revokeUserDrawerTitle}'授权用户`
-          }}</span>
+          <span class="text-body">{{ `为'${drawerTitle}'授权用户` }}</span>
           <el-button
             @click="revokeUserFun"
             class="ms-3"
@@ -389,26 +382,25 @@
   //获取数据-----------------------
   const roleList = ref<roleType[]>();
   const loading = ref(false);
-
-  const getRoleListFun = async () => {
+  const getFun = async () => {
     loading.value = true;
     const res = await getRoleList();
     console.log("获取的角色列表=>", res);
     roleList.value = res.data;
     loading.value = false;
   };
-  getRoleListFun();
+  getFun();
 
   // better scroll-------------------------
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
   BScroll.use(NestedScroll);
   BScroll.use(ObserveDOM);
-  const roleListWrapper = ref();
+  const bsWrapper = ref();
   let bs: BScrollConstructor<{}>;
-  const bsInners = ref<{ [key: number]: BScrollConstructor }>({}); //bs实例
+  const bsInners = ref<{ [key: number]: BScrollConstructor }>({}); //内层bs实例
   onMounted(() => {
-    bs = new BScroll(roleListWrapper.value, {
+    bs = new BScroll(bsWrapper.value, {
       scrollbar: true,
       mouseWheel: true,
       nestedScroll: {
@@ -438,14 +430,14 @@
     column;
     cell;
     if (event.target.className.includes("bi-pencil-square"))
-      editRoleDialog(row.roleId!, !Boolean(row.menuTreeList));
+      toEdit(row.roleId!, !Boolean(row.menuTreeList));
     if (event.target.className.includes("bi-trash"))
-      delRoleFun(row.roleId!, row.roleName);
+      delFun(row.roleId!, row.roleName);
   };
 
   //表单----------------------
-  const dialogFormRef = ref<FormInstance>();
-  const defaultRoleInfo: roleType = {
+  const A_EFormRef = ref<FormInstance>();
+  const defaultE_EInfo: roleType = {
     roleName: "",
     businessId: "",
     companyCheckStrictly: false,
@@ -456,39 +448,39 @@
     status: 0,
     menuIds: [],
   };
-  let roleInfoForm = reactive(defaultRoleInfo);
-  const rules = reactive({
+  let A_EForm = reactive(defaultE_EInfo);
+  const A_ERules = reactive({
     roleName: [{ required: true, message: "请输入角色名称", trigger: "blur" }],
     roleKey: [{ required: true, message: "请输入权限字符", trigger: "blur" }],
   });
 
   //dialog对话框-----------------
-  const roleDialogVisible = ref(false);
-  const dialogTitle = ref("添加角色");
-  const isAddRole = ref(true);
+  const A_EVisible = ref(false);
+  const A_ETitle = ref("添加角色");
+  const isAdd = ref(true);
   const closeConfirmTitle = ref("");
   const closeConfirm = (done: () => void) => {
-    elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
+    elMessageBoxConfirm(`放弃${A_ETitle.value}`, () => {
       done();
-      ElMessage.info(`放弃${dialogTitle.value}`);
+      ElMessage.info(`放弃${A_ETitle.value}`);
     });
   };
 
   //添加/修改角色-----------------------
-  const addRoleDialog = async () => {
-    roleInfoForm = reactive(cloneDeep(defaultRoleInfo));
-    if (!roleInfoForm.menuTreeList) {
+  const toAdd = async () => {
+    A_EForm = reactive(cloneDeep(defaultE_EInfo));
+    if (!A_EForm.menuTreeList) {
       const res = await getMenuTreeList();
       if (res.code == 200) {
         console.log("获取的菜单树=>", res.data);
-        roleInfoForm.menuTreeList = res.data;
+        A_EForm.menuTreeList = res.data;
       }
     }
-    isAddRole.value = true;
-    dialogTitle.value = closeConfirmTitle.value = "添加角色";
-    roleDialogVisible.value = true;
+    isAdd.value = true;
+    A_ETitle.value = closeConfirmTitle.value = "添加角色";
+    A_EVisible.value = true;
   };
-  const editRoleDialog = async (id: number, needLoad: boolean) => {
+  const toEdit = async (id: number, needLoad: boolean) => {
     const index = roleList.value?.findIndex((i) => i.roleId == id);
     if (needLoad) {
       const res = await getRoleMenuTreeSelect(id);
@@ -498,42 +490,42 @@
         roleList.value![index!].menuIds = res.data.checkedKeys;
       }
     }
-    roleInfoForm = reactive(cloneDeep(roleList.value![index!]));
-    isAddRole.value = false;
-    dialogTitle.value = closeConfirmTitle.value = "修改角色";
-    roleDialogVisible.value = true;
+    A_EForm = reactive(cloneDeep(roleList.value![index!]));
+    isAdd.value = false;
+    A_ETitle.value = closeConfirmTitle.value = "修改角色";
+    A_EVisible.value = true;
   };
-  const addOrEditRoleFun = async () => {
-    dialogFormRef.value!.validate(async (valid, fields) => {
+  const A_EFun = async () => {
+    A_EFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
         loading.value = true;
         let res;
-        if (isAddRole.value) res = await addRole(roleInfoForm);
-        else res = await editRole(roleInfoForm);
+        if (isAdd.value) res = await addRole(A_EForm);
+        else res = await editRole(A_EForm);
         // console.log("添加/编辑角色结果=>", res);
         if (res.code == 200) {
-          getRoleListFun();
-          roleDialogVisible.value = false; //隐藏弹出框
-        } else ElMessage.error(res.message);
+          getFun();
+          A_EVisible.value = false; //隐藏弹出框
+        }
         loading.value = false;
       } else console.log("error submit!", fields);
     });
   };
 
   // 删除角色---------------------------------
-  const delRoleFun = (roleId: number, roleName: string) => {
+  const delFun = (roleId: number, roleName: string) => {
     elMessageBoxConfirm(`删除ID为 ${roleId} 的角色"${roleName}"`, async () => {
       const res = await delRole(roleId);
       if (res.code == 200) {
         ElMessage.success(`删除ID为 ${roleId} 的角色"${roleName}"成功`);
-        getRoleListFun();
-      } else ElMessage.error(res.message);
+        getFun();
+      }
     });
   };
 
   // 抽屉---------------------------------
-  const revokeUserDrawerVisible = ref(false);
-  const revokeUserDrawerTitle = ref("");
+  const drawerVisible = ref(false);
+  const drawerTitle = ref("");
   const UnallocatedList = ref<userType[]>([]);
   const revokeUserSelectList = ref<(number | undefined)[]>([]);
   const revokeUserForRoleId = ref(-1);
@@ -567,8 +559,8 @@
 
   // 授权用户-----------------------------
   const revokeUserDrawer = async (roleId: number, roleName: string) => {
-    revokeUserDrawerVisible.value = true;
-    revokeUserDrawerTitle.value = roleName;
+    drawerVisible.value = true;
+    drawerTitle.value = roleName;
     revokeUserForRoleId.value = roleId;
     closeConfirmTitle.value = `为'${roleName}'授权用户`;
     const res = await getUnallocatedList(roleId);
@@ -581,12 +573,12 @@
       revokeUserForRoleId.value,
       revokeUserSelectList.value
     );
-    loading.value = false;
     if (res.code === 200) {
       ElMessage.success(`授权${revokeUserSelectList.value.length}个用户成功`);
       getAllocatedListFun(revokeUserForRoleId.value);
-      revokeUserDrawerVisible.value = false;
-    } else ElMessage.error(res.message);
+      drawerVisible.value = false;
+    }
+    loading.value = false;
   };
 
   // 取消授权用户----------------
@@ -609,13 +601,13 @@
           roleId,
           roleList.value![index!].selectList!
         );
-        loading.value = false;
         if (res.code === 200) {
           ElMessage.success(
             `取消授权${roleList.value![index!].selectList?.length}个用户成功`
           );
           getAllocatedListFun(roleId);
-        } else ElMessage.error(res.message);
+        }
+        loading.value = false;
       }
     );
   };

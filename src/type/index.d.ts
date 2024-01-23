@@ -29,13 +29,13 @@ export type loginInfoType = {
 //每一个后台管理系统用户(账号)的信息
 export type userType = {
   createTime?: string; //注册时间
-  businessId?: number | null;
+  businessId?: number;
   // companyName: string; //商户名称用不到
   email: string; //绑定邮箱
   nickName: string; //部门主体名称
   password?: string; //密码。注册时默认填入123456
   phoneNumber: string; //绑定手机号
-  status?: number | null; //该后台管理账号的状态
+  status?: number; //该后台管理账号的状态
   userName: string; //账号
   userId?: number; //
   remark?: string; //备注
@@ -111,7 +111,7 @@ export type dictType = {
   dictId?: number; //字典类型id
   dictType: string; //字典类型
   dictName: string; //字典名称
-  status?: number | null; //状态（0正常 1停用）
+  status?: number; //状态（0正常 1停用）
   sysDictDataList?: dictDataType[];
   remark?: string; //备注
 } & TimeType;
@@ -139,12 +139,8 @@ export type systemMessageType = {
 } & TimeType;
 // 站内信查询类型
 export type messageQueryType = {
-  timePeriod: string[] | null; //创建时间
-  read: number | null; //是否已读
-} & QueryType;
-//商品规格查询类型
-export type PSNQueryType = {
-  productSpec: ""; //商品规格
+  timePeriod: string[]; //创建时间
+  read?: number; //是否已读
 } & QueryType;
 //商品规格类型
 export type PSNType = {
@@ -160,14 +156,20 @@ export type PSNType = {
   }[];
   specNameId?: string;
 };
-//商品分类查询类型
-export type PCQueryType = PCType & QueryType;
+//商品规格查询类型
+export type PSNQueryType = {
+  productSpec: ""; //商品规格
+} & QueryType;
 // 商品分类类型
 export type PCType = {
-  classificationLevel: number | null;
-  classificationName: string;
-  classificationSort: number;
-  id: number;
-  parentClassificationNumber: number | null;
-  remark: string;
-};
+  id?: number; //分类ID
+
+  classificationName: string; //分类名称
+  classificationSort?: number; //排序
+  parentClassificationNumber?: number; //父级编号
+  remark?: string; //备注
+  status?: number; //状态（0正常 1停用）
+  subClassifications?: PCType[]; //子分类集合
+} & TimeType;
+//商品分类查询类型
+export type PCQueryType = PCType & QueryType;

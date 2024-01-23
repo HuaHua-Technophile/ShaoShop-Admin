@@ -2,8 +2,8 @@
   <div class="w-100 h-100 d-flex flex-column">
     <!-- 搜索用户/新建用户 -->
     <el-form
-      :model="userQueryFrom"
-      ref="userQueryFromRef"
+      :model="queryFrom"
+      ref="queryFromRef"
       :rules="queryRules"
       class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
       <div class="flex-grow-1 d-flex align-items-center">
@@ -11,7 +11,7 @@
           <el-input
             clearable
             maxlength="12"
-            v-model.trim="userQueryFrom.userName"
+            v-model.trim="queryFrom.userName"
             placeholder="每个后台主体唯一名称"
             :prefix-icon="renderFontIcon('bi bi-person')" />
         </el-form-item>
@@ -19,7 +19,7 @@
           <el-input
             clearable
             maxlength="20"
-            v-model.trim="userQueryFrom.email"
+            v-model.trim="queryFrom.email"
             placeholder="每个后台主体唯一邮箱"
             :prefix-icon="renderFontIcon('bi bi-envelope')" />
         </el-form-item>
@@ -27,7 +27,7 @@
           <el-input
             clearable
             maxlength="11"
-            v-model.trim="userQueryFrom.phoneNumber"
+            v-model.trim="queryFrom.phoneNumber"
             placeholder="每个后台主体唯一手机号"
             :prefix-icon="renderFontIcon('bi bi-telephone')" />
         </el-form-item>
@@ -35,14 +35,14 @@
           <el-input
             clearable
             maxlength="12"
-            v-model.trim="userQueryFrom.nickName"
+            v-model.trim="queryFrom.nickName"
             placeholder="运营部/物流部/..."
             :prefix-icon="renderFontIcon('bi bi-people')" />
         </el-form-item>
       </div>
       <el-form-item class="flex-shrink-0 pe-3" label="帐号状态" prop="status">
         <el-select
-          v-model="userQueryFrom.status"
+          v-model="queryFrom.status"
           placeholder="正常/停用"
           clearable
           style="width: 113px">
@@ -51,16 +51,14 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button :loading="loading" @click="queryUserFun"
-          >查询</el-button
-        >
+        <el-button :loading="loading" @click="queryFun">查询</el-button>
       </el-form-item>
     </el-form>
     <!-- 用户列表模块 -->
     <div class="flex-grow-1 overflow-hidden p-3">
       <div
-        ref="userListWrapper"
-        class="userListWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
+        ref="bsWrapper"
+        class="bsWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
         <div
           style="
             min-height: calc(100% + 1px) !important;
@@ -68,7 +66,7 @@
           ">
           <el-table
             v-loading="loading"
-            ref="userTableRef"
+            ref="tableRef"
             :data="allUserList"
             table-layout="auto"
             class="bg-body rounded-4"
@@ -109,14 +107,14 @@
             <el-table-column prop="remark">
               <template #header>
                 <jumpPageBtn
-                  :queryFun="getUserListFun"
+                  :queryFun="getFun"
                   :allPageCount="allPageCount"
                   :nowPage="nowPage"
                   :visible="true"
                   :bs="bs"
                   :tableItemHeight="tableItemHeight"
                   :tableHeaderHeight="tableHeaderHeight"
-                  :queryFrom="userQueryFrom"
+                  :queryFrom="queryFrom"
                   :defaultPageSize="defaultPageSize" />
               </template>
               <template #default="scope">
@@ -132,7 +130,7 @@
             </el-table-column>
             <el-table-column>
               <template #header>
-                <el-button @click="addUserDialog">添加账号</el-button>
+                <el-button @click="toAdd">添加账号</el-button>
               </template>
               <template #default>
                 <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
@@ -145,19 +143,19 @@
     </div>
     <!-- 添加/修改用户弹窗 -->
     <el-dialog
-      v-model="dialogVisible"
-      :title="dialogTitle"
+      v-model="A_EVisible"
+      :title="A_ETitle"
       width="450px"
       :before-close="closeConfirmFun"
       class="rounded-4"
       draggable
       center>
-      <el-form :model="userInfoForm" ref="dialogFromRef" :rules="rules">
+      <el-form :model="A_EFrom" ref="A_EFromRef" :rules="A_ERules">
         <el-form-item label="用户账号" prop="userName">
           <el-input
             clearable
             maxlength="12"
-            v-model.trim="userInfoForm.userName"
+            v-model.trim="A_EFrom.userName"
             placeholder="每个后台主体唯一名称"
             :prefix-icon="renderFontIcon('bi bi-person')" />
         </el-form-item>
@@ -165,7 +163,7 @@
           <el-input
             clearable
             maxlength="20"
-            v-model.trim="userInfoForm.email"
+            v-model.trim="A_EFrom.email"
             placeholder="每个后台主体唯一邮箱"
             :prefix-icon="renderFontIcon('bi bi-envelope')" />
         </el-form-item>
@@ -173,7 +171,7 @@
           <el-input
             clearable
             maxlength="11"
-            v-model.trim="userInfoForm.phoneNumber"
+            v-model.trim="A_EFrom.phoneNumber"
             placeholder="每个后台主体唯一手机号"
             :prefix-icon="renderFontIcon('bi bi-telephone')" />
         </el-form-item>
@@ -181,15 +179,15 @@
           <el-input
             clearable
             maxlength="12"
-            v-model.trim="userInfoForm.nickName"
+            v-model.trim="A_EFrom.nickName"
             placeholder="运营部/物流部/..."
             :prefix-icon="renderFontIcon('bi bi-people')" />
         </el-form-item>
-        <el-form-item label="账号密码" prop="password" v-if="isAddUser">
+        <el-form-item label="账号密码" prop="password" v-if="isAdd">
           <el-input
             clearable
             maxlength="16"
-            v-model.trim="userInfoForm.password"
+            v-model.trim="A_EFrom.password"
             placeholder="6~16位密码,不能含有中文与空格"
             :prefix-icon="renderFontIcon('bi-shield-lock')" />
         </el-form-item>
@@ -197,7 +195,7 @@
           <el-input
             clearable
             maxlength="12"
-            v-model.trim="userInfoForm.businessId"
+            v-model.trim="A_EFrom.businessId"
             placeholder="填写以绑定对应商户"
             :prefix-icon="renderFontIcon('bi bi-shop-window')" />
         </el-form-item>
@@ -207,17 +205,15 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model.trim="userInfoForm.remark"
+            v-model.trim="A_EFrom.remark"
             placeholder="备注"
             :prefix-icon="renderFontIcon('fa-solid fa-marker')" />
         </el-form-item>
       </el-form>
       <div class="d-flex justify-content-center">
-        <el-button @click="addOrEditUserFun" :loading="loading"
-          >确认{{ dialogTitle
-          }}<span v-if="!isAddUser"
-            >ID: {{ userInfoForm.userId }}</span
-          ></el-button
+        <el-button @click="A_EFun" :loading="loading"
+          >确认{{ A_ETitle
+          }}<span v-if="!isAdd">ID: {{ A_EFrom.userId }}</span></el-button
         >
       </div>
     </el-dialog>
@@ -229,14 +225,14 @@
       <jumpPageBtn
         class="position-absolute p-2 rounded-pill me-3 mb-3"
         style="background: #141414; right: 0; bottom: 0"
-        :queryFun="getUserListFun"
+        :queryFun="getFun"
         :allPageCount="allPageCount"
         :nowPage="nowPage"
         :visible="jumpPageBtnVisible"
         :bs="bs"
         :tableItemHeight="tableItemHeight"
         :tableHeaderHeight="tableHeaderHeight"
-        :queryFrom="userQueryFrom"
+        :queryFrom="queryFrom"
         :defaultPageSize="defaultPageSize" />
     </Transition>
   </div>
@@ -275,23 +271,23 @@
   let tableItemHeight: number; //每一项高度
   let tableHeaderHeight: number; //表头高度
   const loading = ref(false);
-  const userQueryFrom = reactive({
+  const queryFrom = reactive({
     userName: "", //账号
     email: "", //绑定邮箱
     phoneNumber: "", //绑定手机号
     nickName: "", //部门主体名称(账号名称)
-    status: null, //状态
+    status: undefined, //状态
     currentPage: 1, //请求的页码
     pageSize: defaultPageSize, //每页返回的数量
   });
-  const getUserListFun = async (excessDataCount?: number) => {
+  const getFun = async (excessDataCount?: number) => {
     let closePullUp;
     loading.value = true;
-    const res = await getUserList(userQueryFrom);
+    const res = await getUserList(queryFrom);
     console.log(
       `查询条件`,
-      userQueryFrom,
-      `\n第${userQueryFrom.currentPage}页用户列表(${res.data?.records?.length})=>`,
+      queryFrom,
+      `\n第${queryFrom.currentPage}页用户列表(${res.data?.records?.length})=>`,
       res
     );
     if (res.code == 200 && res.data.records.length > 0) {
@@ -321,18 +317,18 @@
     loading.value = false;
     return { closePullUp };
   };
-  getUserListFun();
+  getFun();
 
   // better scroll-------------------------
   BScroll.use(Pullup);
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
   BScroll.use(ObserveDOM);
-  const userListWrapper = ref();
+  const bsWrapper = ref();
   const jumpPageBtnVisible = ref(false);
   let bs: BScrollConstructor<{}>;
   onMounted(() => {
-    bs = new BScroll(userListWrapper.value, {
+    bs = new BScroll(bsWrapper.value, {
       pullUpLoad: {
         threshold: -10,
       },
@@ -341,9 +337,9 @@
       observeDOM: true,
     });
     bs.on("pullingUp", async () => {
-      userQueryFrom.currentPage++; //请求页码自增
-      console.log("触发了pullingUp,页码自增", userQueryFrom.currentPage);
-      const { closePullUp } = await getUserListFun();
+      queryFrom.currentPage++; //请求页码自增
+      console.log("触发了pullingUp,页码自增", queryFrom.currentPage);
+      const { closePullUp } = await getFun();
       if (!closePullUp) bs!.finishPullUp();
     });
     bs.on(
@@ -354,11 +350,11 @@
         else jumpPageBtnVisible.value = false;
         // 滚动高度-表头高度=实际滚动内容
         nowPage.value = ceil(
-          (-e.y - tableHeaderHeight! + userListWrapper.value.clientHeight) /
-            (tableItemHeight! * userQueryFrom.pageSize)
+          (-e.y - tableHeaderHeight! + bsWrapper.value.clientHeight) /
+            (tableItemHeight! * queryFrom.pageSize)
         );
         /* console.log(
-            `视窗高${userListWrapper.value.clientHeight}px,表头高${
+            `视窗高${bsWrapper.value.clientHeight}px,表头高${
               tableHeaderHeight
             }px,单格高${tableItemHeight}px,滚动了=>${-e.y}px,`,
             nowPage.value
@@ -376,25 +372,24 @@
   ) => {
     column;
     cell;
-    if (event.target.className.includes("bi-pencil-square"))
-      editUserDialog(row);
-    if (event.target.className.includes("bi-trash")) delUserFun(row);
+    if (event.target.className.includes("bi-pencil-square")) toEdit(row);
+    if (event.target.className.includes("bi-trash")) delFun(row);
   };
 
   //表单-----------------------
-  const dialogFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
-  const defaultUserInfo: userType = {
-    businessId: null, //商户id
+  const A_EFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const defaultA_EInfo: userType = {
+    businessId: undefined, //商户id
     userName: "", //账号
     email: "", //绑定邮箱
     phoneNumber: "", //绑定手机号
     nickName: "", //部门主体名称(账号名称)
     password: "", //密码。
-    userId: -1,
+    userId: undefined,
     remark: "", //备注
   };
-  let userInfoForm = reactive(defaultUserInfo);
-  const rules = reactive({
+  let A_EFrom = reactive(defaultA_EInfo);
+  const A_ERules = reactive({
     userName: [{ required: true, message: "请输入账号", trigger: "blur" }],
     email: [
       { required: true, message: "请输入绑定邮箱", trigger: "blur" },
@@ -418,84 +413,86 @@
   });
 
   //dialog弹出框-----------------------
-  const dialogVisible = ref(false);
-  const dialogTitle = ref("添加用户");
-  const isAddUser = ref(true);
+  const A_EVisible = ref(false);
+  const A_ETitle = ref("添加用户");
+  const isAdd = ref(true);
   const closeConfirmFun = (done: () => void) => {
-    elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
+    elMessageBoxConfirm(`放弃${A_ETitle.value}`, () => {
       done();
-      ElMessage.info(`放弃${dialogTitle.value}`);
+      ElMessage.info(`放弃${A_ETitle.value}`);
     });
   };
 
   // 添加/修改用户--------------------------------
-  const addUserDialog = () => {
-    userInfoForm = reactive(cloneDeep(defaultUserInfo));
-    dialogVisible.value = true;
-    isAddUser.value = true;
-    dialogTitle.value = "添加用户";
+  const toAdd = () => {
+    A_EFrom = reactive(cloneDeep(defaultA_EInfo));
+    A_EVisible.value = true;
+    isAdd.value = true;
+    A_ETitle.value = "添加用户";
   };
-  const editUserDialog = (user: userType) => {
-    userInfoForm = reactive(cloneDeep(user));
-    dialogVisible.value = true;
-    isAddUser.value = false;
-    dialogTitle.value = "修改用户";
+  const toEdit = (user: userType) => {
+    A_EFrom = reactive(cloneDeep(user));
+    A_EVisible.value = true;
+    isAdd.value = false;
+    A_ETitle.value = "修改用户";
   };
-  const addOrEditUserFun = async () => {
-    dialogFromRef.value!.validate(async (valid, fields) => {
+  const A_EFun = async () => {
+    A_EFromRef.value!.validate(async (valid, fields) => {
       if (valid) {
         loading.value = true;
         let res;
-        if (isAddUser.value) res = await addUser(userInfoForm);
-        else res = await editUser(userInfoForm);
+        if (isAdd.value) res = await addUser(A_EFrom);
+        else res = await editUser(A_EFrom);
         if (res.code === 200) {
-          ElMessage.success("添加成功");
           allUserList.value = [];
-          userQueryFrom.currentPage = 1;
-          getUserListFun(); //重新请求数据进行用户列表渲染
+          queryFrom.currentPage = 1;
+          getFun(); //重新请求数据进行用户列表渲染
+          ElMessage.success("添加成功");
           // dialogVisible.value = false; //隐藏弹出框
-        } else ElMessage.error(res.message);
+        }
         loading.value = false;
       } else console.log("error submit!", fields);
     });
   };
 
   //查询用户-------------------------------------
-  const userQueryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const queryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const queryRules = reactive({
     phoneNumber: [{ validator: phoneNumberValidator, trigger: "change" }],
     email: [{ validator: emailValidator, trigger: "change" }],
   });
-  const queryUserFun = async () => {
-    userQueryFromRef.value!.validate(async (valid, fields) => {
+  const queryFun = async () => {
+    queryFromRef.value!.validate(async (valid, fields) => {
       if (valid) {
         allUserList.value = [];
-        userQueryFrom.currentPage = 1;
-        await getUserListFun();
+        queryFrom.currentPage = 1;
+        await getFun();
       } else console.log("error submit!", fields);
     });
   };
 
   //删除用户------------------------------------
-  const userTableRef = ref();
+  const tableRef = ref();
   const userIdList = ref<(number | undefined)[]>([]);
   const selectionChange = (val: userType[]) => {
     userIdList.value = val.map((i) => {
       return i.userId;
     });
   };
-  const delUserFun = (user: userType) => {
-    userTableRef.value.toggleRowSelection(user, true);
+  const delFun = (user: userType) => {
+    tableRef.value.toggleRowSelection(user, true);
     elMessageBoxConfirm(
       `删除勾选的${userIdList.value.length}个用户`,
       async () => {
+        loading.value = true;
         const res = await delUser(userIdList.value);
         if (res.code == 200) {
-          ElMessage.success("删除用户成功");
+          ElMessage.success(`删除勾选的${userIdList.value.length}个用户成功`);
           allUserList.value = [];
-          userQueryFrom.currentPage = 1;
-          getUserListFun(); //重新请求数据进行用户列表渲染
-        } else ElMessage.error(res.message);
+          queryFrom.currentPage = 1;
+          getFun(); //重新请求数据进行用户列表渲染
+        }
+        loading.value = false;
       }
     );
   };

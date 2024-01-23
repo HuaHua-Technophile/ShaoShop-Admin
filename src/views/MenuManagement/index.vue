@@ -1,7 +1,7 @@
 <template>
   <div class="p-3 w-100 h-100">
     <!-- 菜单列表 -->
-    <div ref="menuListWrapper" class="w-100 h-100 overflow-hidden rounded-4">
+    <div ref="bsWrapper" class="w-100 h-100 overflow-hidden rounded-4">
       <div
         style="
           min-height: calc(100% + 1px) !important;
@@ -12,11 +12,11 @@
           :data="menuList"
           table-layout="auto"
           header-cell-class-name="text-center text-body"
+          row-key="menuId"
           row-class-name="bg-body"
           cell-class-name="text-center"
           class="bg-body rounded-4"
           empty-text="查询菜单异常"
-          row-key="menuId"
           @cell-click="cellClickFun">
           <!-- 外层表格扩展 -->
           <el-table-column type="expand">
@@ -298,7 +298,7 @@
           </el-table-column>
           <el-table-column>
             <template #header>
-              <el-button @click="addMenuDialog">添加菜单</el-button>
+              <el-button @click="toAdd">添加菜单</el-button>
             </template>
             <template #default>
               <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
@@ -310,19 +310,19 @@
     </div>
     <!-- 添加/修改弹窗 -->
     <el-dialog
-      :title="dialogTitle"
-      v-model="menuDialogVisible"
+      :title="A_ETitle"
+      v-model="A_EVisible"
       width="445px"
       :before-close="closeConfirmFun"
       class="rounded-4"
       draggable
       center>
-      <el-form :model="menuInfoForm" ref="dialogFormRef" :rules="rules">
+      <el-form :model="A_EForm" ref="A_EFormRef" :rules="A_ERules">
         <el-form-item label="菜单名称" prop="menuName">
           <el-input
             clearable
             maxlength="10"
-            v-model.trim="menuInfoForm.menuName"
+            v-model.trim="A_EForm.menuName"
             placeholder="在左侧导航与顶部导航显示(建议4字)"
             :prefix-icon="renderFontIcon('fa-solid fa-quote-left')">
           </el-input>
@@ -331,7 +331,7 @@
           <el-input
             clearable
             maxlength="30"
-            v-model.trim="menuInfoForm.path"
+            v-model.trim="A_EForm.path"
             placeholder="路由地址"
             :prefix-icon="renderFontIcon('fa-solid fa-code')">
           </el-input>
@@ -340,7 +340,7 @@
           <el-input
             clearable
             maxlength="12"
-            v-model.trim="menuInfoForm.parentId"
+            v-model.trim="A_EForm.parentId"
             placeholder="挂靠的父级菜单id"
             :prefix-icon="renderFontIcon('bi bi-diagram-3')">
           </el-input>
@@ -351,7 +351,7 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model.trim="menuInfoForm.icon"
+            v-model.trim="A_EForm.icon"
             placeholder="BSicon/FontAwesome支持,请填入class类名"
             :prefix-icon="renderFontIcon('fa-solid fa-icons')">
           </el-input>
@@ -360,17 +360,14 @@
           label="菜单排序"
           prop="orderNum"
           style="padding-left: 10.18px">
-          <el-input-number
-            v-model="menuInfoForm.orderNum"
-            :min="0"
-            :max="999" />
+          <el-input-number v-model="A_EForm.orderNum" :min="0" :max="999" />
         </el-form-item>
         <el-form-item
           label="菜单类型"
           prop="menuType"
           class="d-flex align-items-center"
           style="padding-left: 10.18px">
-          <el-radio-group v-model="menuInfoForm.menuType">
+          <el-radio-group v-model="A_EForm.menuType">
             <el-radio label="M" size="large">目录</el-radio>
             <el-radio label="C" size="large">菜单</el-radio>
             <el-radio label="F" size="large">按钮</el-radio>
@@ -381,7 +378,7 @@
           prop="status"
           class="d-flex align-items-center"
           style="padding-left: 10.18px">
-          <el-radio-group v-model="menuInfoForm.status">
+          <el-radio-group v-model="A_EForm.status">
             <el-radio :label="0" size="large">正常</el-radio>
             <el-radio :label="1" size="large">停用</el-radio>
           </el-radio-group>
@@ -391,7 +388,7 @@
           prop="visible"
           class="d-flex align-items-center"
           style="padding-left: 10.18px">
-          <el-radio-group v-model="menuInfoForm.visible">
+          <el-radio-group v-model="A_EForm.visible">
             <el-radio :label="0" size="large">显示</el-radio>
             <el-radio :label="1" size="large">隐藏</el-radio>
           </el-radio-group>
@@ -401,18 +398,16 @@
           prop="isFrame"
           class="d-flex align-items-center"
           style="padding-left: 10.18px">
-          <el-radio-group v-model="menuInfoForm.isFrame">
+          <el-radio-group v-model="A_EForm.isFrame">
             <el-radio :label="0" size="large">是</el-radio>
             <el-radio :label="1" size="large">否</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
       <div class="d-flex justify-content-center">
-        <el-button @click="addOrEditMenuFun" :loading="loading"
-          >确认{{ dialogTitle
-          }}<span v-if="!isAddMenu"
-            >ID: {{ menuInfoForm.menuId }}</span
-          ></el-button
+        <el-button @click="A_EFun" :loading="loading"
+          >确认{{ A_ETitle
+          }}<span v-if="!isAdd">ID: {{ A_EForm.menuId }}</span></el-button
         >
       </div>
     </el-dialog>
@@ -443,23 +438,23 @@
   //获取菜单-----------------------
   const loading = ref(false);
   const menuList = ref<roleMenuType[]>();
-  const getMenuListFun = async () => {
+  const getFun = async () => {
     loading.value = true;
     let res = await getMenuList();
     console.log("获取菜单列表=>", res);
     menuList.value = res.data;
     loading.value = false;
   };
-  getMenuListFun();
+  getFun();
 
   // better scroll-------------------------
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
   BScroll.use(ObserveDOM);
-  const menuListWrapper = ref();
+  const bsWrapper = ref();
   let bs: BScrollConstructor<{}>;
   onMounted(() => {
-    bs = new BScroll(menuListWrapper.value, {
+    bs = new BScroll(bsWrapper.value, {
       scrollbar: true,
       mouseWheel: true,
       observeDOM: true,
@@ -475,15 +470,14 @@
   ) => {
     column;
     cell;
-    if (event.target.className.includes("bi-pencil-square"))
-      editMenuDialog(row);
+    if (event.target.className.includes("bi-pencil-square")) toEdit(row);
     if (event.target.className.includes("bi-trash"))
-      delMenuFun(row.menuId!, row.menuName);
+      delFun(row.menuId!, row.menuName);
   };
 
   // 表单---------------------
-  const dialogFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
-  const defaultMenuInfo: roleMenuType = {
+  const A_EFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const defaultA_EInfo: roleMenuType = {
     icon: "", // 菜单图标
     isFrame: 1, //是否为外链（0是 1否）
     menuName: "", //菜单名称
@@ -494,8 +488,8 @@
     status: 0, //菜单状态（0正常 1停用）
     visible: 0, //菜单状态（0显示 1隐藏）
   };
-  let menuInfoForm = reactive(defaultMenuInfo);
-  const rules = reactive({
+  let A_EForm = reactive(defaultA_EInfo);
+  const A_ERules = reactive({
     menuName: [{ required: true, message: "请输入菜单名称", trigger: "blur" }],
     path: [{ required: true, message: "请输入路由地址", trigger: "blur" }],
     parentId: [
@@ -508,54 +502,56 @@
   });
 
   //dialog弹出框--------------------
-  const menuDialogVisible = ref(false);
-  const dialogTitle = ref("添加菜单");
-  const isAddMenu = ref(true);
+  const A_EVisible = ref(false);
+  const A_ETitle = ref("添加菜单");
+  const isAdd = ref(true);
   const closeConfirmFun = (done: () => void) => {
-    elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
+    elMessageBoxConfirm(`放弃${A_ETitle.value}`, () => {
       done();
-      ElMessage.info(`放弃${dialogTitle.value}`);
+      ElMessage.info(`放弃${A_ETitle.value}`);
     });
   };
 
   //添加/修改菜单------------------------
-  const addMenuDialog = () => {
-    menuInfoForm = reactive(cloneDeep(defaultMenuInfo));
-    menuDialogVisible.value = true;
-    isAddMenu.value = true;
-    dialogTitle.value = "添加菜单";
+  const toAdd = () => {
+    A_EForm = reactive(cloneDeep(defaultA_EInfo));
+    A_EVisible.value = true;
+    isAdd.value = true;
+    A_ETitle.value = "添加菜单";
   };
-  const editMenuDialog = (menu: roleMenuType) => {
-    menuInfoForm = reactive(cloneDeep(menu));
-    menuDialogVisible.value = true;
-    isAddMenu.value = false;
-    dialogTitle.value = "修改菜单";
+  const toEdit = (menu: roleMenuType) => {
+    A_EForm = reactive(cloneDeep(menu));
+    A_EVisible.value = true;
+    isAdd.value = false;
+    A_ETitle.value = "修改菜单";
   };
-  const addOrEditMenuFun = async () => {
-    dialogFormRef.value!.validate(async (valid, fields) => {
+  const A_EFun = async () => {
+    A_EFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
         loading.value = true;
         let res;
-        if (isAddMenu.value) res = await addMenu(menuInfoForm);
-        else res = await editMenu(menuInfoForm);
+        if (isAdd.value) res = await addMenu(A_EForm);
+        else res = await editMenu(A_EForm);
         if (res.code == 200) {
-          getMenuListFun();
-          menuDialogVisible.value = false; //隐藏弹出框
-          ElMessage.success(`${dialogTitle.value}成功`);
-        } else ElMessage.error(res.message);
+          getFun();
+          A_EVisible.value = false; //隐藏弹出框
+          ElMessage.success(`${A_ETitle.value}成功`);
+        }
         loading.value = false;
       } else console.log("error submit!", fields);
     });
   };
 
   // 删除菜单
-  const delMenuFun = (menuId: number, menuName: string) => {
+  const delFun = (menuId: number, menuName: string) => {
     elMessageBoxConfirm(`删除ID为 ${menuId} 的菜单"${menuName}"`, async () => {
+      loading.value = true;
       let res = await delMenu(menuId);
       if (res.code == 200) {
         ElMessage.success(`删除ID为 ${menuId} 的菜单"${menuName}成功`);
-        getMenuListFun();
-      } else ElMessage.error(res.message);
+        getFun();
+      }
+      loading.value = false;
     });
   };
 </script>

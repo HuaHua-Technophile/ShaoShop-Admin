@@ -2,8 +2,8 @@
   <div class="w-100 h-100 d-flex flex-column">
     <!-- 搜索字典 -->
     <el-form
-      :model="dictQueryFrom"
-      ref="dictQueryFromRef"
+      :model="queryFrom"
+      ref="queryFromRef"
       class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
       <el-form-item
         class="col-3 pe-3 flex-grow-1"
@@ -12,7 +12,7 @@
         <el-input
           clearable
           maxlength="10"
-          v-model.trim="dictQueryFrom.dictName"
+          v-model.trim="queryFrom.dictName"
           placeholder="字典名称"
           :prefix-icon="renderFontIcon('fa-solid fa-quote-left')" />
       </el-form-item>
@@ -23,13 +23,13 @@
         <el-input
           clearable
           maxlength="20"
-          v-model.trim="dictQueryFrom.dictType"
+          v-model.trim="queryFrom.dictType"
           placeholder="字典类型"
           :prefix-icon="renderFontIcon('fa-solid fa-code')" />
       </el-form-item>
       <el-form-item class="flex-shrink-0 pe-3" label="字典状态" prop="status">
         <el-select
-          v-model="dictQueryFrom.status"
+          v-model="queryFrom.status"
           placeholder="正常/停用"
           clearable
           style="width: 113px">
@@ -38,14 +38,14 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button :loading="loading" @click="queryDictFun">查询</el-button>
+        <el-button :loading="loading" @click="queryFun">查询</el-button>
       </el-form-item>
     </el-form>
     <!-- 字典列表 -->
     <div class="flex-grow-1 overflow-hidden p-3">
       <div
-        ref="dictListWrapper"
-        class="dictListWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
+        ref="bsWrapper"
+        class="bsWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
         <div
           style="
             min-height: calc(100% + 1px) !important;
@@ -139,7 +139,7 @@
                     </el-table-column>
                     <el-table-column>
                       <template #header>
-                        <el-button @click="addDictDataDialog(props.row)"
+                        <el-button @click="toAddData(props.row)"
                           >添加数据</el-button
                         >
                       </template>
@@ -155,9 +155,7 @@
                   </el-table>
                 </div>
                 <div v-else class="text-center">
-                  <el-button
-                    class="text-center"
-                    @click="addDictDataDialog(props.row)"
+                  <el-button class="text-center" @click="toAddData(props.row)"
                     >该字典下暂无数据,请添加</el-button
                   >
                 </div>
@@ -190,7 +188,7 @@
             </el-table-column>
             <el-table-column>
               <template #header>
-                <el-button @click="addDictDialog">添加字典</el-button>
+                <el-button @click="toAddDict">添加字典</el-button>
               </template>
               <template #default>
                 <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
@@ -203,8 +201,8 @@
     </div>
     <!-- 添加/修改字典弹窗 -->
     <el-dialog
-      :title="dialogTitle"
-      v-model="dialogVisible"
+      :title="A_ETitle"
+      v-model="A_EVisible"
       :before-close="closeConfirm"
       class="rounded-4"
       draggable
@@ -212,15 +210,15 @@
       width="400px">
       <!-- 字典类型表单 -->
       <el-form
-        :model="dictInfoForm"
-        ref="dictDialogFormRef"
-        :rules="dictRules"
+        :model="A_EDictForm"
+        ref="A_EDictFormRef"
+        :rules="A_EDictRules"
         v-if="isDict">
         <el-form-item label="字典名称" prop="dictName">
           <el-input
             clearable
             maxlength="10"
-            v-model.trim="dictInfoForm.dictName"
+            v-model.trim="A_EDictForm.dictName"
             placeholder="在选框外呈现给用户"
             :prefix-icon="renderFontIcon('fa-solid fa-quote-left')">
           </el-input>
@@ -229,7 +227,7 @@
           <el-input
             clearable
             maxlength="20"
-            v-model.trim="dictInfoForm.dictType"
+            v-model.trim="A_EDictForm.dictType"
             placeholder="在数据库中的标识"
             :prefix-icon="renderFontIcon('fa-solid fa-code')">
           </el-input>
@@ -240,7 +238,7 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model.trim="dictInfoForm.remark"
+            v-model.trim="A_EDictForm.remark"
             placeholder="备注"
             :prefix-icon="renderFontIcon('fa-solid fa-marker')">
           </el-input>
@@ -248,9 +246,9 @@
       </el-form>
       <!-- 字典数据表单 -->
       <el-form
-        :model="dictDataInfoForm"
-        ref="dictDataDialogFormRef"
-        :rules="dictDataRules"
+        :model="A_EDataForm"
+        ref="A_EDataFormRef"
+        :rules="A_EDataRules"
         v-else>
         <el-form-item
           label="父级类型"
@@ -259,7 +257,7 @@
           <el-input
             clearable
             disabled
-            v-model.trim="dictDataInfoForm.dictType"
+            v-model.trim="A_EDataForm.dictType"
             :prefix-icon="renderFontIcon('fa-solid fa-code-fork')">
           </el-input>
         </el-form-item>
@@ -267,7 +265,7 @@
           <el-input
             clearable
             maxlength="20"
-            v-model.trim="dictDataInfoForm.dictLabel"
+            v-model.trim="A_EDataForm.dictLabel"
             placeholder="字典数据呈现出的选项名称"
             :prefix-icon="renderFontIcon('fa-solid fa-tag')">
           </el-input>
@@ -276,7 +274,7 @@
           <el-input
             clearable
             maxlength="20"
-            v-model.trim="dictDataInfoForm.dictValue"
+            v-model.trim="A_EDataForm.dictValue"
             placeholder="字典数据传递的值"
             :prefix-icon="renderFontIcon('bi bi-123')">
           </el-input>
@@ -287,7 +285,7 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model.trim="dictDataInfoForm.cssClass"
+            v-model.trim="A_EDataForm.cssClass"
             placeholder="cssClass样式属性（其他样式扩展）"
             :prefix-icon="renderFontIcon('fa-brands fa-bootstrap')">
           </el-input>
@@ -298,7 +296,7 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model.trim="dictDataInfoForm.listClass"
+            v-model.trim="A_EDataForm.listClass"
             placeholder="listClass 表格回显样式"
             :prefix-icon="renderFontIcon('fa-brands fa-bootstrap')">
           </el-input>
@@ -309,7 +307,7 @@
           style="padding-left: 10.18px">
           <el-input
             clearable
-            v-model.trim="dictDataInfoForm.remark"
+            v-model.trim="A_EDataForm.remark"
             placeholder="备注"
             :prefix-icon="renderFontIcon('fa-solid fa-marker')">
           </el-input>
@@ -319,19 +317,17 @@
           prop="dictSort"
           style="padding-left: 10.18px">
           <el-input-number
-            v-model.trim="dictDataInfoForm.dictSort"
+            v-model.trim="A_EDataForm.dictSort"
             :min="0"
             :max="999" />
         </el-form-item>
       </el-form>
       <!-- 通用确认按钮 -->
       <div class="d-flex justify-content-center">
-        <el-button @click="addOrEdit_DictOrDictDataFun" :loading="loading"
-          >确认{{ dialogTitle }}
-          <span v-if="!isAdd && isDict">ID: {{ dictInfoForm.dictId }}</span>
-          <span v-if="!isAdd && !isDict"
-            >Code: {{ dictDataInfoForm.dictCode }}</span
-          >
+        <el-button @click="A_EFun" :loading="loading"
+          >确认{{ A_ETitle }}
+          <span v-if="!isAdd && isDict">ID: {{ A_EDictForm.dictId }}</span>
+          <span v-if="!isAdd && !isDict">Code: {{ A_EDataForm.dictCode }}</span>
         </el-button>
       </div>
     </el-dialog>
@@ -367,33 +363,33 @@
   // 不传参数的情况下，就是获取所有字典。传参数的情况下可用作搜索
   const allDictList = ref<dictType[]>([]);
   const loading = ref(false);
-  const dictQueryFrom = reactive({
+  const queryFrom = reactive({
     dictName: "",
     dictType: "",
-    status: null,
+    status: undefined,
   });
-  const getDictListFun = async () => {
-    allDictList.value = [];
+  const getFun = async () => {
     loading.value = true;
-    console.log("字典查询条件=>", dictQueryFrom);
-    const res = await getDictList(dictQueryFrom);
+    allDictList.value = [];
+    console.log("字典查询条件=>", queryFrom);
+    const res = await getDictList(queryFrom);
     console.log("字典查询结果=>", res);
     if (res.code === 200) {
       ElMessage.success("字典查询成功");
       allDictList.value = res.data.records;
-    } else ElMessage.error(res.message);
+    }
     loading.value = false;
   };
-  getDictListFun();
+  getFun();
 
   // better scroll-------------------------
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
   BScroll.use(ObserveDOM);
-  const dictListWrapper = ref();
+  const bsWrapper = ref();
   let bs: BScrollConstructor<{}>;
   onMounted(() => {
-    bs = new BScroll(dictListWrapper.value, {
+    bs = new BScroll(bsWrapper.value, {
       scrollbar: true,
       mouseWheel: true,
       observeDOM: true,
@@ -413,26 +409,26 @@
       event.target.className.includes("bi-pencil-square") &&
       row.sysDictDataList
     )
-      editDictDialog(row);
+      toEditDict(row);
     if (
       event.target.className.includes("bi-pencil-square") &&
       !row.sysDictDataList
     )
-      editDictDataDialog(row);
+      toEditData(row);
     if (event.target.className.includes("bi-trash") && row.sysDictDataList)
       delDictFun(row.dictId!, row.dictName);
     if (event.target.className.includes("bi-trash") && !row.sysDictDataList)
-      delDictDataFun(row.dictCode!, row.dictLabel);
+      delDataFun(row.dictCode!, row.dictLabel);
   };
   // 表单---------------------
-  const dictDialogFormRef = ref<FormInstance>(); //表单实例
-  const dictDataDialogFormRef = ref<FormInstance>(); //表单实例
-  const defaultDictInfo: dictType = {
+  const A_EDictFormRef = ref<FormInstance>(); //表单实例
+  const A_EDataFormRef = ref<FormInstance>(); //表单实例
+  const defaultA_EDict: dictType = {
     dictName: "",
     dictType: "",
     remark: "",
   };
-  const defaultDictDataInfo: dictDataType = {
+  const defaultA_EData: dictDataType = {
     cssClass: "",
     dictLabel: "",
     dictSort: 0,
@@ -441,13 +437,13 @@
     listClass: "",
     remark: "",
   };
-  let dictInfoForm = reactive(defaultDictInfo);
-  let dictDataInfoForm = reactive(defaultDictDataInfo);
-  const dictRules = reactive({
+  let A_EDictForm = reactive(defaultA_EDict);
+  let A_EDataForm = reactive(defaultA_EData);
+  const A_EDictRules = reactive({
     dictName: [{ required: true, message: "请输入字典名称", trigger: "blur" }],
     dictType: [{ required: true, message: "请输入字典类型", trigger: "blur" }],
   });
-  const dictDataRules = reactive({
+  const A_EDataRules = reactive({
     dictLabel: [
       { required: true, message: "请输入字典数据标签", trigger: "blur" },
     ],
@@ -456,67 +452,64 @@
     ],
   });
   //dialog弹出框--------------------
-  const dialogVisible = ref(false);
-  const dialogTitle = ref("");
+  const A_EVisible = ref(false);
+  const A_ETitle = ref("");
   const isAdd = ref(true);
   const isDict = ref(true);
   const closeConfirm = (done: () => void) => {
-    elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
+    elMessageBoxConfirm(`放弃${A_ETitle.value}`, () => {
       done();
-      ElMessage.info(`放弃${dialogTitle.value}`);
+      ElMessage.info(`放弃${A_ETitle.value}`);
     });
   };
 
   //添加/修改字典类型/字典数据-----------------
-  const addDictDialog = () => {
-    dictInfoForm = reactive(cloneDeep(defaultDictInfo));
-    dialogVisible.value = true;
+  const toAddDict = () => {
+    A_EDictForm = reactive(cloneDeep(defaultA_EDict));
+    A_EVisible.value = true;
     isAdd.value = true;
     isDict.value = true;
-    dialogTitle.value = "添加字典类型";
+    A_ETitle.value = "添加字典类型";
   };
-  const editDictDialog = (dict: dictType) => {
-    dictInfoForm = reactive(cloneDeep(dict));
-    dialogVisible.value = true;
+  const toEditDict = (dict: dictType) => {
+    A_EDictForm = reactive(cloneDeep(dict));
+    A_EVisible.value = true;
     isAdd.value = false;
     isDict.value = true;
-    dialogTitle.value = "修改字典类型";
+    A_ETitle.value = "修改字典类型";
   };
-  const addDictDataDialog = (dict: dictType) => {
-    const DictDataInfo = cloneDeep(defaultDictDataInfo);
+  const toAddData = (dict: dictType) => {
+    const DictDataInfo = cloneDeep(defaultA_EData);
     DictDataInfo.dictType = dict.dictType;
     console.log("添加字典数据的默认值=>", DictDataInfo);
-    dictDataInfoForm = reactive(DictDataInfo);
-    dialogVisible.value = true;
+    A_EDataForm = reactive(DictDataInfo);
+    A_EVisible.value = true;
     isAdd.value = true;
     isDict.value = false;
-    dialogTitle.value = "添加字典数据";
+    A_ETitle.value = "添加字典数据";
   };
-  const editDictDataDialog = (dictData: dictDataType) => {
-    dictDataInfoForm = reactive(cloneDeep(dictData));
-    dialogVisible.value = true;
+  const toEditData = (dictData: dictDataType) => {
+    A_EDataForm = reactive(cloneDeep(dictData));
+    A_EVisible.value = true;
     isAdd.value = false;
     isDict.value = false;
-    dialogTitle.value = "修改字典数据";
+    A_ETitle.value = "修改字典数据";
   };
-  const addOrEdit_DictOrDictDataFun = async () => {
-    let formEl = isDict.value
-      ? dictDialogFormRef.value
-      : dictDataDialogFormRef.value;
+  const A_EFun = async () => {
+    let formEl = isDict.value ? A_EDictFormRef.value : A_EDataFormRef.value;
     // 先进行表单验证
     formEl!.validate(async (valid, fields) => {
       if (valid) {
         loading.value = true;
         let res;
-        if (isAdd.value && isDict.value) res = await addDict(dictInfoForm);
-        if (!isAdd.value && isDict.value) res = await editDict(dictInfoForm);
-        if (isAdd.value && !isDict.value)
-          res = await addDictData(dictDataInfoForm);
+        if (isAdd.value && isDict.value) res = await addDict(A_EDictForm);
+        if (!isAdd.value && isDict.value) res = await editDict(A_EDictForm);
+        if (isAdd.value && !isDict.value) res = await addDictData(A_EDataForm);
         if (!isAdd.value && !isDict.value)
-          res = await editDictData(dictDataInfoForm);
+          res = await editDictData(A_EDataForm);
         if (res!.code == 200) {
-          getDictListFun();
-          dialogVisible.value = false; //隐藏弹出框
+          getFun();
+          A_EVisible.value = false; //隐藏弹出框
         } else {
           ElMessage.error(res!.message);
         }
@@ -526,10 +519,10 @@
   };
 
   //查询用户-------------------------------------
-  const dictQueryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
-  const queryDictFun = async () => {
-    dictQueryFromRef.value!.validate((valid, fields) => {
-      if (valid) getDictListFun();
+  const queryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const queryFun = async () => {
+    queryFromRef.value!.validate((valid, fields) => {
+      if (valid) getFun();
       else console.log("error submit!", fields);
     });
   };
@@ -539,23 +532,27 @@
     elMessageBoxConfirm(
       `删除ID为 ${dictId} 的字典类型"${dictName}"`,
       async () => {
+        loading.value = true;
         const res = await delDict(dictId);
         if (res.code == 200) {
           ElMessage.success(`删除ID为 ${dictId} 的字典类型"${dictName}"成功`);
-          getDictListFun();
-        } else ElMessage.error(res.message);
+          getFun();
+        }
+        loading.value = false;
       }
     );
   };
-  const delDictDataFun = (dictCode: number, dictLabel: string) => {
+  const delDataFun = (dictCode: number, dictLabel: string) => {
     elMessageBoxConfirm(
       `删除Code为 ${dictCode} 的选项"${dictLabel}"`,
       async () => {
+        loading.value = true;
         const res = await delDictData(dictCode);
         if (res.code == 200) {
           ElMessage.success(`删除Code为 ${dictCode} 的选项"${dictLabel}成功"`);
-          getDictListFun();
-        } else ElMessage.error(res.message);
+          getFun();
+        }
+        loading.value = false;
       }
     );
   };

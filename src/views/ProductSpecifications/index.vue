@@ -2,39 +2,39 @@
   <div class="w-100 h-100 d-flex flex-column">
     <!-- 根据规格名称搜索 -->
     <el-form
-      :model="PSNQueryFrom"
-      ref="PSNQueryFromRef"
+      :model="queryFrom"
+      ref="queryFromRef"
       :rules="queryRules"
       class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
       <el-form-item label="商品规格名称" prop="productSpec" class="flex-grow-1">
         <el-input
           clearable
           maxlength="10"
-          v-model.trim="PSNQueryFrom.productSpec"
+          v-model.trim="queryFrom.productSpec"
           placeholder="商品规格名称"
           :prefix-icon="renderFontIcon('fa-solid fa-ruler-combined')" />
       </el-form-item>
       <el-form-item class="ms-3">
-        <el-button :loading="loading" @click="queryPSNFun">查询</el-button>
+        <el-button :loading="loading" @click="queryFun">查询</el-button>
       </el-form-item>
       <el-form-item class="ms-3">
         <jumpPageBtn
-          :queryFun="getPSNListFun"
+          :queryFun="getFun"
           :allPageCount="allPageCount"
           :nowPage="nowPage"
           :visible="true"
           :bs="bs"
           :tableItemHeight="tableItemHeight"
           :tableHeaderHeight="tableHeaderHeight"
-          :queryFrom="PSNQueryFrom"
+          :queryFrom="queryFrom"
           :defaultPageSize="defaultPageSize" />
       </el-form-item>
     </el-form>
     <!-- 商品规格列表 -->
     <div class="flex-grow-1 overflow-hidden p-3">
       <div
-        ref="PSNWrapper"
-        class="PSNWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
+        ref="bsWrapper"
+        class="bsWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
         <div
           style="
             min-height: calc(100% + 1px) !important;
@@ -84,12 +84,6 @@
                             </el-tag>
                           </div>
                         </el-collapse-item>
-                        <el-collapse-item
-                          v-for="j in 100"
-                          :name="j"
-                          title="测试标题">
-                          {{ j }}</el-collapse-item
-                        >
                       </el-collapse>
                     </div>
                     <div
@@ -109,7 +103,7 @@
             <el-table-column prop="valueName" label="valueName" />
             <el-table-column>
               <template #header>
-                <el-button @click="addPSNDialog">添加规格</el-button>
+                <el-button @click="toAdd">添加规格</el-button>
               </template>
               <template #default>
                 <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
@@ -122,26 +116,24 @@
     </div>
     <!-- 添加/修改商品规格弹窗 -->
     <el-dialog
-      v-model="dialogVisible"
+      v-model="A_EVisible"
       width="450px"
       :before-close="closeConfirmFun"
       class="rounded-4"
       draggable
       center>
       <template #header>
-        <el-button @click="addOrEditPSNFun" :loading="loading"
-          >确认{{ dialogTitle
-          }}<span v-if="!isAddPSN"
-            >ID: {{ PSNForm.specNameId }}</span
-          ></el-button
+        <el-button @click="A_EFun" :loading="loading"
+          >确认{{ A_ETitle
+          }}<span v-if="!isAdd">ID: {{ A_EFrom.specNameId }}</span></el-button
         >
       </template>
-      <el-form :model="PSNForm" ref="dialogFromRef" :rules="PSNRules">
+      <el-form :model="A_EFrom" ref="A_EFromRef" :rules="A_ERules">
         <el-form-item label="商品规格名称" prop="specName">
           <el-input
             clearable
             maxlength="10"
-            v-model.trim="PSNForm.specName"
+            v-model.trim="A_EFrom.specName"
             placeholder="商品规格名称"
             :prefix-icon="renderFontIcon('fa-solid fa-pen-ruler')">
           </el-input>
@@ -158,9 +150,9 @@
         </el-form-item>
         <el-collapse
           class="w-100"
-          v-if="PSNForm.productSpecificationsList?.length! > 0">
+          v-if="A_EFrom.productSpecificationsList?.length! > 0">
           <el-collapse-item
-            v-for="(i, index) in PSNForm.productSpecificationsList"
+            v-for="(i, index) in A_EFrom.productSpecificationsList"
             :name="i.keyName">
             <template #title>
               <Transition
@@ -225,14 +217,14 @@
       <jumpPageBtn
         class="position-absolute p-2 rounded-pill me-3 mb-3"
         style="background: #141414; right: 0; bottom: 0"
-        :queryFun="getPSNListFun"
+        :queryFun="getFun"
         :allPageCount="allPageCount"
         :nowPage="nowPage"
         :visible="jumpPageBtnVisible"
         :bs="bs"
         :tableItemHeight="tableItemHeight"
         :tableHeaderHeight="tableHeaderHeight"
-        :queryFrom="PSNQueryFrom"
+        :queryFrom="queryFrom"
         :defaultPageSize="defaultPageSize" />
     </Transition>
   </div>
@@ -267,20 +259,20 @@
   const defaultPageSize = 20;
   let tableItemHeight: number; //每一项高度
   let tableHeaderHeight: number; //表头高度
-  const PSNQueryFrom = reactive<PSNQueryType>({
+  const queryFrom = reactive<PSNQueryType>({
     productSpec: "", //商品规格名称
     currentPage: 1, //请求的页码
     pageSize: defaultPageSize, //每页返回的数量
   });
   const queryRules = reactive({});
-  const getPSNListFun = async (excessDataCount?: number) => {
+  const getFun = async (excessDataCount?: number) => {
     let closePullUp;
     loading.value = true;
-    const res = await getPSNList(PSNQueryFrom);
+    const res = await getPSNList(queryFrom);
     console.log(
       `查询条件`,
-      PSNQueryFrom,
-      `\n第${PSNQueryFrom.currentPage}页商品规格(${res.data?.records?.length})=>`,
+      queryFrom,
+      `\n第${queryFrom.currentPage}页商品规格(${res.data?.records?.length})=>`,
       res
     );
     if (res.code == 200 && res.data.records.length > 0) {
@@ -313,7 +305,7 @@
     loading.value = false;
     return { closePullUp };
   };
-  getPSNListFun();
+  getFun();
 
   const getPSNificationListFun = async (id: number, dontLoad?: boolean) => {
     const index = allPSNList.value.findIndex((i) => i.specificationsId == id);
@@ -344,11 +336,11 @@
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
   BScroll.use(ObserveDOM);
-  const PSNWrapper = ref();
+  const bsWrapper = ref();
   const jumpPageBtnVisible = ref(false);
   let bs: BScrollConstructor<{}>;
   onMounted(() => {
-    bs = new BScroll(PSNWrapper.value, {
+    bs = new BScroll(bsWrapper.value, {
       pullUpLoad: {
         threshold: -10,
       },
@@ -357,9 +349,9 @@
       observeDOM: true,
     });
     bs.on("pullingUp", async () => {
-      PSNQueryFrom.currentPage++; //请求页码自增
-      console.log("触发了pullingUp,页码自增", PSNQueryFrom.currentPage);
-      const { closePullUp } = await getPSNListFun();
+      queryFrom.currentPage++; //请求页码自增
+      console.log("触发了pullingUp,页码自增", queryFrom.currentPage);
+      const { closePullUp } = await getFun();
       if (!closePullUp) bs!.finishPullUp();
     });
     bs.on(
@@ -370,8 +362,8 @@
         else jumpPageBtnVisible.value = false;
         // 滚动高度-表头高度=实际滚动内容
         nowPage.value = ceil(
-          (-e.y - tableHeaderHeight! + PSNWrapper.value.clientHeight) /
-            (tableItemHeight! * PSNQueryFrom.pageSize)
+          (-e.y - tableHeaderHeight! + bsWrapper.value.clientHeight) /
+            (tableItemHeight! * queryFrom.pageSize)
         );
         /* console.log(
               `视窗高${PSNListWrapper.value.clientHeight}px,表头高${
@@ -407,6 +399,7 @@
     } else bsInners.value[row.specificationsId!]?.destroy();
     loading.value = false;
   };
+
   //表格点击回调----------------------
   const cellClickFun = (
     row: PSNType,
@@ -417,50 +410,47 @@
     column;
     cell;
     if (event.target.className.includes("bi-pencil-square"))
-      editPSNDialog(
-        row.specificationsId!,
-        Boolean(row.productSpecificationsList)
-      );
-    if (event.target.className.includes("bi-trash")) delPSNFun(row);
+      toEdit(row.specificationsId!, Boolean(row.productSpecificationsList));
+    if (event.target.className.includes("bi-trash")) delFun(row);
   };
 
   //dialog弹出框表单-----------------------
-  const dialogFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
-  const defaultPSN: PSNType = {
+  const A_EFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const defaultA_EFrom: PSNType = {
     productSpecificationsList: [],
     specName: "",
   };
-  let PSNForm = reactive(defaultPSN);
+  let A_EFrom = reactive(defaultA_EFrom);
   const keyName = ref("");
-  const PSNRules = reactive({
+  const A_ERules = reactive({
     specName: [
       { required: true, message: "请输入商品规格名称", trigger: "blur" },
     ],
   });
   //dialog弹出框-----------------------
-  const dialogVisible = ref(false);
-  const dialogTitle = ref("添加商品规格");
-  const isAddPSN = ref(true);
+  const A_EVisible = ref(false);
+  const A_ETitle = ref("添加商品规格");
+  const isAdd = ref(true);
   const closeConfirmFun = (done: () => void) => {
-    elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
+    elMessageBoxConfirm(`放弃${A_ETitle.value}`, () => {
       done();
-      dialogFromRef.value?.resetFields();
-      dialogFromRef.value?.clearValidate();
-      ElMessage.info(`放弃${dialogTitle.value}`);
+      A_EFromRef.value?.resetFields();
+      A_EFromRef.value?.clearValidate();
+      ElMessage.info(`放弃${A_ETitle.value}`);
     });
   };
   const enterConfirm = (e: KeyboardEvent, ind?: number) => {
     // 添加二级规格
     if (e.key === "Enter" && ind === undefined) {
       if (
-        PSNForm.productSpecificationsList?.some(
+        A_EFrom.productSpecificationsList?.some(
           (i) => i.keyName == keyName.value
         )
       )
         ElMessage.error(`已存在二级规格:'${keyName.value}'`);
       else if (keyName.value == "") ElMessage.error(`不可为空`);
       else {
-        PSNForm.productSpecificationsList?.push({
+        A_EFrom.productSpecificationsList?.push({
           keyName: keyName.value,
           valueList: [],
         });
@@ -470,51 +460,51 @@
     // 修改二级规格或添加三级规格
     if (e.key === "Enter" && ind !== undefined) {
       // 如果是编辑状态,说明是修改二级规格
-      if (PSNForm.productSpecificationsList![ind].editStatus) {
-        if (PSNForm.productSpecificationsList![ind].keyName == "")
+      if (A_EFrom.productSpecificationsList![ind].editStatus) {
+        if (A_EFrom.productSpecificationsList![ind].keyName == "")
           ElMessage.error(`不可为空`);
-        else delete PSNForm.productSpecificationsList![ind].editStatus; //直接删除临时属性
+        else delete A_EFrom.productSpecificationsList![ind].editStatus; //直接删除临时属性
       }
       // 不在编辑状态,说明是添加三级规格
       else {
         if (
-          PSNForm.productSpecificationsList![ind].valueList.some(
-            (i) => i == PSNForm.productSpecificationsList![ind].tag
+          A_EFrom.productSpecificationsList![ind].valueList.some(
+            (i) => i == A_EFrom.productSpecificationsList![ind].tag
           )
         )
           ElMessage.error(
             `'${
-              PSNForm.productSpecificationsList![ind].keyName
-            }'上已存在规格值:'${PSNForm.productSpecificationsList![ind].tag}'`
+              A_EFrom.productSpecificationsList![ind].keyName
+            }'上已存在规格值:'${A_EFrom.productSpecificationsList![ind].tag}'`
           );
         else if (
-          PSNForm.productSpecificationsList![ind].tag == "" ||
-          PSNForm.productSpecificationsList![ind].tag == undefined
+          A_EFrom.productSpecificationsList![ind].tag == "" ||
+          A_EFrom.productSpecificationsList![ind].tag == undefined
         )
           ElMessage.error(`不可为空`);
         else {
-          PSNForm.productSpecificationsList![ind].valueList.push(
-            PSNForm.productSpecificationsList![ind].tag!
+          A_EFrom.productSpecificationsList![ind].valueList.push(
+            A_EFrom.productSpecificationsList![ind].tag!
           );
-          delete PSNForm.productSpecificationsList![ind].tag; //直接删除临时属性,避免传参时出错
+          delete A_EFrom.productSpecificationsList![ind].tag; //直接删除临时属性,避免传参时出错
         }
       }
     }
   };
   const editCollapse = (ind: number) => {
-    PSNForm.productSpecificationsList![ind].editStatus = true;
+    A_EFrom.productSpecificationsList![ind].editStatus = true;
   };
   const delCollapse = (keyName: string) => {
     elMessageBoxConfirm(`删除二级规格:'${keyName}'`, () => {
-      PSNForm.productSpecificationsList =
-        PSNForm.productSpecificationsList?.filter((i) => i.keyName != keyName);
+      A_EFrom.productSpecificationsList =
+        A_EFrom.productSpecificationsList?.filter((i) => i.keyName != keyName);
       ElMessage.success(`删除二级规格:'${keyName}'`);
     });
   };
   const delTag = (tag: string, ind: number) => {
     elMessageBoxConfirm(`删除规格值:'${tag}'`, () => {
-      PSNForm.productSpecificationsList![ind].valueList =
-        PSNForm.productSpecificationsList![ind].valueList.filter(
+      A_EFrom.productSpecificationsList![ind].valueList =
+        A_EFrom.productSpecificationsList![ind].valueList.filter(
           (i) => i != tag
         );
       ElMessage.success(`删除规格值:'${tag}'`);
@@ -522,35 +512,35 @@
   };
 
   //添加/修改商品规格----------------
-  const addPSNDialog = () => {
-    PSNForm = reactive(cloneDeep(defaultPSN));
-    isAddPSN.value = true;
-    dialogTitle.value = "添加商品规格";
-    dialogVisible.value = true;
+  const toAdd = () => {
+    A_EFrom = reactive(cloneDeep(defaultA_EFrom));
+    isAdd.value = true;
+    A_ETitle.value = "添加商品规格";
+    A_EVisible.value = true;
   };
-  const editPSNDialog = async (id: number, dontLoad: boolean) => {
+  const toEdit = async (id: number, dontLoad: boolean) => {
     const index = await getPSNificationListFun(id, dontLoad);
-    PSNForm = reactive(cloneDeep(allPSNList.value[index!]));
-    isAddPSN.value = false;
-    dialogTitle.value = "修改商品规格";
-    dialogVisible.value = true;
+    A_EFrom = reactive(cloneDeep(allPSNList.value[index!]));
+    isAdd.value = false;
+    A_ETitle.value = "修改商品规格";
+    A_EVisible.value = true;
   };
-  const addOrEditPSNFun = () => {
-    dialogFromRef.value?.validate(async (valid, fields) => {
+  const A_EFun = () => {
+    A_EFromRef.value?.validate(async (valid, fields) => {
       if (valid) {
         // 验证二级规格名称是否有空值
-        if (!PSNForm.productSpecificationsList?.some((i) => i.keyName == "")) {
+        if (!A_EFrom.productSpecificationsList?.some((i) => i.keyName == "")) {
           loading.value = true;
           let res;
-          if (isAddPSN.value) res = await addPSN(PSNForm);
-          else res = await editPSN(PSNForm);
+          if (isAdd.value) res = await addPSN(A_EFrom);
+          else res = await editPSN(A_EFrom);
           if (res.code === 200) {
-            ElMessage.success(`${dialogTitle.value}成功`);
+            ElMessage.success(`${A_ETitle.value}成功`);
             allPSNList.value = [];
-            PSNQueryFrom.currentPage = 1;
-            getPSNListFun(); //重新请求数据进行商品规格列表渲染
+            queryFrom.currentPage = 1;
+            getFun(); //重新请求数据进行商品规格列表渲染
             // dialogVisible.value = false; //隐藏弹出框
-          } else ElMessage.error(res.message);
+          }
           loading.value = false;
         } else ElMessage.error("二级规格名称不可为空");
       } else console.log("error submit!", fields);
@@ -558,27 +548,29 @@
   };
 
   //查询商品规格------------------------------
-  const PSNQueryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
-  const queryPSNFun = async () => {
-    PSNQueryFromRef.value?.validate(async (valid, fields) => {
+  const queryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const queryFun = async () => {
+    queryFromRef.value?.validate(async (valid, fields) => {
       if (valid) {
         allPSNList.value = [];
-        PSNQueryFrom.currentPage = 1;
-        getPSNListFun(); //重新请求数据进行商品规格列表渲染
+        queryFrom.currentPage = 1;
+        getFun(); //重新请求数据进行商品规格列表渲染
       } else console.log("error submit!", fields);
     });
   };
 
   // 删除商品规格------------------
-  const delPSNFun = (PSN: PSNType) => {
+  const delFun = (PSN: PSNType) => {
     elMessageBoxConfirm(`删除规格'${PSN.specName}'`, async () => {
+      loading.value = true;
       const res = await delPSN(PSN.specificationsId!);
       if (res.code === 200) {
         ElMessage.success(`删除规格'${PSN.specName}'成功`);
         allPSNList.value = [];
-        PSNQueryFrom.currentPage = 1;
-        getPSNListFun(); //重新请求数据进行商品规格列表渲染
-      } else ElMessage.error(res.message);
+        queryFrom.currentPage = 1;
+        getFun(); //重新请求数据进行商品规格列表渲染
+      }
+      loading.value = false;
     });
   };
 </script>

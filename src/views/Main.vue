@@ -338,7 +338,7 @@
 
   // better scroll----------------------
   const historicalNavigationScroll = ref();
-  let bs: BScrollConstructor<{}> | null = null;
+  let bs: BScrollConstructor<{}>;
   BScroll.use(MouseWheel);
   BScroll.use(ScrollBar);
   BScroll.use(ObserveDOM);
@@ -456,9 +456,9 @@
   //点击退出登录-------------------------------
   const logoutFun = async () => {
     const res = await logout();
-    if (res.code == 200) {
+    if (res.code == 200) 
       reLogIn(res.message);
-    } else ElMessage.error(res.message);
+    
   };
 
   // 个人信息----------------------
@@ -481,7 +481,7 @@
     else done();
   };
   let personalInfoFrom = reactive<userType>({
-    businessId: null,
+    businessId: undefined,
     createTime: "",
     nickName: "",
     phoneNumber: "",
@@ -530,7 +530,7 @@
           ElMessage.success("修改成功");
           showUserInfo();
           editStatus.value = false;
-        } else ElMessage.error(res.message);
+        }
         loading.value = false;
       } else console.log("error submit!", fields);
     });
@@ -581,7 +581,7 @@
         if (res.code === 200) {
           editPasswordStatus.value = false;
           reLogIn("修改成功,请重新登录");
-        } else ElMessage.error(res.message);
+        } 
         loading.value = false;
       } else console.log("error submit!", fields);
     });
