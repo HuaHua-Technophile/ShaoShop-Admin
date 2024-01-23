@@ -51,7 +51,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button :loading="waitQueryUser" @click="queryUserFun"
+        <el-button :loading="loading" @click="queryUserFun"
           >查询</el-button
         >
       </el-form-item>
@@ -67,7 +67,7 @@
             padding: 1px 0 !important;
           ">
           <el-table
-            v-loading="waitQueryUser"
+            v-loading="loading"
             ref="userTableRef"
             :data="allUserList"
             table-layout="auto"
@@ -213,7 +213,7 @@
         </el-form-item>
       </el-form>
       <div class="d-flex justify-content-center">
-        <el-button @click="addOrEditUserFun" :loading="waitAddOrEditUser"
+        <el-button @click="addOrEditUserFun" :loading="loading"
           >确认{{ dialogTitle
           }}<span v-if="!isAddUser"
             >ID: {{ userInfoForm.userId }}</span
@@ -274,7 +274,7 @@
   const defaultPageSize = 20;
   let tableItemHeight: number; //每一项高度
   let tableHeaderHeight: number; //表头高度
-  const waitQueryUser = ref(false);
+  const loading = ref(false);
   const userQueryFrom = reactive({
     userName: "", //账号
     email: "", //绑定邮箱
@@ -286,7 +286,7 @@
   });
   const getUserListFun = async (excessDataCount?: number) => {
     let closePullUp;
-    waitQueryUser.value = true;
+    loading.value = true;
     const res = await getUserList(userQueryFrom);
     console.log(
       `查询条件`,
@@ -318,7 +318,7 @@
         closePullUp = true;
       }
     } else bs.closePullUp();
-    waitQueryUser.value = false;
+    loading.value = false;
     return { closePullUp };
   };
   getUserListFun();
@@ -421,7 +421,6 @@
   const dialogVisible = ref(false);
   const dialogTitle = ref("添加用户");
   const isAddUser = ref(true);
-  const waitAddOrEditUser = ref(false);
   const closeConfirmFun = (done: () => void) => {
     elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
       done();
@@ -445,7 +444,7 @@
   const addOrEditUserFun = async () => {
     dialogFromRef.value!.validate(async (valid, fields) => {
       if (valid) {
-        waitAddOrEditUser.value = true;
+        loading.value = true;
         let res;
         if (isAddUser.value) res = await addUser(userInfoForm);
         else res = await editUser(userInfoForm);
@@ -456,7 +455,7 @@
           getUserListFun(); //重新请求数据进行用户列表渲染
           // dialogVisible.value = false; //隐藏弹出框
         } else ElMessage.error(res.message);
-        waitAddOrEditUser.value = false;
+        loading.value = false;
       } else console.log("error submit!", fields);
     });
   };

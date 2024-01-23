@@ -295,7 +295,7 @@
               <el-button
                 @click="savePersonalInfo"
                 v-if="editStatus"
-                :loading="waitEditPersonalInfo"
+                :loading="loading"
                 >确认保存修改</el-button
               >
               <el-button @click="editPersonalInfo" v-else
@@ -332,6 +332,7 @@
   import BScroll from "@better-scroll/core"; //bs核心
   import MouseWheel from "@better-scroll/mouse-wheel"; //引入鼠标滚动插件
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条插件
+  import ObserveDOM from "@better-scroll/observe-dom"; //自动重载
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //betterscroll的TS类型
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm/elMessageBoxConfirm";
 
@@ -340,6 +341,7 @@
   let bs: BScrollConstructor<{}> | null = null;
   BScroll.use(MouseWheel);
   BScroll.use(ScrollBar);
+  BScroll.use(ObserveDOM);
   onMounted(() => {
     bs = new BScroll(historicalNavigationScroll.value, {
       scrollX: true,
@@ -349,6 +351,7 @@
         fade: true,
         interactive: true,
       },
+      observeDOM: true,
     });
   });
 
@@ -412,7 +415,6 @@
       });
     }
     await nextTick();
-    bs?.refresh();
     bs?.scrollToElement(".Btn-" + index.replace("/main/", ""), 500, true, true);
   };
 
@@ -443,7 +445,6 @@
         }
       }
       await nextTick();
-      bs?.refresh(); //同时重新实例化BS
       // console.log(item.path, active.value);
     }
     // 点击的不是关闭按钮,就跳转点击项
@@ -508,7 +509,7 @@
   });
   const personalInfoFormRef = ref<FormInstance>();
   const editStatus = ref(false);
-  const waitEditPersonalInfo = ref(false);
+  const loading = ref(false);
   const showUserInfo = async () => {
     const res = await getUserInfo();
     console.log("个人信息=>", res.data);
@@ -523,14 +524,14 @@
   const savePersonalInfo = () => {
     personalInfoFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
-        waitEditPersonalInfo.value = true;
+        loading.value = true;
         let res = await updateUserInfo(personalInfoFrom);
         if (res.code === 200) {
           ElMessage.success("修改成功");
           showUserInfo();
           editStatus.value = false;
         } else ElMessage.error(res.message);
-        waitEditPersonalInfo.value = false;
+        loading.value = false;
       } else console.log("error submit!", fields);
     });
   };
@@ -568,21 +569,20 @@
     ],
   });
   const editPasswordStatus = ref(false);
-  const waitEditPassword = ref(false);
   const editPassword = () => {
     editPasswordStatus.value = true;
   };
   const savePassword = () => {
     passwordFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
-        waitEditPassword.value = true;
+        loading.value = true;
         let res = await updateUserPassword(passwordForm);
         console.log(res);
         if (res.code === 200) {
           editPasswordStatus.value = false;
           reLogIn("修改成功,请重新登录");
         } else ElMessage.error(res.message);
-        waitEditPassword.value = false;
+        loading.value = false;
       } else console.log("error submit!", fields);
     });
   };

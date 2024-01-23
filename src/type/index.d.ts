@@ -2,6 +2,12 @@ export type QueryType = {
   pageSize: number; //每页条数
   currentPage: number; //当前页码
 };
+export type TimeType = {
+  createBy?: string; //创建者
+  createTime?: string; //创建时间
+  updateBy?: string; //最后更新者
+  updateTime?: string; //最后更新时间
+};
 // 左侧用户菜单
 export type authMenuListType = {
   path: string;
@@ -53,7 +59,6 @@ export type iconType = {
   align?: string;
   onLoad?: Function;
   includes?: Function;
-
   //  all icon
   style?: object;
 };
@@ -87,8 +92,6 @@ export type roleType = {
   admin?: boolean; //是否是超级管理员
   businessId: string; //商户id
   companyCheckStrictly: boolean; //公司树选择项是否关联显示
-  createBy?: string; //创建者
-  createTime?: string; //创建时间
   dataScope: number; //权限范围 1=所有数据权限,2=自定义数据权限,3=本部门数据权限,4=本部门及以下数据权限,5=仅本人数据权限
   menuCheckStrictly: boolean; //菜单树选择项是否关联显示
   remark: string; //备注
@@ -96,13 +99,13 @@ export type roleType = {
   roleKey?: string; //角色权限字符串
   roleSort: number; //角色排序
   status: number; //角色状态 0正常 1停用
-  updateBy?: string; //最后更新者
-  updateTime?: string; //最后更新时间
   params?: string; //数据��限
+
   menuIds?: number[]; //菜单id集合
+  menuTreeList?: treeListType[]; //菜单树形结构集合
   userList?: userType[]; //用户集合
   selectList?: (number | undefined)[]; //选中用户id集合,用于取消授权
-};
+} & TimeType;
 // 字典类型-类型
 export type dictType = {
   dictId?: number; //字典类型id
@@ -110,18 +113,10 @@ export type dictType = {
   dictName: string; //字典名称
   status?: number | null; //状态（0正常 1停用）
   sysDictDataList?: dictDataType[];
-  createBy?: string; //创建者
-  createTime?: string; //创建时间
-  updateBy?: string; //更新者
-  updateTime?: string; //更新时间
   remark?: string; //备注
-};
+} & TimeType;
 // 字典数据类型
 export type dictDataType = {
-  createBy?: string; //创建者
-  createTime?: string; //创建时间
-  updateBy?: string; //更新者
-  updateTime?: string; //更新时间
   cssClass: string; //样式属性（其他样式扩展）
   dictCode?: number; //字典数据编码(自增,类似于排序)
   dictLabel: string; //字典数据标签
@@ -132,20 +127,16 @@ export type dictDataType = {
   listClass: string; //表格回显样式
   remark: string; //备注
   status?: number; //状态（0正常 1停用）
-};
+} & TimeType;
 // 站内信类型
 export type systemMessageType = {
-  createBy: string;
-  createTime: string;
-  updateBy: string;
-  updateTime: string;
   id: number; //可以理解为序号
   isRead: boolean; //是否已读
   messageContent: string; //消息本体
   messageId: number; //站内信ID
   receiverId: number; //收件用户ID
   receiverName: string; //收件用户
-};
+} & TimeType;
 // 站内信查询类型
 export type messageQueryType = {
   timePeriod: string[] | null; //创建时间
@@ -180,12 +171,3 @@ export type PCType = {
   parentClassificationNumber: number | null;
   remark: string;
 };
-// 商品分类编辑类型
-/* export type PCEditType = {
-  classificationLevel: number | null;
-  classificationName: string;
-  classificationSort: number;
-  id: number;
-  parentClassificationNumber: number | null;
-  remark: number;
-}; */

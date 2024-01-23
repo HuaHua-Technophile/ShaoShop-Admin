@@ -1,5 +1,6 @@
 <template>
   <div class="w-100 h-100 p-3 position-relative">
+    <!-- 角色列表 -->
     <div ref="roleListWrapper" class="w-100 h-100 overflow-hidden rounded-4">
       <div
         style="
@@ -243,7 +244,7 @@
         <el-form-item label="关联菜单" style="padding-left: 10.18px">
           <el-tree-select
             v-model="roleInfoForm.menuIds"
-            :data="menuTreeList"
+            :data="roleInfoForm.menuTreeList"
             show-checkbox
             multiple
             check-strictly
@@ -295,7 +296,7 @@
         </el-form-item>
       </el-form>
       <div class="d-flex justify-content-center">
-        <el-button @click="addOrEditRoleFun" :loading="waitAddOrEditRole"
+        <el-button @click="addOrEditRoleFun" :loading="loading"
           >确认{{ dialogTitle
           }}<span v-if="!isAddRole"
             >ID: {{ roleInfoForm.roleId }}</span
@@ -319,7 +320,7 @@
             @click="revokeUserFun"
             class="ms-3"
             :disabled="revokeUserSelectList.length == 0"
-            :loading="waitRevokeUser"
+            :loading="loading"
             >确认授权{{ revokeUserSelectList.length }}个用户</el-button
           >
         </div>
@@ -376,7 +377,7 @@
   import ObserveDOM from "@better-scroll/observe-dom"; //自动重载
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll"; //bs类型
   import { nextTick, onMounted, reactive, ref } from "vue";
-  import { roleType, treeListType, userType } from "@/type";
+  import { roleType, userType } from "@/type";
   import { ElMessage, FormInstance, TableInstance } from "element-plus";
   import { cloneDeep } from "lodash";
   import { storeToRefs } from "pinia";
@@ -404,10 +405,10 @@
   BScroll.use(NestedScroll);
   BScroll.use(ObserveDOM);
   const roleListWrapper = ref();
-  let bsOuter: BScrollConstructor<{}>;
+  let bs: BScrollConstructor<{}>;
   const bsInners = ref<{ [key: number]: BScrollConstructor }>({}); //bs实例
   onMounted(() => {
-    bsOuter = new BScroll(roleListWrapper.value, {
+    bs = new BScroll(roleListWrapper.value, {
       scrollbar: true,
       mouseWheel: true,
       nestedScroll: {
@@ -417,10 +418,10 @@
     });
   });
   const expandChangeFun = async (row: roleType, expandedRows: roleType[]) => {
-    // 如果是展开就重载数据,并且延迟实例化内层BetterScroll
-    loading.value = true;
+    // 如果是展开就重载数据
+    loading.value = true; //禁止操作,以防在一次性重载大量数据时页面卡顿,而多次点击展开收起
     if (expandedRows.includes(row))
-      await getAllocatedListFun(row.roleId!, Boolean(row.userList));
+      getAllocatedListFun(row.roleId!, Boolean(row.userList));
     else {
       bsInners.value[row.roleId!]?.destroy();
       loading.value = false;
@@ -437,7 +438,7 @@
     column;
     cell;
     if (event.target.className.includes("bi-pencil-square"))
-      editRoleDialog(row);
+      editRoleDialog(row.roleId!, !Boolean(row.menuTreeList));
     if (event.target.className.includes("bi-trash"))
       delRoleFun(row.roleId!, row.roleName);
   };
@@ -464,9 +465,7 @@
   //dialog对话框-----------------
   const roleDialogVisible = ref(false);
   const dialogTitle = ref("添加角色");
-  const waitAddOrEditRole = ref(false);
   const isAddRole = ref(true);
-  const menuTreeList = ref<treeListType[]>([]);
   const closeConfirmTitle = ref("");
   const closeConfirm = (done: () => void) => {
     elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
@@ -478,31 +477,36 @@
   //添加/修改角色-----------------------
   const addRoleDialog = async () => {
     roleInfoForm = reactive(cloneDeep(defaultRoleInfo));
-    isAddRole.value = true;
-    roleDialogVisible.value = true;
-    dialogTitle.value = closeConfirmTitle.value = "添加角色";
-    const res = await getMenuTreeList();
-    if (res.code == 200) {
-      console.log("获取的菜单树=>", res.data);
-      menuTreeList.value = res.data;
+    if (!roleInfoForm.menuTreeList) {
+      const res = await getMenuTreeList();
+      if (res.code == 200) {
+        console.log("获取的菜单树=>", res.data);
+        roleInfoForm.menuTreeList = res.data;
+      }
     }
-  };
-  const editRoleDialog = async (role: roleType) => {
-    roleInfoForm = reactive(cloneDeep(role));
+    isAddRole.value = true;
+    dialogTitle.value = closeConfirmTitle.value = "添加角色";
     roleDialogVisible.value = true;
+  };
+  const editRoleDialog = async (id: number, needLoad: boolean) => {
+    const index = roleList.value?.findIndex((i) => i.roleId == id);
+    if (needLoad) {
+      const res = await getRoleMenuTreeSelect(id);
+      if (res.code == 200) {
+        console.log(`id${id}的菜单树=>`, res.data);
+        roleList.value![index!].menuTreeList = res.data.menus;
+        roleList.value![index!].menuIds = res.data.checkedKeys;
+      }
+    }
+    roleInfoForm = reactive(cloneDeep(roleList.value![index!]));
     isAddRole.value = false;
     dialogTitle.value = closeConfirmTitle.value = "修改角色";
-    const res = await getRoleMenuTreeSelect(role.roleId!);
-    if (res.code == 200) {
-      console.log(`id${role.roleId}的菜单树=>`, res.data);
-      menuTreeList.value = res.data.menus;
-      roleInfoForm.menuIds = res.data.checkedKeys;
-    }
+    roleDialogVisible.value = true;
   };
   const addOrEditRoleFun = async () => {
     dialogFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
-        waitAddOrEditRole.value = true;
+        loading.value = true;
         let res;
         if (isAddRole.value) res = await addRole(roleInfoForm);
         else res = await editRole(roleInfoForm);
@@ -510,10 +514,8 @@
         if (res.code == 200) {
           getRoleListFun();
           roleDialogVisible.value = false; //隐藏弹出框
-        } else {
-          ElMessage.error(res.message);
-        }
-        waitAddOrEditRole.value = false;
+        } else ElMessage.error(res.message);
+        loading.value = false;
       } else console.log("error submit!", fields);
     });
   };
@@ -535,7 +537,6 @@
   const UnallocatedList = ref<userType[]>([]);
   const revokeUserSelectList = ref<(number | undefined)[]>([]);
   const revokeUserForRoleId = ref(-1);
-  const waitRevokeUser = ref(false);
   const revokeUserSelectionChange = (val: userType[]) => {
     revokeUserSelectList.value = val.map((i) => {
       return i.userId;
@@ -575,12 +576,12 @@
     UnallocatedList.value = res.data;
   };
   const revokeUserFun = async () => {
-    waitRevokeUser.value = true;
+    loading.value = true;
     const res = await revokeUser(
       revokeUserForRoleId.value,
       revokeUserSelectList.value
     );
-    waitRevokeUser.value = false;
+    loading.value = false;
     if (res.code === 200) {
       ElMessage.success(`授权${revokeUserSelectList.value.length}个用户成功`);
       getAllocatedListFun(revokeUserForRoleId.value);

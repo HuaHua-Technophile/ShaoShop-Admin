@@ -38,9 +38,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button :loading="waitQueryDict" @click="queryDictFun"
-          >查询</el-button
-        >
+        <el-button :loading="loading" @click="queryDictFun">查询</el-button>
       </el-form-item>
     </el-form>
     <!-- 字典列表 -->
@@ -54,7 +52,7 @@
             padding: 1px 0 !important;
           ">
           <el-table
-            v-loading="waitQueryDict"
+            v-loading="loading"
             ref="dictTableRef"
             :data="allDictList"
             table-layout="auto"
@@ -328,7 +326,7 @@
       </el-form>
       <!-- 通用确认按钮 -->
       <div class="d-flex justify-content-center">
-        <el-button @click="addOrEdit_DictOrDictDataFun" :loading="waitAddOrEdit"
+        <el-button @click="addOrEdit_DictOrDictDataFun" :loading="loading"
           >确认{{ dialogTitle }}
           <span v-if="!isAdd && isDict">ID: {{ dictInfoForm.dictId }}</span>
           <span v-if="!isAdd && !isDict"
@@ -368,7 +366,7 @@
 
   // 不传参数的情况下，就是获取所有字典。传参数的情况下可用作搜索
   const allDictList = ref<dictType[]>([]);
-  const waitQueryDict = ref(false);
+  const loading = ref(false);
   const dictQueryFrom = reactive({
     dictName: "",
     dictType: "",
@@ -376,7 +374,7 @@
   });
   const getDictListFun = async () => {
     allDictList.value = [];
-    waitQueryDict.value = true;
+    loading.value = true;
     console.log("字典查询条件=>", dictQueryFrom);
     const res = await getDictList(dictQueryFrom);
     console.log("字典查询结果=>", res);
@@ -384,7 +382,7 @@
       ElMessage.success("字典查询成功");
       allDictList.value = res.data.records;
     } else ElMessage.error(res.message);
-    waitQueryDict.value = false;
+    loading.value = false;
   };
   getDictListFun();
 
@@ -460,7 +458,6 @@
   //dialog弹出框--------------------
   const dialogVisible = ref(false);
   const dialogTitle = ref("");
-  const waitAddOrEdit = ref(false);
   const isAdd = ref(true);
   const isDict = ref(true);
   const closeConfirm = (done: () => void) => {
@@ -509,7 +506,7 @@
     // 先进行表单验证
     formEl!.validate(async (valid, fields) => {
       if (valid) {
-        waitAddOrEdit.value = true;
+        loading.value = true;
         let res;
         if (isAdd.value && isDict.value) res = await addDict(dictInfoForm);
         if (!isAdd.value && isDict.value) res = await editDict(dictInfoForm);
@@ -523,7 +520,7 @@
         } else {
           ElMessage.error(res!.message);
         }
-        waitAddOrEdit.value = false;
+        loading.value = false;
       } else console.log("error submit!", fields);
     });
   };

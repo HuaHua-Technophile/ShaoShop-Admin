@@ -8,7 +8,7 @@
           padding: 1px 0 !important;
         ">
         <el-table
-          v-loading="waitQueryMenu"
+          v-loading="loading"
           :data="menuList"
           table-layout="auto"
           header-cell-class-name="text-center text-body"
@@ -408,7 +408,7 @@
         </el-form-item>
       </el-form>
       <div class="d-flex justify-content-center">
-        <el-button @click="addOrEditMenuFun" :loading="waitAddOrEditMenu"
+        <el-button @click="addOrEditMenuFun" :loading="loading"
           >确认{{ dialogTitle
           }}<span v-if="!isAddMenu"
             >ID: {{ menuInfoForm.menuId }}</span
@@ -441,14 +441,14 @@
   //修改主题------------------------------------------
   const { darkTheme } = storeToRefs(useDarkThemeStore());
   //获取菜单-----------------------
-  const waitQueryMenu = ref(false);
+  const loading = ref(false);
   const menuList = ref<roleMenuType[]>();
   const getMenuListFun = async () => {
-    waitQueryMenu.value = true;
+    loading.value = true;
     let res = await getMenuList();
     console.log("获取菜单列表=>", res);
     menuList.value = res.data;
-    waitQueryMenu.value = false;
+    loading.value = false;
   };
   getMenuListFun();
 
@@ -510,7 +510,6 @@
   //dialog弹出框--------------------
   const menuDialogVisible = ref(false);
   const dialogTitle = ref("添加菜单");
-  const waitAddOrEditMenu = ref(false);
   const isAddMenu = ref(true);
   const closeConfirmFun = (done: () => void) => {
     elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
@@ -535,7 +534,7 @@
   const addOrEditMenuFun = async () => {
     dialogFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
-        waitAddOrEditMenu.value = true;
+        loading.value = true;
         let res;
         if (isAddMenu.value) res = await addMenu(menuInfoForm);
         else res = await editMenu(menuInfoForm);
@@ -544,7 +543,7 @@
           menuDialogVisible.value = false; //隐藏弹出框
           ElMessage.success(`${dialogTitle.value}成功`);
         } else ElMessage.error(res.message);
-        waitAddOrEditMenu.value = false;
+        loading.value = false;
       } else console.log("error submit!", fields);
     });
   };

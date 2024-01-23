@@ -49,7 +49,7 @@
       draggable
       center>
       <template #header>
-        <el-button @click="addOrEditPCFun" :loading="waitAddOrEditPC"
+        <el-button @click="addOrEditPCFun" :loading="loading"
           >确认{{ dialogTitle
           }}<span v-if="!isAddPC">ID: {{ PCForm.specNameId }}</span></el-button
         >
@@ -133,7 +133,7 @@
   const defaultPageSize = 20;
   let tableItemHeight: number; //每一项高度
   let tableHeaderHeight: number; //表头高度
-  const waitQueryPC = ref(false);
+  const loading = ref(false);
   const PCQueryFrom = reactive<PCQueryType>({
     id: null, //分类编号
     parentClassificationNumber: null, //父级分类编号
@@ -146,9 +146,9 @@
   const queryRules = reactive({});
   const getPCListFun = async (excessDataCount?: number) => {
     let closePullUp;
-    waitQueryPC.value = true;
+    loading.value = true;
     const res = await getPCList(PCQueryFrom);
-    waitQueryPC.value = false;
+    loading.value = false;
     console.log(
       `查询条件`,
       PCQueryFrom,
@@ -159,7 +159,6 @@
       if (excessDataCount) res.data.records.splice(0, excessDataCount);
       allPCList.value.push(...res.data.records);
       await nextTick();
-      bs.refresh();
 
       // 每次请求都重新赋值总页数
       allPageCount.value = ceil(Number(res.data.total) / defaultPageSize);
@@ -259,7 +258,6 @@
   const dialogVisible = ref(false);
   const dialogTitle = ref("添加商品分类");
   const isAddPC = ref(true);
-  const waitAddOrEditPC = ref(false);
   const closeConfirmFun = (done: () => void) => {
     elMessageBoxConfirm(`放弃${dialogTitle.value}`, () => {
       done();

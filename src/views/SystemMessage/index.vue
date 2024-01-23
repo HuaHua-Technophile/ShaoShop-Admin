@@ -34,9 +34,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button :loading="waitQueryMessage" @click="queryMessageFun"
-          >查询</el-button
-        >
+        <el-button :loading="loading" @click="queryMessageFun">查询</el-button>
       </el-form-item>
     </el-form>
     <!-- 消息列表模块 -->
@@ -50,7 +48,7 @@
             padding: 1px 0 !important;
           ">
           <el-table
-            v-loading="waitQueryMessage"
+            v-loading="loading"
             :data="systemMessageList"
             table-layout="auto"
             class="bg-body rounded-4"
@@ -160,7 +158,7 @@
   const defaultPageSize = 20;
   let tableItemHeight: number; //每一项高度
   let tableHeaderHeight: number; //表头高度
-  const waitQueryMessage = ref(false);
+  const loading = ref(false);
   const messageQueryFrom = reactive<messageQueryType>({
     timePeriod: null, //发送时间
     read: null, //是否已读
@@ -169,9 +167,9 @@
   });
   const getSystemMessageFun = async (excessDataCount?: number) => {
     let closePullUp;
-    waitQueryMessage.value = true;
+    loading.value = true;
     const res = await getSystemMessage(messageQueryFrom);
-    waitQueryMessage.value = false;
+    loading.value = false;
     console.log(
       `查询条件`,
       messageQueryFrom,
