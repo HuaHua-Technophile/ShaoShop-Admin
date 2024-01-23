@@ -5,47 +5,60 @@
       :model="queryFrom"
       ref="queryFromRef"
       :rules="queryRules"
-      class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
-      <div class="flex-grow-1 d-flex align-items-center">
-        <el-form-item class="col-3 pe-3" label="用户账号" prop="userName">
-          <el-input
-            clearable
-            maxlength="12"
-            v-model.trim="queryFrom.userName"
-            placeholder="每个后台主体唯一名称"
-            :prefix-icon="renderFontIcon('bi bi-person')" />
-        </el-form-item>
-        <el-form-item class="col-3 pe-3" label="绑定邮箱" prop="email">
-          <el-input
-            clearable
-            maxlength="20"
-            v-model.trim="queryFrom.email"
-            placeholder="每个后台主体唯一邮箱"
-            :prefix-icon="renderFontIcon('bi bi-envelope')" />
-        </el-form-item>
-        <el-form-item class="col-3 pe-3" label="绑定电话" prop="phoneNumber">
-          <el-input
-            clearable
-            maxlength="11"
-            v-model.trim="queryFrom.phoneNumber"
-            placeholder="每个后台主体唯一手机号"
-            :prefix-icon="renderFontIcon('bi bi-telephone')" />
-        </el-form-item>
-        <el-form-item class="col-3 pe-3" label="部门主体" prop="nickName">
-          <el-input
-            clearable
-            maxlength="12"
-            v-model.trim="queryFrom.nickName"
-            placeholder="运营部/物流部/..."
-            :prefix-icon="renderFontIcon('bi bi-people')" />
-        </el-form-item>
-      </div>
-      <el-form-item class="flex-shrink-0 pe-3" label="帐号状态" prop="status">
+      class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-0 px-sm-1 px-md-2 px-lg-3">
+      <el-form-item
+        label="用户账号"
+        prop="userName"
+        class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
+        <el-input
+          clearable
+          maxlength="12"
+          v-model.trim="queryFrom.userName"
+          placeholder="每个后台主体唯一名称"
+          :prefix-icon="renderFontIcon('bi bi-person')" />
+      </el-form-item>
+      <el-form-item
+        label="绑定邮箱"
+        prop="email"
+        class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
+        <el-input
+          clearable
+          maxlength="20"
+          v-model.trim="queryFrom.email"
+          placeholder="每个后台主体唯一邮箱"
+          :prefix-icon="renderFontIcon('bi bi-envelope')" />
+      </el-form-item>
+      <el-form-item
+        label="绑定电话"
+        prop="phoneNumber"
+        class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
+        <el-input
+          clearable
+          maxlength="11"
+          v-model.trim="queryFrom.phoneNumber"
+          placeholder="每个后台主体唯一手机号"
+          :prefix-icon="renderFontIcon('bi bi-telephone')" />
+      </el-form-item>
+      <el-form-item
+        label="部门主体"
+        prop="nickName"
+        class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
+        <el-input
+          clearable
+          maxlength="12"
+          v-model.trim="queryFrom.nickName"
+          placeholder="运营部/物流部/..."
+          :prefix-icon="renderFontIcon('bi bi-people')" />
+      </el-form-item>
+      <el-form-item
+        label="帐号状态"
+        prop="status"
+        class="flex-shrink-0 me-0 me-md-1 me-lg-2">
         <el-select
           v-model="queryFrom.status"
           placeholder="正常/停用"
           clearable
-          style="width: 113px">
+          style="width: 106px">
           <el-option label="正常" :value="0" />
           <el-option label="停用" :value="1" />
         </el-select>
@@ -55,7 +68,7 @@
       </el-form-item>
     </el-form>
     <!-- 用户列表模块 -->
-    <div class="flex-grow-1 overflow-hidden p-3">
+    <div class="flex-grow-1 overflow-hidden p-0 p-sm-1 p-md-2 p-lg-3">
       <div
         ref="bsWrapper"
         class="bsWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
@@ -150,6 +163,12 @@
       class="rounded-4"
       draggable
       center>
+      <template #header>
+        <el-button @click="A_EFun" :loading="loading"
+          >确认{{ A_ETitle
+          }}<span v-if="!isAdd">ID: {{ A_EFrom.userId }}</span></el-button
+        >
+      </template>
       <el-form :model="A_EFrom" ref="A_EFromRef" :rules="A_ERules">
         <el-form-item label="用户账号" prop="userName">
           <el-input
@@ -202,7 +221,8 @@
         <el-form-item
           label="用户备注"
           prop="remark"
-          style="padding-left: 10.18px">
+          style="padding-left: 10.18px"
+          class="mb-0">
           <el-input
             clearable
             v-model.trim="A_EFrom.remark"
@@ -210,12 +230,6 @@
             :prefix-icon="renderFontIcon('fa-solid fa-marker')" />
         </el-form-item>
       </el-form>
-      <div class="d-flex justify-content-center">
-        <el-button @click="A_EFun" :loading="loading"
-          >确认{{ A_ETitle
-          }}<span v-if="!isAdd">ID: {{ A_EFrom.userId }}</span></el-button
-        >
-      </div>
     </el-dialog>
     <!-- 右下角悬浮跳页按钮 -->
     <Transition

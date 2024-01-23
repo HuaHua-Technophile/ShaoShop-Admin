@@ -1,7 +1,7 @@
 <template>
   <el-container class="vw-100 vh-100 overflow-x-hidden">
     <!-- 左侧(菜单) -->
-    <el-aside width="180px" class="d-flex flex-column">
+    <el-aside width="150px" class="d-flex flex-column">
       <div
         class="flex-shrink-0 pt-3 border-end text-center text-uppercase fs-4"
         style="font-family: YouSheBiaoTiHei">
@@ -39,11 +39,11 @@
     <!-- 右侧 -->
     <el-container>
       <!-- 右侧头部 -->
-      <el-header>
+      <el-header class="px-0 px-sm-1 px-md-2 px-lg-3">
         <div class="w-100 h-100 d-flex align-items-center">
           <!-- 历史路由 -->
           <div
-            class="position-relative flex-grow-1 me-3 overflow-x-hidden"
+            class="position-relative flex-grow-1 me-0 me-sm-1 me-md-2 me-lg-3 overflow-x-hidden"
             style="padding: 7px 0">
             <!-- BS滚动条会自动附着在最近的相对定位父元素，为了避免BS滚动条覆盖历史路由item，外面套一层 -->
             <div
@@ -66,7 +66,7 @@
                   class="historicalNavigation border rounded-top p-1 d-flex align-items-center position-relative text-nowrap"
                   :class="[
                     {
-                      'me-2':
+                      'me-0 me-md-1 me-lg-2':
                         index <
                         historicalNavigationStore.historicalNavigation.length -
                           1,
@@ -90,7 +90,7 @@
             <!-- 站内信未读消息数量 -->
             <routerLink
               to="/main/SystemMessage"
-              class="text-decoration-none text-body me-4">
+              class="text-decoration-none text-body me-2 me-md-3 me-lg-4">
               <el-badge
                 :value="unReadMessage"
                 :type="unReadMessage == 0 ? 'info' : 'danger'">
@@ -99,7 +99,8 @@
             </routerLink>
             <!-- 用户退出登录 -->
             <el-dropdown>
-              <div class="d-flex align-items-center me-3">
+              <div
+                class="d-flex align-items-center me-0 me-sm-1 me-md-2 me-lg-3">
                 <el-avatar
                   :size="38"
                   shape="square"
@@ -456,9 +457,7 @@
   //点击退出登录-------------------------------
   const logoutFun = async () => {
     const res = await logout();
-    if (res.code == 200) 
-      reLogIn(res.message);
-    
+    if (res.code == 200) reLogIn(res.message);
   };
 
   // 个人信息----------------------
@@ -581,7 +580,7 @@
         if (res.code === 200) {
           editPasswordStatus.value = false;
           reLogIn("修改成功,请重新登录");
-        } 
+        }
         loading.value = false;
       } else console.log("error submit!", fields);
     });

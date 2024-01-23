@@ -3,11 +3,61 @@
     <!-- 根据分类名称搜索 -->
     <el-form
       :model="queryFrom"
-      ref="PCQueryFromRef"
+      ref="queryFromRef"
       :rules="queryRules"
-      class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4"></el-form>
+      class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-0 px-sm-1 px-md-2 px-lg-3">
+      <el-form-item
+        label="分类名称"
+        prop="classificationName"
+        class="flex-grow-1 overflow-hidden me-0 me-sm-1 me-md-2 me-lg-3">
+        <el-input
+          clearable
+          maxlength="12"
+          v-model.trim="queryFrom.classificationName"
+          placeholder="分类名称"
+          :prefix-icon="renderFontIcon('fa-solid fa-quote-left')" />
+      </el-form-item>
+      <el-form-item
+        label="分类ID"
+        prop="id"
+        class="flex-grow-1 overflow-hidden me-0 me-sm-1 me-md-2 me-lg-3">
+        <el-input
+          clearable
+          maxlength="12"
+          v-model.trim="queryFrom.id"
+          placeholder="分类ID"
+          :prefix-icon="renderFontIcon('bi bi-123')" />
+      </el-form-item>
+      <el-form-item
+        label="父分类ID"
+        prop="parentClassificationNumber"
+        class="flex-grow-1 overflow-hidden me-0 me-sm-1 me-md-2 me-lg-3">
+        <el-input
+          clearable
+          maxlength="12"
+          v-model.trim="queryFrom.parentClassificationNumber"
+          placeholder="父分类ID"
+          :prefix-icon="renderFontIcon('bi bi-diagram-3')" />
+      </el-form-item>
+      <el-form-item
+        label="分类状态"
+        prop="status"
+        class="flex-shrink-0 me-0 me-sm-1 me-md-2 me-lg-3">
+        <el-select
+          v-model="queryFrom.status"
+          placeholder="正常/停用"
+          clearable
+          style="width: 106px">
+          <el-option label="正常" :value="0" />
+          <el-option label="停用" :value="1" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button :loading="loading" @click="queryFun">查询</el-button>
+      </el-form-item>
+    </el-form>
     <!-- 商品分类列表 -->
-    <div class="flex-grow-1 overflow-hidden p-3">
+    <div class="flex-grow-1 overflow-hidden p-0 p-sm-1 p-md-2 p-lg-3">
       <div
         ref="bsWrapper"
         class="bsWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
@@ -126,6 +176,13 @@
                 scope.row.subClassifications.length
               }}</template>
             </el-table-column>
+            <el-table-column prop="status" label="状态">
+              <template #default="scope">
+                <el-tag :type="scope.row.status == 0 ? 'success' : 'danger'">{{
+                  scope.row.status == 0 ? "正常" : "停用"
+                }}</el-tag>
+              </template>
+            </el-table-column>
             <el-table-column prop="updateBy" label="更新者" />
             <el-table-column prop="updateTime" label="更新时间">
               <template #default="scope">
@@ -176,7 +233,7 @@
       <template #header>
         <el-button @click="A_EFun" :loading="loading"
           >确认{{ A_ETitle
-          }}<span v-if="!isAdd">ID: {{ A_EForm.specNameId }}</span></el-button
+          }}<span v-if="!isAdd">ID: {{ A_EForm.id }}</span></el-button
         >
       </template>
       <el-form :model="A_EForm" ref="A_EFormRef" :rules="A_ERules">
@@ -215,11 +272,22 @@
         <el-form-item
           label="分类排序"
           prop="classificationSort"
-          style="padding-left: 10.18px">
+          style="padding-left: 10.18px"
+          class="mb-2">
           <el-input-number
             v-model="A_EForm.classificationSort"
             :min="0"
             :max="999" />
+        </el-form-item>
+        <el-form-item
+          label="分类状态"
+          prop="status"
+          class="d-flex align-items-center mb-0"
+          style="padding-left: 10.18px">
+          <el-radio-group v-model="A_EForm.status">
+            <el-radio :label="0" size="large">正常</el-radio>
+            <el-radio :label="1" size="large">停用</el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -261,18 +329,15 @@
   const queryFrom = reactive<PCQueryType>({
     id: undefined, //分类编号
     parentClassificationNumber: undefined, //父级分类编号
-    classificationLevel: undefined,
     classificationName: "",
     status: undefined, //状态（0正常 1停用）
     currentPage: 1, //请求的页码
     pageSize: defaultPageSize, //每页返回的数量
   });
-  const queryRules = reactive({});
   const getFun = async (excessDataCount?: number) => {
-    let closePullUp;
     loading.value = true;
+    let closePullUp;
     const res = await getPCList(queryFrom);
-    loading.value = false;
     console.log(
       `查询条件`,
       queryFrom,
@@ -306,6 +371,7 @@
         closePullUp = true;
       }
     } else bs.closePullUp();
+    loading.value = false;
     return { closePullUp };
   };
   getFun();
@@ -374,6 +440,7 @@
     classificationSort: 0, //分类排序
     parentClassificationNumber: undefined, //父编号
     remark: "", //备注
+    status: 0, //0正常 1停用
   };
   let A_EForm = reactive(defaultA_EForm);
   const A_ERules = reactive({
@@ -404,14 +471,18 @@
     A_ETitle.value = "添加商品分类";
   };
   const toEdit = async (PC: PCType) => {
-    let res = await getPCificationList(PC.specificationsId);
-    if (res.code == 200) {
-      console.log(`获取到ID${PC.specificationsId}的商品分类=>`, res.data);
-      A_EForm = reactive(cloneDeep(res.data));
-      A_EVisible.value = true;
-      isAdd.value = false;
-      A_ETitle.value = "修改商品分类";
-    }
+    // A_EForm = reactive(cloneDeep(PC));
+    A_EForm = reactive({
+      classificationName: PC.classificationName,
+      classificationSort: PC.classificationSort,
+      id: PC.id,
+      parentClassificationNumber: PC.parentClassificationNumber,
+      remark: PC.remark,
+      status: PC.status,
+    });
+    A_EVisible.value = true;
+    isAdd.value = false;
+    A_ETitle.value = "修改商品分类";
   };
   const A_EFun = async () => {
     A_EFormRef.value!.validate(async (valid, fields) => {
@@ -428,6 +499,19 @@
           ElMessage.success(`${A_ETitle.value}成功`);
         }
         loading.value = false;
+      } else console.log("error submit!", fields);
+    });
+  };
+
+  //查询分类-------------------------------------
+  const queryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const queryRules = reactive({});
+  const queryFun = async () => {
+    queryFromRef.value!.validate(async (valid, fields) => {
+      if (valid) {
+        allPCList.value = [];
+        queryFrom.currentPage = 1;
+        await getFun();
       } else console.log("error submit!", fields);
     });
   };

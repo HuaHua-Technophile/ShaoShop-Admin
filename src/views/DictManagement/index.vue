@@ -4,11 +4,11 @@
     <el-form
       :model="queryFrom"
       ref="queryFromRef"
-      class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
+      class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-0 px-sm-1 px-md-2 px-lg-3">
       <el-form-item
-        class="col-3 pe-3 flex-grow-1"
         label="字典名称"
-        prop="dictName">
+        prop="dictName"
+        class="flex-grow-1 overflow-hidden me-0 me-sm-1 me-md-2 me-lg-3">
         <el-input
           clearable
           maxlength="10"
@@ -17,9 +17,9 @@
           :prefix-icon="renderFontIcon('fa-solid fa-quote-left')" />
       </el-form-item>
       <el-form-item
-        class="col-3 pe-3 flex-grow-1"
         label="字典类型"
-        prop="dictType">
+        prop="dictType"
+        class="flex-grow-1 overflow-hidden me-0 me-sm-1 me-md-2 me-lg-3">
         <el-input
           clearable
           maxlength="20"
@@ -27,12 +27,15 @@
           placeholder="字典类型"
           :prefix-icon="renderFontIcon('fa-solid fa-code')" />
       </el-form-item>
-      <el-form-item class="flex-shrink-0 pe-3" label="字典状态" prop="status">
+      <el-form-item
+        label="字典状态"
+        prop="status"
+        class="flex-shrink-0 me-0 me-sm-1 me-md-2 me-lg-3">
         <el-select
           v-model="queryFrom.status"
           placeholder="正常/停用"
           clearable
-          style="width: 113px">
+          style="width: 106px">
           <el-option label="正常" :value="0" />
           <el-option label="停用" :value="1" />
         </el-select>
@@ -42,7 +45,7 @@
       </el-form-item>
     </el-form>
     <!-- 字典列表 -->
-    <div class="flex-grow-1 overflow-hidden p-3">
+    <div class="flex-grow-1 overflow-hidden p-0 p-sm-1 p-md-2 p-lg-3">
       <div
         ref="bsWrapper"
         class="bsWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
@@ -208,6 +211,13 @@
       draggable
       center
       width="400px">
+      <template #header>
+        <el-button @click="A_EFun" :loading="loading"
+          >确认{{ A_ETitle }}
+          <span v-if="!isAdd && isDict">ID: {{ A_EDictForm.dictId }}</span>
+          <span v-if="!isAdd && !isDict">Code: {{ A_EDataForm.dictCode }}</span>
+        </el-button>
+      </template>
       <!-- 字典类型表单 -->
       <el-form
         :model="A_EDictForm"
@@ -235,7 +245,8 @@
         <el-form-item
           label="字典备注"
           prop="remark"
-          style="padding-left: 10.18px">
+          style="padding-left: 10.18px"
+          class="mb-0">
           <el-input
             clearable
             v-model.trim="A_EDictForm.remark"
@@ -315,21 +326,14 @@
         <el-form-item
           label="选项排序"
           prop="dictSort"
-          style="padding-left: 10.18px">
+          style="padding-left: 10.18px"
+          class="mb-0">
           <el-input-number
             v-model.trim="A_EDataForm.dictSort"
             :min="0"
             :max="999" />
         </el-form-item>
       </el-form>
-      <!-- 通用确认按钮 -->
-      <div class="d-flex justify-content-center">
-        <el-button @click="A_EFun" :loading="loading"
-          >确认{{ A_ETitle }}
-          <span v-if="!isAdd && isDict">ID: {{ A_EDictForm.dictId }}</span>
-          <span v-if="!isAdd && !isDict">Code: {{ A_EDataForm.dictCode }}</span>
-        </el-button>
-      </div>
     </el-dialog>
   </div>
 </template>

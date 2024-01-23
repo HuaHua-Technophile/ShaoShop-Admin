@@ -5,7 +5,7 @@
       :model="queryFromRef"
       ref="queryFromRef"
       :rules="queryRules"
-      class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
+      class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-0 px-sm-1 px-md-2 px-lg-3">
       <el-form-item
         label="发送日期"
         prop="createTime"
@@ -23,12 +23,15 @@
             time-format="A hh:mm:ss" />
         </el-config-provider>
       </el-form-item>
-      <el-form-item class="flex-shrink-0 px-3" label="是否未读" prop="status">
+      <el-form-item
+        label="是否未读"
+        prop="status"
+        class="flex-shrink-0 px-0 px-sm-1 px-md-2 px-lg-3">
         <el-select
           v-model="queryFrom.read"
           placeholder="已读/未读"
           clearable
-          style="width: 113px">
+          style="width: 106px">
           <el-option label="未读" :value="0" />
           <el-option label="已读" :value="1" />
         </el-select>
@@ -38,7 +41,7 @@
       </el-form-item>
     </el-form>
     <!-- 消息列表模块 -->
-    <div class="flex-grow-1 overflow-hidden p-3">
+    <div class="flex-grow-1 overflow-hidden p-0 p-sm-1 p-md-2 p-lg-3">
       <div
         ref="bsWrapper"
         class="bsWrapper position-relative w-100 h-100 overflow-hidden rounded-4">

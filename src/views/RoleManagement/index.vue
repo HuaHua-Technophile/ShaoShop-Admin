@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100 h-100 p-3 position-relative">
+  <div class="w-100 h-100 position-relative p-0 p-sm-1 p-md-2 p-lg-3">
     <!-- 角色列表 -->
     <div ref="bsWrapper" class="w-100 h-100 overflow-hidden rounded-4">
       <div
@@ -199,6 +199,12 @@
       class="rounded-4"
       draggable
       center>
+      <template #header>
+        <el-button @click="A_EFun" :loading="loading"
+          >确认{{ A_ETitle
+          }}<span v-if="!isAdd">ID: {{ A_EForm.roleId }}</span></el-button
+        >
+      </template>
       <el-form :model="A_EForm" ref="A_EFormRef" :rules="A_ERules">
         <el-form-item label="角色称呼" prop="roleName">
           <el-input
@@ -255,19 +261,21 @@
         <el-form-item
           label="权限范围"
           prop="dataScope"
-          style="padding-left: 10.18px">
+          style="padding-left: 10.18px"
+          class="mb-2">
           <el-input-number v-model="A_EForm.dataScope" :min="1" :max="5" />
         </el-form-item>
         <el-form-item
           label="角色排序"
           prop="roleSort"
-          style="padding-left: 10.18px">
+          style="padding-left: 10.18px"
+          class="mb-0">
           <el-input-number v-model="A_EForm.roleSort" :min="0" :max="999" />
         </el-form-item>
         <el-form-item
           label="公司树选择项关联显示"
           style="padding-left: 10.18px"
-          class="align-items-center">
+          class="align-items-center mb-0">
           <el-radio-group v-model="A_EForm.companyCheckStrictly">
             <el-radio :label="true" size="large">是</el-radio>
             <el-radio :label="false" size="large">否</el-radio>
@@ -276,7 +284,7 @@
         <el-form-item
           label="菜单树选择项关联显示"
           style="padding-left: 10.18px"
-          class="align-items-center">
+          class="align-items-center mb-0">
           <el-radio-group v-model="A_EForm.menuCheckStrictly">
             <el-radio :label="true" size="large">是</el-radio>
             <el-radio :label="false" size="large">否</el-radio>
@@ -285,19 +293,13 @@
         <el-form-item
           label="角色状态"
           style="padding-left: 10.18px"
-          class="align-items-center">
+          class="align-items-center mb-0">
           <el-radio-group v-model="A_EForm.status">
             <el-radio :label="0" size="large">正常</el-radio>
             <el-radio :label="1" size="large">停用</el-radio>
           </el-radio-group>
         </el-form-item>
       </el-form>
-      <div class="d-flex justify-content-center">
-        <el-button @click="A_EFun" :loading="loading"
-          >确认{{ A_ETitle
-          }}<span v-if="!isAdd">ID: {{ A_EForm.roleId }}</span></el-button
-        >
-      </div>
     </el-dialog>
     <!-- 授权用户抽屉 -->
     <el-drawer

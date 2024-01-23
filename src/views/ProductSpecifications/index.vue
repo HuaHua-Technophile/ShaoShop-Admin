@@ -5,8 +5,11 @@
       :model="queryFrom"
       ref="queryFromRef"
       :rules="queryRules"
-      class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-4">
-      <el-form-item label="商品规格名称" prop="productSpec" class="flex-grow-1">
+      class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-0 px-sm-1 px-md-2 px-lg-3">
+      <el-form-item
+        label="商品规格名称"
+        prop="productSpec"
+        class="flex-grow-1 overflow-hidden">
         <el-input
           clearable
           maxlength="10"
@@ -14,10 +17,10 @@
           placeholder="商品规格名称"
           :prefix-icon="renderFontIcon('fa-solid fa-ruler-combined')" />
       </el-form-item>
-      <el-form-item class="ms-3">
+      <el-form-item class="mx-0 mx-sm-1 mx-md-2 mx-lg-3">
         <el-button :loading="loading" @click="queryFun">查询</el-button>
       </el-form-item>
-      <el-form-item class="ms-3">
+      <el-form-item>
         <jumpPageBtn
           :queryFun="getFun"
           :allPageCount="allPageCount"
@@ -31,7 +34,7 @@
       </el-form-item>
     </el-form>
     <!-- 商品规格列表 -->
-    <div class="flex-grow-1 overflow-hidden p-3">
+    <div class="flex-grow-1 overflow-hidden p-0 p-sm-1 p-md-2 p-lg-3">
       <div
         ref="bsWrapper"
         class="bsWrapper position-relative w-100 h-100 overflow-hidden rounded-4">

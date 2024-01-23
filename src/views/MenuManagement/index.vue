@@ -1,5 +1,5 @@
 <template>
-  <div class="p-3 w-100 h-100">
+  <div class="w-100 h-100 p-0 p-sm-1 p-md-2 p-lg-3">
     <!-- 菜单列表 -->
     <div ref="bsWrapper" class="w-100 h-100 overflow-hidden rounded-4">
       <div
@@ -317,6 +317,12 @@
       class="rounded-4"
       draggable
       center>
+      <template #header>
+        <el-button @click="A_EFun" :loading="loading"
+          >确认{{ A_ETitle
+          }}<span v-if="!isAdd">ID: {{ A_EForm.menuId }}</span></el-button
+        >
+      </template>
       <el-form :model="A_EForm" ref="A_EFormRef" :rules="A_ERules">
         <el-form-item label="菜单名称" prop="menuName">
           <el-input
@@ -359,13 +365,14 @@
         <el-form-item
           label="菜单排序"
           prop="orderNum"
-          style="padding-left: 10.18px">
+          style="padding-left: 10.18px"
+          class="mb-0">
           <el-input-number v-model="A_EForm.orderNum" :min="0" :max="999" />
         </el-form-item>
         <el-form-item
           label="菜单类型"
           prop="menuType"
-          class="d-flex align-items-center"
+          class="d-flex align-items-center mb-0"
           style="padding-left: 10.18px">
           <el-radio-group v-model="A_EForm.menuType">
             <el-radio label="M" size="large">目录</el-radio>
@@ -376,7 +383,7 @@
         <el-form-item
           label="菜单状态"
           prop="status"
-          class="d-flex align-items-center"
+          class="d-flex align-items-center mb-0"
           style="padding-left: 10.18px">
           <el-radio-group v-model="A_EForm.status">
             <el-radio :label="0" size="large">正常</el-radio>
@@ -386,7 +393,7 @@
         <el-form-item
           label="菜单显隐"
           prop="visible"
-          class="d-flex align-items-center"
+          class="d-flex align-items-center mb-0"
           style="padding-left: 10.18px">
           <el-radio-group v-model="A_EForm.visible">
             <el-radio :label="0" size="large">显示</el-radio>
@@ -396,7 +403,7 @@
         <el-form-item
           label="是否外链"
           prop="isFrame"
-          class="d-flex align-items-center"
+          class="d-flex align-items-center mb-0"
           style="padding-left: 10.18px">
           <el-radio-group v-model="A_EForm.isFrame">
             <el-radio :label="0" size="large">是</el-radio>
@@ -404,12 +411,6 @@
           </el-radio-group>
         </el-form-item>
       </el-form>
-      <div class="d-flex justify-content-center">
-        <el-button @click="A_EFun" :loading="loading"
-          >确认{{ A_ETitle
-          }}<span v-if="!isAdd">ID: {{ A_EForm.menuId }}</span></el-button
-        >
-      </div>
     </el-dialog>
   </div>
 </template>
