@@ -337,7 +337,7 @@
     addPC,
     delPC,
     editPC,
-    getClassificationTree,
+    getClassificationIds,
     getPCList,
   } from "@/api/ProductClassificationAPI";
   import { PCQueryType, PCType } from "@/type";
@@ -548,8 +548,8 @@
     cb: (arg0: PCType[]) => void
   ) => {
     if (!A_EAutoComplete.value) {
-      const res = await getClassificationTree();
-      console.log("获取可挂靠父分类树=>", res);
+      const res = await getClassificationIds();
+      console.log("获取可挂靠分类=>", res);
       A_EAutoComplete.value = res.data;
     }
     cb(

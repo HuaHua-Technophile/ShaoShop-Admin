@@ -36,10 +36,10 @@ export const delPC = (PCId: number) => {
   });
 };
 
-//  /product-classification/getClassificationTree 获取所有可挂载的父类id
-export const getClassificationTree = () => {
+//  /product-classification/getClassificationIds 获取所有可挂载的父类id
+export const getClassificationIds = () => {
   return instance<PCType[]>({
-    url: "/product-classification/getClassificationTree",
+    url: "/product-classification/getClassificationIds",
     method: "GET",
   });
 };
