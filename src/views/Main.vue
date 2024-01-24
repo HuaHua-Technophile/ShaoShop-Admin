@@ -142,23 +142,24 @@
       </el-main>
     </el-container>
   </el-container>
+  <!-- 个人信息 -->
   <el-drawer
     v-model="drawerVisible"
     direction="rtl"
-    class="rounded-start-5 bg-body"
+    class="rounded-start-5 bg-body 个人信息"
     :before-close="closeDrawerFun">
     <template #header>
       <h2 class="text-body">账号信息</h2>
     </template>
     <el-form
       ref="personalInfoFormRef"
-      :model="personalInfoFrom"
-      :rules="personalInfoRules">
+      :model="EPersonalInfoFrom"
+      :rules="EPersonalInfoRules">
       <el-form-item label="注册时间" prop="createTime">
-        {{ personalInfoFrom.createTime || "暂无" }}
+        {{ EPersonalInfoFrom.createTime || "暂无" }}
       </el-form-item>
       <el-form-item label="绑定商户" prop="businessId">
-        {{ personalInfoFrom.businessId || "暂无" }}
+        {{ EPersonalInfoFrom.businessId || "暂无" }}
       </el-form-item>
       <el-form-item label="用户昵称" prop="userName" class="overflow-hidden">
         <Transition
@@ -168,12 +169,12 @@
           <el-input
             clearable
             maxlength="12"
-            v-model="personalInfoFrom.userName"
+            v-model="EPersonalInfoFrom.userName"
             placeholder="每个后台主体唯一名称"
             :prefix-icon="renderFontIcon('bi bi-123')"
-            v-if="editStatus" />
+            v-if="isEditPersonalInfo" />
           <span style="padding-bottom: 2px" v-else>{{
-            personalInfoFrom.userName || "暂无"
+            EPersonalInfoFrom.userName || "暂无"
           }}</span>
         </Transition>
       </el-form-item>
@@ -185,12 +186,12 @@
           <el-input
             clearable
             maxlength="12"
-            v-model="personalInfoFrom.nickName"
+            v-model="EPersonalInfoFrom.nickName"
             placeholder="运营部/物流部/..."
             :prefix-icon="renderFontIcon('bi bi-people')"
-            v-if="editStatus" />
+            v-if="isEditPersonalInfo" />
           <span style="padding-bottom: 2px" v-else>{{
-            personalInfoFrom.nickName || "暂无"
+            EPersonalInfoFrom.nickName || "暂无"
           }}</span>
         </Transition>
       </el-form-item>
@@ -202,12 +203,12 @@
           <el-input
             clearable
             maxlength="11"
-            v-model="personalInfoFrom.phoneNumber"
+            v-model="EPersonalInfoFrom.phoneNumber"
             placeholder="每个后台主体唯一手机号"
             :prefix-icon="renderFontIcon('bi bi-telephone')"
-            v-if="editStatus" />
+            v-if="isEditPersonalInfo" />
           <span style="padding-bottom: 2px" v-else>{{
-            personalInfoFrom.phoneNumber || "暂无"
+            EPersonalInfoFrom.phoneNumber || "暂无"
           }}</span>
         </Transition>
       </el-form-item>
@@ -219,12 +220,12 @@
           <el-input
             clearable
             maxlength="20"
-            v-model="personalInfoFrom.email"
+            v-model="EPersonalInfoFrom.email"
             placeholder="每个后台主体唯一邮箱"
             :prefix-icon="renderFontIcon('bi bi-envelope')"
-            v-if="editStatus" />
+            v-if="isEditPersonalInfo" />
           <span style="padding-bottom: 2px" v-else>{{
-            personalInfoFrom.email || "暂无"
+            EPersonalInfoFrom.email || "暂无"
           }}</span>
         </Transition>
       </el-form-item>
@@ -234,15 +235,15 @@
       enter-active-class="animate__animated animate__fadeInUp"
       leave-active-class="animate__animated animate__fadeOutRight">
       <el-form
-        ref="passwordFormRef"
-        :model="passwordForm"
-        :rules="passwordRules"
-        v-if="editPasswordStatus">
+        ref="EPasswordFormRef"
+        :model="EPasswordForm"
+        :rules="EPasswordRules"
+        v-if="isEditPassword">
         <el-form-item label="当前密码" prop="oldPassword">
           <el-input
             clearable
             maxlength="16"
-            v-model="passwordForm.oldPassword"
+            v-model="EPasswordForm.oldPassword"
             placeholder="当前旧密码"
             :prefix-icon="renderFontIcon('fa-solid fa-key')" />
         </el-form-item>
@@ -250,7 +251,7 @@
           <el-input
             clearable
             maxlength="16"
-            v-model="passwordForm.newPassword"
+            v-model="EPasswordForm.newPassword"
             placeholder="新的密码(6~16位,不能含有中文与空格)"
             :prefix-icon="renderFontIcon('fa-solid fa-unlock')" />
         </el-form-item>
@@ -258,7 +259,7 @@
           <el-input
             clearable
             maxlength="16"
-            v-model="passwordForm.confirmPassword"
+            v-model="EPasswordForm.confirmPassword"
             placeholder="请再次输入新的密码(6~16位,不能含有中文与空格)"
             :prefix-icon="renderFontIcon('fa-solid fa-lock')" />
         </el-form-item>
@@ -272,14 +273,23 @@
             enter-active-class="animate__animated animate__fadeInUp"
             leave-active-class="animate__animated animate__fadeOutUp">
             <Transition
-              v-if="!editStatus"
+              v-if="isEditPersonalInfo"
               mode="out-in"
               enter-active-class="animate__animated animate__fadeInUp"
               leave-active-class="animate__animated animate__fadeOutUp">
-              <el-button @click="savePassword" v-if="editPasswordStatus"
+              <el-button @click="cencelEdit" :loading="loading"
+                >取消修改</el-button
+              >
+            </Transition>
+            <Transition
+              v-else
+              mode="out-in"
+              enter-active-class="animate__animated animate__fadeInUp"
+              leave-active-class="animate__animated animate__fadeOutUp">
+              <el-button @click="EPasswordFun" v-if="isEditPassword"
                 >确认修改</el-button
               >
-              <el-button @click="editPassword" v-else>修改密码</el-button>
+              <el-button @click="toEditPassword" v-else>修改密码</el-button>
             </Transition>
           </Transition>
         </div>
@@ -289,19 +299,26 @@
             enter-active-class="animate__animated animate__fadeInUp"
             leave-active-class="animate__animated animate__fadeOutUp">
             <Transition
-              v-if="!editPasswordStatus"
+              v-if="isEditPassword"
+              mode="out-in"
+              enter-active-class="animate__animated animate__fadeInUp"
+              leave-active-class="animate__animated animate__fadeOutUp">
+              <el-button @click="cencelEdit" :loading="loading"
+                >取消修改</el-button
+              >
+            </Transition>
+            <Transition
+              v-else
               mode="out-in"
               enter-active-class="animate__animated animate__fadeInUp"
               leave-active-class="animate__animated animate__fadeOutUp">
               <el-button
                 @click="savePersonalInfo"
-                v-if="editStatus"
+                v-if="isEditPersonalInfo"
                 :loading="loading"
                 >确认保存修改</el-button
               >
-              <el-button @click="editPersonalInfo" v-else
-                >修改个人信息</el-button
-              >
+              <el-button @click="toEditUserInfo" v-else>修改个人信息</el-button>
             </Transition>
           </Transition>
         </div>
@@ -463,23 +480,23 @@
   // 个人信息----------------------
   const drawerVisible = ref(false);
   const closeDrawerFun = (done: () => void) => {
-    if (editStatus.value)
+    if (isEditPersonalInfo.value)
       elMessageBoxConfirm(`放弃修改个人信息`, () => {
         done();
         ElMessage.info(`放弃放弃修改个人信息`);
-        editStatus.value = false;
+        isEditPersonalInfo.value = false;
       });
-    else if (editPasswordStatus.value)
+    else if (isEditPassword.value)
       elMessageBoxConfirm(`放弃修改密码`, () => {
         done();
         ElMessage.info(`放弃修改密码`);
-        editPasswordStatus.value = false;
-        passwordFormRef.value!.clearValidate();
-        passwordFormRef.value!.resetFields();
+        isEditPassword.value = false;
+        EPasswordFormRef.value!.clearValidate();
+        EPasswordFormRef.value!.resetFields();
       });
     else done();
   };
-  let personalInfoFrom = reactive<userType>({
+  let EPersonalInfoFrom = reactive<userType>({
     businessId: undefined,
     createTime: "",
     nickName: "",
@@ -488,7 +505,7 @@
     userName: "",
     email: "",
   });
-  const personalInfoRules = reactive({
+  const EPersonalInfoRules = reactive({
     userName: [{ required: true, message: "请输入账号", trigger: "blur" }],
     email: [
       { required: true, message: "请输入绑定邮箱", trigger: "blur" },
@@ -507,28 +524,33 @@
     ],
   });
   const personalInfoFormRef = ref<FormInstance>();
-  const editStatus = ref(false);
+  const isEditPersonalInfo = ref(false);
   const loading = ref(false);
   const showUserInfo = async () => {
     const res = await getUserInfo();
     console.log("个人信息=>", res.data);
     if (res.code == 200) {
       drawerVisible.value = true;
-      personalInfoFrom = reactive(res.data);
+      EPersonalInfoFrom = reactive(res.data);
     }
   };
-  const editPersonalInfo = () => {
-    editStatus.value = true;
+  const cencelEdit = () => {
+    isEditPersonalInfo.value = isEditPassword.value = false;
+    EPasswordFormRef.value?.clearValidate();
+    EPasswordFormRef.value?.resetFields();
+  };
+  const toEditUserInfo = () => {
+    isEditPersonalInfo.value = true;
   };
   const savePersonalInfo = () => {
     personalInfoFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
         loading.value = true;
-        let res = await updateUserInfo(personalInfoFrom);
+        let res = await updateUserInfo(EPersonalInfoFrom);
         if (res.code === 200) {
           ElMessage.success("修改成功");
           showUserInfo();
-          editStatus.value = false;
+          isEditPersonalInfo.value = false;
         }
         loading.value = false;
       } else console.log("error submit!", fields);
@@ -536,13 +558,13 @@
   };
 
   // 修改密码---------------
-  const passwordForm = reactive({
+  const EPasswordForm = reactive({
     oldPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
-  const passwordFormRef = ref<FormInstance>();
-  const passwordRules = reactive({
+  const EPasswordFormRef = ref<FormInstance>();
+  const EPasswordRules = reactive({
     oldPassword: [
       { required: true, message: "请输入旧密码", trigger: "blur" },
       { validator: passwordValidator, trigger: "blur" },
@@ -560,25 +582,25 @@
           callback: (arg0?: Error) => void
         ) => {
           rule;
-          if (value == passwordForm.newPassword) callback();
+          if (value == EPasswordForm.newPassword) callback();
           else callback(new Error("两次输入密码不一致!"));
         },
         trigger: "blur",
       },
     ],
   });
-  const editPasswordStatus = ref(false);
-  const editPassword = () => {
-    editPasswordStatus.value = true;
+  const isEditPassword = ref(false);
+  const toEditPassword = () => {
+    isEditPassword.value = true;
   };
-  const savePassword = () => {
-    passwordFormRef.value!.validate(async (valid, fields) => {
+  const EPasswordFun = () => {
+    EPasswordFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
         loading.value = true;
-        let res = await updateUserPassword(passwordForm);
+        let res = await updateUserPassword(EPasswordForm);
         console.log(res);
         if (res.code === 200) {
-          editPasswordStatus.value = false;
+          isEditPassword.value = false;
           reLogIn("修改成功,请重新登录");
         }
         loading.value = false;
@@ -623,7 +645,7 @@
       transform: scale(1.1) rotate(90deg) !important;
     }
   }
-  :root {
+  .个人信息 {
     --animate-duration: 350ms;
   }
   /* .custom-horizontal-scrollbar {

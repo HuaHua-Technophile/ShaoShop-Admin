@@ -197,7 +197,20 @@
               </template>
             </el-table-column>
             <el-table-column prop="remark">
-              <template #header>跳页</template>
+              <template #header>
+                <div class="d-flex align-items-center justify-content-center">
+                  <jumpPageBtn
+                    :queryFun="getFun"
+                    :allPageCount="allPageCount"
+                    :nowPage="nowPage"
+                    :visible="true"
+                    :bs="bs"
+                    :tableItemHeight="tableItemHeight"
+                    :tableHeaderHeight="tableHeaderHeight"
+                    :queryFrom="queryFrom"
+                    :defaultPageSize="defaultPageSize" />
+                </div>
+              </template>
               <template #default="scope">
                 <el-tooltip
                   :content="scope.row.remark"
@@ -299,6 +312,24 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <!-- 右下角悬浮跳页按钮 -->
+    <Transition
+      appear
+      enter-active-class="animate__animated animate__bounceIn"
+      leave-active-class="animate__animated animate__bounceOut">
+      <jumpPageBtn
+        class="position-absolute p-2 rounded-pill me-3 mb-3"
+        style="background: #141414; right: 0; bottom: 0"
+        :queryFun="getFun"
+        :allPageCount="allPageCount"
+        :nowPage="nowPage"
+        :visible="jumpPageBtnVisible"
+        :bs="bs"
+        :tableItemHeight="tableItemHeight"
+        :tableHeaderHeight="tableHeaderHeight"
+        :queryFrom="queryFrom"
+        :defaultPageSize="defaultPageSize" />
+    </Transition>
   </div>
 </template>
 <script lang="ts" setup>
