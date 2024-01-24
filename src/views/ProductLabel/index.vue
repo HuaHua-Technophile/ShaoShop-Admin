@@ -29,6 +29,9 @@
           :prefix-icon="renderFontIcon('bi bi-123')" />
       </el-form-item>
       <el-form-item class="flex-shrink-0 me-0 me-md-1 me-lg-2">
+        <el-button :loading="loading" @click="queryFun">查询</el-button>
+      </el-form-item>
+      <el-form-item>
         <jumpPageBtn
           :queryFun="getFun"
           :allPageCount="allPageCount"
@@ -39,9 +42,6 @@
           :tableHeaderHeight="tableHeaderHeight"
           :queryFrom="queryFrom"
           :defaultPageSize="defaultPageSize" />
-      </el-form-item>
-      <el-form-item>
-        <el-button :loading="loading" @click="queryFun">查询</el-button>
       </el-form-item>
     </el-form>
     <!-- 标签列表模块 -->
