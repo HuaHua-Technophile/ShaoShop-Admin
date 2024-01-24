@@ -152,7 +152,6 @@
     </Transition>
   </div>
 </template>
-
 <script lang="ts" setup>
   import { PLType, PLQueryType } from "@/type/index";
   import { addPL, delPL, editPL, getPLList } from "@/api/ProductLabelAPI";

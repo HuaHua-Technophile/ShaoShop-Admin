@@ -30,7 +30,6 @@ export const editPL = (data: PLType) => {
   });
 };
 
-// /label/{ids} 删除标签
 export const delPL = (PLIds: (number | undefined)[]) => {
   return instance({
     url: `/label/${PLIds}`,
