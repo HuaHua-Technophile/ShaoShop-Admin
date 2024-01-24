@@ -173,3 +173,10 @@ export type PCType = {
 } & TimeType;
 //商品分类查询类型
 export type PCQueryType = PCType & QueryType;
+
+export type PLType = {
+  id?: number; //id
+  labelName: string; //标签名称
+  productId?: number; //标签id
+} & TimeType;
+export type PLQueryType = PLType & QueryType;

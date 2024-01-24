@@ -7,6 +7,8 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    BsWrapper: typeof import('./src/components/bsWrapper/bsWrapper.vue')['default']
+    BSWrapper: typeof import('./src/components/BSWrapper/BSWrapper.vue')['default']
     DarkIcon: typeof import("./src/components/darkThemeSwitch/DarkIcon.vue")["default"]
     DarkThemeSwitch: typeof import('./src/components/darkThemeSwitch/darkThemeSwitch.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']

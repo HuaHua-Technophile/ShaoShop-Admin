@@ -1,6 +1,6 @@
 <template>
   <div class="w-100 h-100 d-flex flex-column">
-    <!-- 搜索用户/新建用户 -->
+    <!-- 搜索用户 -->
     <el-form
       :model="queryFrom"
       ref="queryFromRef"
@@ -489,9 +489,7 @@
   const tableRef = ref();
   const userIdList = ref<(number | undefined)[]>([]);
   const selectionChange = (val: userType[]) => {
-    userIdList.value = val.map((i) => {
-      return i.userId;
-    });
+    userIdList.value = val.map((i) => i.userId);
   };
   const delFun = (user: userType) => {
     tableRef.value.toggleRowSelection(user, true);
@@ -511,9 +509,3 @@
     );
   };
 </script>
-<style lang="scss">
-  .el-table__header-wrapper {
-    position: sticky !important;
-    top: 0 !important;
-  }
-</style>

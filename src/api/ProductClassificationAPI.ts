@@ -1,6 +1,6 @@
 import instance from "./instance";
 import { PCQueryType, PCType } from "@/type";
-export const getPCList = (params?: PCQueryType) => {
+export const getPCList = (params: PCQueryType) => {
   return instance<{
     records: Array<PCType>;
     total: number;
@@ -11,7 +11,7 @@ export const getPCList = (params?: PCQueryType) => {
   });
 };
 
-export const addPC = (data?: PCType) => {
+export const addPC = (data: PCType) => {
   console.log("准备添加分类=>", data);
   return instance({
     url: "/product-classification",
@@ -19,7 +19,7 @@ export const addPC = (data?: PCType) => {
     data,
   });
 };
-export const editPC = (data?: PCType) => {
+export const editPC = (data: PCType) => {
   console.log("准备修改分类=>", data);
   return instance({
     url: "/product-classification",
