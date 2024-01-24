@@ -250,13 +250,21 @@
           label="父级编号"
           prop="parentClassificationNumber"
           style="padding-left: 10.18px">
-          <el-input
+          <el-autocomplete
             clearable
             maxlength="20"
             v-model.trim.number="A_EForm.parentClassificationNumber"
             placeholder="父级商品分类编号"
-            :prefix-icon="renderFontIcon('bi bi-diagram-3')">
-          </el-input>
+            :prefix-icon="renderFontIcon('bi bi-diagram-3')"
+            :fetch-suggestions="A_EAutoCompleteFun"
+            value-key="id"
+            select-when-unmatched
+            class="flex-grow-1">
+            <template #default="{ item }">
+              {{ item.classificationName }}
+              <span style="color: var(--bs-ShaoShop)">({{ item.id }})</span>
+            </template>
+          </el-autocomplete>
         </el-form-item>
         <el-form-item
           label="分类备注"
@@ -298,6 +306,7 @@
     addPC,
     delPC,
     editPC,
+    getClassificationTree,
     getPCList,
   } from "@/api/ProductClassificationAPI";
   import { PCQueryType, PCType } from "@/type";
@@ -448,6 +457,7 @@
       { required: true, message: "请输入分类名称", trigger: "blur" },
     ],
   });
+  const A_EAutoComplete = ref<PCType[]>();
   //dialog弹出框-----------------------
   const A_EVisible = ref(false);
   const A_ETitle = ref("添加商品分类");
@@ -495,12 +505,31 @@
           allPCList.value = [];
           queryFrom.currentPage = 1;
           getFun();
-          A_EVisible.value = false; //隐藏弹出框
+          // A_EVisible.value = false; //隐藏弹出框
           ElMessage.success(`${A_ETitle.value}成功`);
         }
         loading.value = false;
       } else console.log("error submit!", fields);
     });
+  };
+  const A_EAutoCompleteFun = async (
+    queryStr: string,
+    cb: (arg0: PCType[]) => void
+  ) => {
+    if (!A_EAutoComplete.value) {
+      const res = await getClassificationTree();
+      console.log("获取可挂靠父分类树=>", res);
+      A_EAutoComplete.value = res.data;
+    }
+    cb(
+      queryStr
+        ? A_EAutoComplete.value.filter(
+            (i) =>
+              i.classificationName.includes(queryStr) ||
+              String(i.id).includes(queryStr)
+          )
+        : A_EAutoComplete.value
+    );
   };
 
   //查询分类-------------------------------------

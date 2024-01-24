@@ -38,7 +38,7 @@ export const delPC = (PCId: number) => {
 
 //  /product-classification/getClassificationTree 获取所有可挂载的父类id
 export const getClassificationTree = () => {
-  return instance({
+  return instance<PCType[]>({
     url: "/product-classification/getClassificationTree",
     method: "GET",
   });
