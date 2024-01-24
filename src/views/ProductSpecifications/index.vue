@@ -128,7 +128,9 @@
       <template #header>
         <el-button @click="A_EFun" :loading="loading"
           >确认{{ A_ETitle
-          }}<span v-if="!isAdd">ID: {{ A_EFrom.specNameId }}</span></el-button
+          }}<span v-if="!isAdd"
+            >ID: {{ A_EFrom.specificationsId }}</span
+          ></el-button
         >
       </template>
       <el-form :model="A_EFrom" ref="A_EFromRef" :rules="A_ERules">
