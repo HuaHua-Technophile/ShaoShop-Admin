@@ -28,6 +28,18 @@
           placeholder="商品标签ID"
           :prefix-icon="renderFontIcon('bi bi-123')" />
       </el-form-item>
+      <el-form-item class="flex-shrink-0 me-0 me-md-1 me-lg-2">
+        <jumpPageBtn
+          :queryFun="getFun"
+          :allPageCount="allPageCount"
+          :nowPage="nowPage"
+          :visible="true"
+          :bs="bs"
+          :tableItemHeight="tableItemHeight"
+          :tableHeaderHeight="tableHeaderHeight"
+          :queryFrom="queryFrom"
+          :defaultPageSize="defaultPageSize" />
+      </el-form-item>
       <el-form-item>
         <el-button :loading="loading" @click="queryFun">查询</el-button>
       </el-form-item>
@@ -120,6 +132,24 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+    <!-- 右下角悬浮跳页按钮 -->
+    <Transition
+      appear
+      enter-active-class="animate__animated animate__bounceIn"
+      leave-active-class="animate__animated animate__bounceOut">
+      <jumpPageBtn
+        class="position-absolute p-2 rounded-pill me-3 mb-3"
+        style="background: #141414; right: 0; bottom: 0"
+        :queryFun="getFun"
+        :allPageCount="allPageCount"
+        :nowPage="nowPage"
+        :visible="jumpPageBtnVisible"
+        :bs="bs"
+        :tableItemHeight="tableItemHeight"
+        :tableHeaderHeight="tableHeaderHeight"
+        :queryFrom="queryFrom"
+        :defaultPageSize="defaultPageSize" />
+    </Transition>
   </div>
 </template>
 
