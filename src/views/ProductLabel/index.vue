@@ -18,14 +18,14 @@
           :prefix-icon="renderFontIcon('fa-solid fa-quote-left')" />
       </el-form-item>
       <el-form-item
-        label="商品标签ID"
+        label="已绑定商品ID"
         prop="productId"
         class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
         <el-input
           clearable
           maxlength="20"
           v-model.trim.number="queryFrom.productId"
-          placeholder="商品标签ID"
+          placeholder="已绑定商品(ID)"
           :prefix-icon="renderFontIcon('bi bi-123')" />
       </el-form-item>
       <el-form-item class="flex-shrink-0 me-0 me-md-1 me-lg-2">
@@ -70,7 +70,7 @@
             <el-table-column type="selection" width="30" />
             <el-table-column label="序号" type="index" width="55" />
             <el-table-column prop="id" label="ID" />
-            <el-table-column prop="productId" label="productId" />
+            <el-table-column prop="productId" label="已绑定商品ID" />
             <el-table-column prop="labelName" label="标签名称" />
             <el-table-column prop="updateBy" label="更新者" />
             <el-table-column prop="updateTime" label="更新时间">
@@ -122,12 +122,15 @@
             placeholder="商品标签名称"
             :prefix-icon="renderFontIcon('fa-solid fa-quote-left')" />
         </el-form-item>
-        <el-form-item label="商品标签ID" prop="productId">
+        <el-form-item
+          label="绑定商品的ID"
+          prop="productId"
+          style="padding-left: 10.18px">
           <el-input
             clearable
             maxlength="20"
             v-model.trim.number="A_EFrom.productId"
-            placeholder="商品标签ID"
+            placeholder="绑定商品的ID"
             :prefix-icon="renderFontIcon('bi bi-123')" />
         </el-form-item>
       </el-form>
@@ -286,7 +289,6 @@
   let A_EFrom = reactive(defaultA_EInfo);
   const A_ERules = reactive({
     labelName: [{ required: true, message: "请输入商品标签", trigger: "blur" }],
-    productId: [{ required: true, message: "请输入商品标签", trigger: "blur" }],
   });
 
   //dialog弹出框-----------------------
