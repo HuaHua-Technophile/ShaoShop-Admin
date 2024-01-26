@@ -265,7 +265,7 @@
     passwordValidator,
   } from "@/utils/elFromValidator/elFromValidator";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm/elMessageBoxConfirm";
-  import { userType } from "@/type/index";
+  import { userQueryType, userType } from "@/type/index";
 
   import { ElMessage, FormInstance } from "element-plus";
   import { onMounted, reactive, ref, nextTick } from "vue";
@@ -285,7 +285,7 @@
   let tableItemHeight: number; //每一项高度
   let tableHeaderHeight: number; //表头高度
   const loading = ref(false);
-  const queryFrom = reactive({
+  const queryFrom = reactive<userQueryType>({
     userName: "", //账号
     email: "", //绑定邮箱
     phoneNumber: "", //绑定手机号

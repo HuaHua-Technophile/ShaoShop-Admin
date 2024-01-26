@@ -90,7 +90,6 @@ export type treeListType = {
 export type roleType = {
   roleName: string; //角色名称
   admin?: boolean; //是否是超级管理员
-  businessId: string; //商户id
   companyCheckStrictly: boolean; //公司树选择项是否关联显示
   dataScope: number; //权限范围 1=所有数据权限,2=自定义数据权限,3=本部门数据权限,4=本部门及以下数据权限,5=仅本人数据权限
   menuCheckStrictly: boolean; //菜单树选择项是否关联显示
@@ -173,9 +172,22 @@ export type PCType = {
 } & TimeType;
 //商品分类查询类型
 export type PCQueryType = PCType & QueryType;
-
+//商品标签
 export type PLType = {
   id?: number; //id
   labelName: string; //标签名称
 } & TimeType;
 export type PLQueryType = PLType & QueryType;
+// 满减规则
+export type FRType = {
+  id?: number; //满减规则ID
+  name?: string; //满减规则名称
+  discountAmount?: number; //优惠金额
+  minAmount?: number; //最低触发金额
+  businessId?: number; //商户ID
+  description?: string; //描述
+  startTime?: string; //开始时间
+  endTime?: string; //截止时间
+  status?: true; //是否正在开启
+} & TimeType;
+export type FRQueryType = FRType & QueryType;

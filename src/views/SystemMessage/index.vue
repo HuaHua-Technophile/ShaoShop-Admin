@@ -84,7 +84,7 @@
                   :defaultPageSize="defaultPageSize" />
               </template>
               <template #default="scope">
-                <el-tag :type="scope.row.isRead == 0 ? 'success' : 'danger'">{{
+                <el-tag :type="scope.row.isRead ? 'success' : 'danger'">{{
                   scope.row.isRead ? "已读" : "未读"
                 }}</el-tag>
               </template>

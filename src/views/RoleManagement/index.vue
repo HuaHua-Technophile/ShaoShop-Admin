@@ -152,7 +152,6 @@
               }}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="businessId" label="所属商户id" />
           <el-table-column prop="updateBy" label="更新者" />
           <el-table-column prop="updateTime" label="更新时间">
             <template #default="scope">
@@ -222,18 +221,6 @@
             v-model.trim="A_EForm.roleKey"
             placeholder="权限标识/权限字符"
             :prefix-icon="renderFontIcon('fa-solid fa-code')">
-          </el-input>
-        </el-form-item>
-        <el-form-item
-          label="对应商户"
-          prop="businessId"
-          maxlength="12"
-          style="padding-left: 10.18px">
-          <el-input
-            clearable
-            v-model.trim="A_EForm.businessId"
-            placeholder="商户ID,不填写则为管理员角色"
-            :prefix-icon="renderFontIcon('bi bi-shop-window')">
           </el-input>
         </el-form-item>
         <el-form-item
@@ -441,7 +428,6 @@
   const A_EFormRef = ref<FormInstance>();
   const defaultE_EInfo: roleType = {
     roleName: "",
-    businessId: "",
     companyCheckStrictly: false,
     dataScope: 5,
     menuCheckStrictly: false,
