@@ -177,6 +177,5 @@ export type PCQueryType = PCType & QueryType;
 export type PLType = {
   id?: number; //id
   labelName: string; //标签名称
-  productId?: number; //已绑定商品ID
 } & TimeType;
 export type PLQueryType = PLType & QueryType;

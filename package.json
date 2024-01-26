@@ -16,7 +16,7 @@
     "@better-scroll/pull-up": "^2.5.1",
     "@better-scroll/scroll-bar": "^2.5.1",
     "animate.css": "^4.1.1",
-    "axios": "^1.6.5",
+    "axios": "^1.6.7",
     "bootstrap": "^5.3.2",
     "bootstrap-icons": "^1.11.3",
     "element-plus": "^2.5.3",
@@ -29,7 +29,7 @@
   "devDependencies": {
     "@types/bootstrap": "^5.2.10",
     "@types/lodash": "^4.14.202",
-    "@types/node": "^20.11.5",
+    "@types/node": "^20.11.6",
     "@vitejs/plugin-vue": "^4.6.2",
     "sass": "^1.70.0",
     "typescript": "^5.3.3",

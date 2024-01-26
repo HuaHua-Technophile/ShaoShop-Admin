@@ -17,17 +17,6 @@
           placeholder="商品标签名称"
           :prefix-icon="renderFontIcon('fa-solid fa-quote-left')" />
       </el-form-item>
-      <el-form-item
-        label="已绑定商品ID"
-        prop="productId"
-        class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
-        <el-input
-          clearable
-          maxlength="20"
-          v-model.trim.number="queryFrom.productId"
-          placeholder="已绑定商品(ID)"
-          :prefix-icon="renderFontIcon('bi bi-123')" />
-      </el-form-item>
       <el-form-item class="flex-shrink-0 me-0 me-md-1 me-lg-2">
         <el-button :loading="loading" @click="queryFun">查询</el-button>
       </el-form-item>
@@ -70,8 +59,8 @@
             <el-table-column type="selection" width="30" />
             <el-table-column label="序号" type="index" width="55" />
             <el-table-column prop="id" label="ID" />
-            <el-table-column prop="productId" label="已绑定商品ID" />
             <el-table-column prop="labelName" label="标签名称" />
+            <el-table-column prop="productId" label="已绑定商品ID" />
             <el-table-column prop="updateBy" label="更新者" />
             <el-table-column prop="updateTime" label="更新时间">
               <template #default="scope">
@@ -122,17 +111,6 @@
             placeholder="商品标签名称"
             :prefix-icon="renderFontIcon('fa-solid fa-quote-left')" />
         </el-form-item>
-        <el-form-item
-          label="绑定商品的ID"
-          prop="productId"
-          style="padding-left: 10.18px">
-          <el-input
-            clearable
-            maxlength="20"
-            v-model.trim.number="A_EFrom.productId"
-            placeholder="绑定商品的ID"
-            :prefix-icon="renderFontIcon('bi bi-123')" />
-        </el-form-item>
       </el-form>
     </el-dialog>
     <!-- 右下角悬浮跳页按钮 -->
@@ -179,7 +157,6 @@
   let tableHeaderHeight: number; //表头高度
   const loading = ref(false);
   const queryFrom = reactive<PLQueryType>({
-    productId: undefined, //标签ID
     labelName: "", //标签名称
     currentPage: 1, //请求的页码
     pageSize: defaultPageSize, //每页返回的数量
@@ -284,7 +261,6 @@
   const A_EFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const defaultA_EInfo: PLType = {
     labelName: "",
-    productId: undefined,
   };
   let A_EFrom = reactive(defaultA_EInfo);
   const A_ERules = reactive({
