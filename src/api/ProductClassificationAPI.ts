@@ -1,45 +1,14 @@
-import instance from "./instance";
+import { addFun, delFun, editFun, getFun, getListFun } from "@/api/instance";
 import { PCQueryType, PCType } from "@/type";
-export const getPCList = (params: PCQueryType) => {
-  return instance<{
-    records: Array<PCType>;
-    total: number;
-  }>({
-    url: "/product-classification/list",
-    method: "GET",
-    params,
-  });
-};
 
-export const addPC = (data: PCType) => {
-  console.log("准备添加分类=>", data);
-  return instance({
-    url: "/product-classification",
-    method: "POST",
-    data,
-  });
-};
-export const editPC = (data: PCType) => {
-  console.log("准备修改分类=>", data);
-  return instance({
-    url: "/product-classification",
-    method: "PUT",
-    data,
-  });
-};
-
-// /product-classification/{ids} 删除商品分类
-export const delPC = (PCId: number) => {
-  return instance({
-    url: `/product-classification/${PCId}`,
-    method: "DELETE",
-  });
-};
-
-//  /product-classification/getClassificationIds 获取所有可挂载的父类id
-export const getClassificationIds = () => {
-  return instance<PCType[]>({
-    url: "/product-classification/getClassificationIds",
-    method: "GET",
-  });
-};
+export const getPCList = getListFun<PCType, PCQueryType>(
+  "/product-classification/list",
+  "商品分类"
+);
+export const addPC = addFun<PCType>("/product-classification", "商品分类");
+export const editPC = editFun<PCType>("/product-classification", "商品分类");
+export const delPC = delFun<number>("/product-classification", "商品分类");
+export const getClassificationIds = getFun<PCType[]>(
+  "/product-classification/getClassificationIds",
+  "可挂载的父类id"
+);

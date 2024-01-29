@@ -1,50 +1,17 @@
-import instance from "./instance";
+import { addFun, delFun, editFun, getFun } from "@/api/instance";
 import { roleMenuType, treeListType } from "@/type/index";
-export const getMenuList = () => {
-  return instance<roleMenuType[]>({
-    url: "/system/menu/list",
-    method: "GET",
-  });
-};
-export const getMenuTreeList = () => {
-  return instance<treeListType[]>({
-    url: "/system/menu/treeList",
-    method: "GET",
-  });
-};
-
-export const getRoleMenuTreeSelect = (roleId: number) => {
-  return instance<{ checkedKeys: number[]; menus: treeListType[] }>({
-    url: `/system/menu/roleMenuTreeSelect/${roleId}`,
-    method: "GET",
-  });
-};
-
-export const addMenu = (data: roleMenuType) => {
-  console.log("准备添加菜单=>", data);
-  return instance({
-    url: "/system/menu",
-    method: "POST",
-    data,
-  });
-};
-export const editMenu = (data: roleMenuType) => {
-  console.log("准备修改菜单=>", data);
-  return instance({
-    url: "/system/menu",
-    method: "PUT",
-    data,
-  });
-};
-export const getMenuDetail = (menuId: number) => {
-  return instance({
-    url: `/system/menu/${menuId}`,
-    method: "GET",
-  });
-};
-export const delMenu = (menuId: number) => {
-  return instance({
-    url: `/system/menu/${menuId}`,
-    method: "DeLETE",
-  });
-};
+export const getMenuList = getFun<roleMenuType[]>(
+  "/system/menu/list",
+  "菜单列表"
+);
+export const getMenuTreeList = getFun<treeListType[]>(
+  "/system/menu/treeList",
+  "下拉菜单"
+);
+export const getRoleMenuTreeSelect = getFun<
+  { checkedKeys: number[]; menus: treeListType[] },
+  number
+>("/system/menu/roleMenuTreeSelect", "已授权菜单");
+export const addMenu = addFun<roleMenuType>("/system/menu", "菜单");
+export const editMenu = editFun<roleMenuType>("/system/menu", "菜单");
+export const delMenu = delFun<number>("/system/menu", "菜单");

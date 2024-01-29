@@ -1,14 +1,10 @@
-import instance from "./instance";
+import { addFun, delFun, editFun, getListFun } from "@/api/instance";
 import { FRQueryType, FRType } from "@/type";
 
-// /reductionRule/list
-export const getFRList = (params?: FRQueryType) => {
-  return instance<{
-    records: Array<FRType>;
-    total: number;
-  }>({
-    url: "/reductionRule/list",
-    method: "GET",
-    params,
-  });
-};
+export const getFRList = getListFun<FRType, FRQueryType>(
+  "/reductionRule/list",
+  "满减规则"
+);
+export const addFR = addFun<FRType>("/reductionRule", "满减规则");
+export const editFR = editFun<FRType>("/reductionRule", "满减规则");
+export const delFR = delFun<FRType>("/reductionRule", "满减规则");

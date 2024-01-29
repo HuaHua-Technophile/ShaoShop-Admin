@@ -7,18 +7,29 @@
       :rules="queryRules"
       class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-0 px-sm-1 px-md-2 px-lg-3">
       <el-form-item
-        label="用户账号"
+        label="账号"
         prop="userName"
         class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
         <el-input
           clearable
           maxlength="12"
           v-model.trim="queryFrom.userName"
-          placeholder="每个后台主体唯一名称"
+          placeholder="账号"
           :prefix-icon="renderFontIcon('bi bi-person')" />
       </el-form-item>
       <el-form-item
-        label="绑定邮箱"
+        label="昵称"
+        prop="nickName"
+        class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
+        <el-input
+          clearable
+          maxlength="12"
+          v-model.trim="queryFrom.nickName"
+          placeholder="昵称"
+          :prefix-icon="renderFontIcon('bi bi-people')" />
+      </el-form-item>
+      <el-form-item
+        label="邮箱"
         prop="email"
         class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
         <el-input
@@ -29,7 +40,7 @@
           :prefix-icon="renderFontIcon('bi bi-envelope')" />
       </el-form-item>
       <el-form-item
-        label="绑定电话"
+        label="电话"
         prop="phoneNumber"
         class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
         <el-input
@@ -40,18 +51,7 @@
           :prefix-icon="renderFontIcon('bi bi-telephone')" />
       </el-form-item>
       <el-form-item
-        label="部门主体"
-        prop="nickName"
-        class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
-        <el-input
-          clearable
-          maxlength="12"
-          v-model.trim="queryFrom.nickName"
-          placeholder="运营部/物流部/..."
-          :prefix-icon="renderFontIcon('bi bi-people')" />
-      </el-form-item>
-      <el-form-item
-        label="帐号状态"
+        label="状态"
         prop="status"
         class="flex-shrink-0 me-0 me-md-1 me-lg-2">
         <el-select
@@ -93,8 +93,8 @@
             <el-table-column type="selection" width="30" />
             <el-table-column label="序号" type="index" width="55" />
             <el-table-column prop="userId" label="ID" />
-            <el-table-column prop="userName" label="账号名称" />
-            <el-table-column prop="nickName" label="部门主体" />
+            <el-table-column prop="userName" label="账号" />
+            <el-table-column prop="nickName" label="昵称" />
             <el-table-column prop="status" label="状态">
               <template #default="scope">
                 <el-tag :type="scope.row.status == 0 ? 'success' : 'danger'">{{
@@ -172,11 +172,20 @@
       <el-form :model="A_EFrom" ref="A_EFromRef" :rules="A_ERules">
         <el-form-item label="用户账号" prop="userName">
           <el-input
+            :disabled="!isAdd"
             clearable
             maxlength="12"
             v-model.trim="A_EFrom.userName"
             placeholder="每个后台主体唯一名称"
             :prefix-icon="renderFontIcon('bi bi-person')" />
+        </el-form-item>
+        <el-form-item label="用户昵称" prop="nickName">
+          <el-input
+            clearable
+            maxlength="12"
+            v-model.trim="A_EFrom.nickName"
+            placeholder="用户昵称"
+            :prefix-icon="renderFontIcon('bi bi-people')" />
         </el-form-item>
         <el-form-item label="绑定邮箱" prop="email">
           <el-input
@@ -193,14 +202,6 @@
             v-model.trim="A_EFrom.phoneNumber"
             placeholder="每个后台主体唯一手机号"
             :prefix-icon="renderFontIcon('bi bi-telephone')" />
-        </el-form-item>
-        <el-form-item label="部门主体" prop="nickName">
-          <el-input
-            clearable
-            maxlength="12"
-            v-model.trim="A_EFrom.nickName"
-            placeholder="运营部/物流部/..."
-            :prefix-icon="renderFontIcon('bi bi-people')" />
         </el-form-item>
         <el-form-item label="账号密码" prop="password" v-if="isAdd">
           <el-input
@@ -461,7 +462,7 @@
           allUserList.value = [];
           queryFrom.currentPage = 1;
           getFun(); //重新请求数据进行用户列表渲染
-          ElMessage.success("添加成功");
+          ElMessage.success(`${A_ETitle.value}成功`);
           // dialogVisible.value = false; //隐藏弹出框
         }
         loading.value = false;

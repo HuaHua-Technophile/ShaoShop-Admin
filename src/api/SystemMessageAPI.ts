@@ -1,33 +1,14 @@
-import instance from "./instance";
+import { getFun, getListFun } from "@/api/instance";
 import { systemMessageType, messageQueryType } from "@/type/index";
-export const getSystemMessage = (params: messageQueryType) => {
-  return instance<{ records: systemMessageType[]; total: number }>({
-    url: "/system/message",
-    method: "GET",
-    params: {
-      currentPage: params.currentPage,
-      pageSize: params.pageSize,
-      read: params.read,
-      startTime: params.timePeriod ? params.timePeriod[0] : null,
-      endTime: params.timePeriod ? params.timePeriod[1] : null,
-    },
-  });
-};
-
-// /system/message/{messageId} 根据消息ID查看消息详情
-
-export const getSystemMessageById = (messageId: number) => {
-  return instance({
-    url: "/system/message/" + messageId,
-    method: "GET",
-  });
-};
-
-// /system/message/unReadMessage 未读消息
-
-export const getUnReadMessage = () => {
-  return instance<number>({
-    url: "/system/message/unReadMessage",
-    method: "GET",
-  });
-};
+export const getSystemMessage = getListFun<systemMessageType, messageQueryType>(
+  "/system/message",
+  "站内信"
+);
+export const getSystemMessageById = getFun<any, number>(
+  "/system/message",
+  "站内信具体内容"
+);
+export const getUnReadMessage = getFun<number>(
+  "/system/message/unReadMessage",
+  "未读站内信数"
+);

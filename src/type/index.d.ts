@@ -36,7 +36,7 @@ export type userType = {
   password?: string; //密码。注册时默认填入123456
   phoneNumber: string; //绑定手机号
   status?: number; //该后台管理账号的状态
-  userName: string; //账号
+  userName?: string; //账号
   userId?: number; //
   remark?: string; //备注
   roleName?: string[];
@@ -138,7 +138,9 @@ export type systemMessageType = {
 } & TimeType;
 // 站内信查询类型
 export type messageQueryType = {
-  timePeriod: string[]; //创建时间
+  timePeriod?: string[]; //创建时间
+  startTime?: string; //发送时间段的起始
+  endTime?: string; //发送时间段的结尾
   read?: number; //是否已读
 } & QueryType;
 //商品规格类型

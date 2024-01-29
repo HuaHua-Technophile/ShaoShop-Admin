@@ -155,30 +155,25 @@
       ref="personalInfoFormRef"
       :model="EPersonalInfoFrom"
       :rules="EPersonalInfoRules">
-      <el-form-item label="注册时间" prop="createTime">
+      <el-form-item
+        label="用户账号"
+        prop="userName"
+        style="padding-left: 10.18px">
+        {{ EPersonalInfoFrom.userName || "暂无" }}
+      </el-form-item>
+      <el-form-item
+        label="注册时间"
+        prop="createTime"
+        style="padding-left: 10.18px">
         {{ EPersonalInfoFrom.createTime || "暂无" }}
       </el-form-item>
-      <el-form-item label="绑定商户" prop="businessId">
+      <el-form-item
+        label="绑定商户"
+        prop="businessId"
+        style="padding-left: 10.18px">
         {{ EPersonalInfoFrom.businessId || "暂无" }}
       </el-form-item>
-      <el-form-item label="用户昵称" prop="userName" class="overflow-hidden">
-        <Transition
-          mode="out-in"
-          enter-active-class="animate__animated animate__fadeInUp"
-          leave-active-class="animate__animated animate__fadeOutUp">
-          <el-input
-            clearable
-            maxlength="12"
-            v-model="EPersonalInfoFrom.userName"
-            placeholder="每个后台主体唯一名称"
-            :prefix-icon="renderFontIcon('bi bi-123')"
-            v-if="isEditPersonalInfo" />
-          <span style="padding-bottom: 2px" v-else>{{
-            EPersonalInfoFrom.userName || "暂无"
-          }}</span>
-        </Transition>
-      </el-form-item>
-      <el-form-item label="部门主体" prop="nickName" class="overflow-hidden">
+      <el-form-item label="用户昵称" prop="nickName" class="overflow-hidden">
         <Transition
           mode="out-in"
           enter-active-class="animate__animated animate__fadeInUp"
@@ -187,7 +182,7 @@
             clearable
             maxlength="12"
             v-model="EPersonalInfoFrom.nickName"
-            placeholder="运营部/物流部/..."
+            placeholder="用户昵称"
             :prefix-icon="renderFontIcon('bi bi-people')"
             v-if="isEditPersonalInfo" />
           <span style="padding-bottom: 2px" v-else>{{
@@ -502,11 +497,9 @@
     nickName: "",
     phoneNumber: "",
     roleName: [],
-    userName: "",
     email: "",
   });
   const EPersonalInfoRules = reactive({
-    userName: [{ required: true, message: "请输入账号", trigger: "blur" }],
     email: [
       { required: true, message: "请输入绑定邮箱", trigger: "blur" },
       { validator: emailValidator, trigger: "blur" },
@@ -598,7 +591,6 @@
       if (valid) {
         loading.value = true;
         let res = await updateUserPassword(EPasswordForm);
-        console.log(res);
         if (res.code === 200) {
           isEditPassword.value = false;
           reLogIn("修改成功,请重新登录");
@@ -608,7 +600,6 @@
     });
   };
 </script>
-
 <style lang="scss">
   //顶部历史路由
   .historicalNavigation {

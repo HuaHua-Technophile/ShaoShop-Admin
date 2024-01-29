@@ -78,14 +78,31 @@
         </div>
       </div>
     </div>
+    <!-- 添加/修改满减规则弹窗 -->
+    <el-dialog
+      v-model="A_EVisible"
+      :title="A_ETitle"
+      width="450px"
+      :before-close="closeConfirmFun"
+      class="rounded-4"
+      draggable
+      center>
+      <template #header>
+        <el-button @click="A_EFun" :loading="loading"
+          >确认{{ A_ETitle
+          }}<span v-if="!isAdd">ID: {{ A_EFrom.userId }}</span></el-button
+        >
+      </template>
+      <el-form :model="A_EFrom" ref="A_EFromRef" :rules="A_ERules"> </el-form>
+    </el-dialog>
   </div>
 </template>
 <script lang="ts" setup>
-  import { getFRList } from "@/api/ReductionRulesAPI";
+  import { addFR, editFR, getFRList } from "@/api/ReductionRulesAPI";
   import { FRType, FRQueryType } from "@/type";
   import { getDateDiff } from "@/utils/time/getDateDiff";
 
-  import { ceil, throttle } from "lodash";
+  import { ceil, cloneDeep, throttle } from "lodash";
   import { nextTick, onMounted, reactive, ref } from "vue";
   import BScroll from "@better-scroll/core";
   import Pullup from "@better-scroll/pull-up"; //上拉懒加载
@@ -93,6 +110,8 @@
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import ObserveDOM from "@better-scroll/observe-dom"; //自动重载
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
+  import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm/elMessageBoxConfirm";
+  import { ElMessage, FormInstance } from "element-plus";
 
   // 不传参数的情况下，就是获取所有满减规则。传参数的情况下可用作搜索
   const allFRList = ref<FRType[]>([]);
@@ -196,5 +215,53 @@
       }, 400)
     );
   });
+
+  //表单-----------------------
+  const A_EFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const defaultA_EInfo: FRType = {};
+  let A_EFrom = reactive(defaultA_EInfo);
+  const A_ERules = reactive({});
+
+  //dialog弹出框-----------------------
+  const A_EVisible = ref(false);
+  const A_ETitle = ref("添加满减规则");
+  const isAdd = ref(true);
+  const closeConfirmFun = (done: () => void) => {
+    elMessageBoxConfirm(`放弃${A_ETitle.value}`, () => {
+      done();
+      ElMessage.info(`放弃${A_ETitle.value}`);
+    });
+  };
+
+  // 添加/修改满减规则------------------------
+  const toAdd = () => {
+    A_EFrom = reactive(cloneDeep(defaultA_EInfo));
+    A_EVisible.value = true;
+    isAdd.value = true;
+    A_ETitle.value = "添加满减规则";
+  };
+  const toEdit = (FR: FRType) => {
+    A_EFrom = reactive(cloneDeep(FR));
+    A_EVisible.value = true;
+    isAdd.value = false;
+    A_ETitle.value = "修改满减规则";
+  };
+  const A_EFun = async () => {
+    A_EFromRef.value!.validate(async (valid, fields) => {
+      if (valid) {
+        loading.value = true;
+        let res;
+        if (isAdd.value) res = await addFR(A_EFrom);
+        else res = await editFR(A_EFrom);
+        if (res.code === 200) {
+          allFRList.value = [];
+          queryFrom.currentPage = 1;
+          getFun(); //重新请求数据进行满减规则渲染
+          ElMessage.success(`${A_ETitle.value}成功`);
+          // dialogVisible.value = false; //隐藏弹出框
+        }
+        loading.value = false;
+      } else console.log("error submit!", fields);
+    });
+  };
 </script>
-@/utils/time/getDateDiff

@@ -1,7 +1,2 @@
-import instance from "./instance";
-export const logout = () => {
-  return instance({
-    url: "/system/auth/logout",
-    method: "POST",
-  });
-};
+import { addFun } from "@/api/instance";
+export const logout = addFun("/system/auth/logout", "退出登录信息");

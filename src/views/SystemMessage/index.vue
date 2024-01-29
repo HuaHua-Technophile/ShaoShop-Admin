@@ -171,7 +171,14 @@
   const getFun = async (excessDataCount?: number) => {
     let closePullUp;
     loading.value = true;
-    const res = await getSystemMessage(queryFrom);
+    const res = await getSystemMessage({
+      currentPage: queryFrom.currentPage,
+      pageSize: queryFrom.pageSize,
+      read: queryFrom.read,
+      startTime: queryFrom.timePeriod ? queryFrom.timePeriod[0] : undefined,
+      endTime: queryFrom.timePeriod ? queryFrom.timePeriod[1] : undefined,
+    });
+    //
     loading.value = false;
     console.log(
       `查询条件`,

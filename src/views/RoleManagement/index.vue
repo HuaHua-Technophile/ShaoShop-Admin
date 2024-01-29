@@ -374,7 +374,7 @@
   const getFun = async () => {
     loading.value = true;
     const res = await getRoleList();
-    console.log("获取的角色列表=>", res);
+    console.log("获取的角色列表=>", res?.data);
     roleList.value = res.data;
     loading.value = false;
   };
@@ -526,7 +526,7 @@
   //查询授权用户------------------------------
   const getAllocatedListFun = async (roleId: number, dontLoad?: boolean) => {
     if (!dontLoad) {
-      const res = await getAllocatedList(roleId!);
+      const res = await getAllocatedList(roleId);
       console.log(`ID${roleId}已挂载用户=>`, res);
       if (res.code === 200) {
         const index = roleList.value?.findIndex((i) => i.roleId === roleId);
@@ -557,10 +557,10 @@
   };
   const revokeUserFun = async () => {
     loading.value = true;
-    const res = await revokeUser(
-      revokeUserForRoleId.value,
-      revokeUserSelectList.value
-    );
+    const res = await revokeUser({
+      roleId: revokeUserForRoleId.value,
+      userIds: revokeUserSelectList.value,
+    });
     if (res.code === 200) {
       ElMessage.success(`授权${revokeUserSelectList.value.length}个用户成功`);
       getAllocatedListFun(revokeUserForRoleId.value);
@@ -585,10 +585,10 @@
       `取消授权勾选的${roleList.value![index!].selectList?.length}个用户`,
       async () => {
         loading.value = true;
-        const res = await cancelUser(
+        const res = await cancelUser({
           roleId,
-          roleList.value![index!].selectList!
-        );
+          userIds: roleList.value![index!].selectList!,
+        });
         if (res.code === 200) {
           ElMessage.success(
             `取消授权${roleList.value![index!].selectList?.length}个用户成功`
