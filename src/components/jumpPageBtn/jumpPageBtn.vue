@@ -55,7 +55,7 @@
       type: Function,
       required: true,
     },
-    queryFrom: {
+    queryForm: {
       type: Object,
       required: true,
     },
@@ -74,25 +74,25 @@
   const emit = defineEmits(["jumpPage"]);
   const jumpPage = async () => {
     // 如果已经请求的页码小于跳转的页码,则先请求一次,然后再跳转。
-    const jumpNum = son_nowPage.value - props.queryFrom.currentPage;
+    const jumpNum = son_nowPage.value - props.queryForm.currentPage;
     if (jumpNum > 1) {
       let excessDataCount: Number;
       let currentPage = floor(son_nowPage.value / jumpNum);
-      props.queryFrom.currentPage = currentPage;
+      props.queryForm.currentPage = currentPage;
       let pageSize = ceil(
         (son_nowPage.value / currentPage) * props.defaultPageSize
       ); //如果一次性跳页太多则每一页多请求一些,然后改回默认defaultPageSize
-      props.queryFrom.pageSize = pageSize;
+      props.queryForm.pageSize = pageSize;
       excessDataCount =
-        props.queryFrom.pageSize - props.defaultPageSize * jumpNum;
+        props.queryForm.pageSize - props.defaultPageSize * jumpNum;
       // console.log(`查询第${currentPage}页,设置每页${pageSize}条`);
       await props.queryFun(excessDataCount);
       await nextTick();
       // 恢复默认
-      props.queryFrom.currentPage = son_nowPage.value;
-      props.queryFrom.pageSize = props.defaultPageSize;
+      props.queryForm.currentPage = son_nowPage.value;
+      props.queryForm.pageSize = props.defaultPageSize;
     } else if (jumpNum == 1) {
-      props.queryFrom.currentPage++;
+      props.queryForm.currentPage++;
       await props.queryFun();
       await nextTick();
     }
@@ -102,7 +102,7 @@
       0,
       -(
         props.tableItemHeight *
-          props.queryFrom.pageSize *
+          props.queryForm.pageSize *
           (son_nowPage.value - 1) +
         props.tableHeaderHeight
       ),

@@ -2,8 +2,8 @@
   <div class="w-100 h-100 d-flex flex-column">
     <!-- 根据分类名称搜索 -->
     <el-form
-      :model="queryFrom"
-      ref="queryFromRef"
+      :model="queryForm"
+      ref="queryFormRef"
       :rules="queryRules"
       class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-0 px-sm-1 px-md-2 px-lg-3">
       <el-form-item
@@ -13,7 +13,7 @@
         <el-input
           clearable
           maxlength="12"
-          v-model.trim="queryFrom.classificationName"
+          v-model.trim="queryForm.classificationName"
           placeholder="分类名称"
           :prefix-icon="renderFontIcon('fa-solid fa-quote-left')" />
       </el-form-item>
@@ -24,7 +24,7 @@
         <el-input
           clearable
           maxlength="12"
-          v-model.trim="queryFrom.id"
+          v-model.trim="queryForm.id"
           placeholder="分类ID"
           :prefix-icon="renderFontIcon('bi bi-123')" />
       </el-form-item>
@@ -35,7 +35,7 @@
         <el-input
           clearable
           maxlength="12"
-          v-model.trim="queryFrom.parentClassificationNumber"
+          v-model.trim="queryForm.parentClassificationNumber"
           placeholder="父分类ID"
           :prefix-icon="renderFontIcon('bi bi-diagram-3')" />
       </el-form-item>
@@ -44,7 +44,7 @@
         prop="status"
         class="flex-shrink-0 me-0 me-sm-1 me-md-2 me-lg-3">
         <el-select
-          v-model="queryFrom.status"
+          v-model="queryForm.status"
           placeholder="正常/停用"
           clearable
           style="width: 106px">
@@ -207,7 +207,7 @@
                     :bs="bs"
                     :tableItemHeight="tableItemHeight"
                     :tableHeaderHeight="tableHeaderHeight"
-                    :queryFrom="queryFrom"
+                    :queryForm="queryForm"
                     :defaultPageSize="defaultPageSize" />
                 </div>
               </template>
@@ -327,7 +327,7 @@
         :bs="bs"
         :tableItemHeight="tableItemHeight"
         :tableHeaderHeight="tableHeaderHeight"
-        :queryFrom="queryFrom"
+        :queryForm="queryForm"
         :defaultPageSize="defaultPageSize" />
     </Transition>
   </div>
@@ -366,7 +366,7 @@
   let tableItemHeight: number; //每一项高度
   let tableHeaderHeight: number; //表头高度
   const loading = ref(false);
-  const queryFrom = reactive<PCQueryType>({
+  const queryForm = reactive<PCQueryType>({
     id: undefined, //分类编号
     parentClassificationNumber: undefined, //父级分类编号
     classificationName: "",
@@ -377,11 +377,11 @@
   const getFun = async (excessDataCount?: number) => {
     loading.value = true;
     let closePullUp;
-    const res = await getPCList(queryFrom);
+    const res = await getPCList(queryForm);
     console.log(
       `查询条件`,
-      queryFrom,
-      `\n第${queryFrom.currentPage}页商品分类(${res.data?.records?.length})=>`,
+      queryForm,
+      `\n第${queryForm.currentPage}页商品分类(${res.data?.records?.length})=>`,
       res
     );
     if (res.code == 200 && res.data.records.length > 0) {
@@ -434,8 +434,8 @@
       observeDOM: true,
     });
     bs.on("pullingUp", async () => {
-      queryFrom.currentPage++; //请求页码自增
-      console.log("触发了pullingUp,页码自增", queryFrom.currentPage);
+      queryForm.currentPage++; //请求页码自增
+      console.log("触发了pullingUp,页码自增", queryForm.currentPage);
       const { closePullUp } = await getFun();
       if (!closePullUp) bs!.finishPullUp();
     });
@@ -448,7 +448,7 @@
         // 滚动高度-表头高度=实际滚动内容
         nowPage.value = ceil(
           (-e.y - tableHeaderHeight! + bsWrapper.value.clientHeight) /
-            (tableItemHeight! * queryFrom.pageSize)
+            (tableItemHeight! * queryForm.pageSize)
         );
         /* console.log(
               `视窗高${PCListWrapper.value.clientHeight}px,表头高${
@@ -534,7 +534,7 @@
         else res = await editPC(A_EForm);
         if (res.code == 200) {
           allPCList.value = [];
-          queryFrom.currentPage = 1;
+          queryForm.currentPage = 1;
           getFun();
           // A_EVisible.value = false; //隐藏弹出框
           ElMessage.success(`${A_ETitle.value}成功`);
@@ -564,13 +564,13 @@
   };
 
   //查询分类-------------------------------------
-  const queryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const queryFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const queryRules = reactive({});
   const queryFun = async () => {
-    queryFromRef.value!.validate(async (valid, fields) => {
+    queryFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
         allPCList.value = [];
-        queryFrom.currentPage = 1;
+        queryForm.currentPage = 1;
         await getFun();
       } else console.log("error submit!", fields);
     });
@@ -584,7 +584,7 @@
       if (res.code == 200) {
         ElMessage.success(`删除分类"${PC.classificationName}成功"`);
         allPCList.value = [];
-        queryFrom.currentPage = 1;
+        queryForm.currentPage = 1;
         getFun(); //重新请求数据进行用户列表渲染
       }
       loading.value = false;

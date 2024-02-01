@@ -1,48 +1,3 @@
-export type QueryType = {
-  pageSize: number; //每页条数
-  currentPage: number; //当前页码
-};
-export type TimeType = {
-  createBy?: string; //创建者
-  createTime?: string; //创建时间
-  updateBy?: string; //最后更新者
-  updateTime?: string; //最后更新时间
-};
-// 左侧用户菜单
-export type authMenuListType = {
-  path: string;
-  icon: string;
-  menuName: string;
-  children: authMenuListType[];
-};
-// 登录表单
-export type loginFormType = {
-  userName: string;
-  password: string;
-};
-//登录返回信息,例如token
-export type loginInfoType = {
-  authentication: string;
-  username: string;
-  userId: number;
-};
-//每一个后台管理系统用户(账号)的信息
-export type userType = {
-  createTime?: string; //注册时间
-  businessId?: number;
-  // companyName: string; //商户名称用不到
-  email: string; //绑定邮箱
-  nickName: string; //部门主体名称
-  password?: string; //密码。注册时默认填入123456
-  phoneNumber: string; //绑定手机号
-  status?: number; //该后台管理账号的状态
-  userName?: string; //账号
-  userId?: number; //
-  remark?: string; //备注
-  roleName?: string[];
-};
-//分页查询用户列表所需参数
-export type userQueryType = userType & QueryType;
 //字体图标
 export type iconType = {
   // iconify (https://docs.iconify.design/icon-components/vue/#properties)
@@ -62,10 +17,23 @@ export type iconType = {
   //  all icon
   style?: object;
 };
-// 历史路由
-export type historicalRouteType = {
-  name: RouteRecordName | undefined;
+// 登录表单
+export type loginFormType = {
+  userName: string;
+  password: string;
+};
+//登录返回信息,例如token
+export type loginInfoType = {
+  authentication: string;
+  username: string;
+  userId: number;
+};
+// 左侧用户菜单
+export type authMenuListType = {
   path: string;
+  icon: string;
+  menuName: string;
+  children: authMenuListType[];
 };
 //角色对应的菜单
 export type roleMenuType = {
@@ -80,6 +48,64 @@ export type roleMenuType = {
   path: string;
   visible: number;
 };
+
+// 历史路由
+export type historicalRouteType = {
+  name: RouteRecordName | undefined;
+  path: string;
+};
+
+export type elFormItemType = {
+  prop: string;
+  label: string;
+};
+export type elInputInfoType = {
+  disabledOnEdit?: boolean;
+  maxlength?: number;
+  placeholder: string;
+  prefixIcon: string; //输入框前置图标
+};
+export type elInputItemInfoType = {
+  hiddenOnEdit?: boolean; //是否在编辑时隐藏
+  notRequired?: boolean; //是否非必填
+} & elInputInfoType &
+  elFormItemType;
+export type elSelectInfoType = {
+  placeholder: string;
+  width?: string;
+  option: { label: string; value: string | number }[];
+};
+export type elSelectItemInfoType = elSelectInfoType & elFormItemType;
+
+export type QueryType = {
+  pageSize: number; //每页条数
+  currentPage: number; //当前页码
+};
+export type TimeType = {
+  createBy?: string; //创建者
+  createTime?: string; //创建时间
+  updateBy?: string; //最后更新者
+  updateTime?: string; //最后更新时间
+};
+
+//每一个后台管理系统用户(账号)的信息
+export type userType = {
+  createTime?: string; //注册时间
+  businessId?: number;
+  // companyName: string; //商户名称用不到
+  email: string; //绑定邮箱
+  nickName: string; //部门主体名称
+  password?: string; //密码。注册时默认填入123456
+  phoneNumber: string; //绑定手机号
+  status?: number; //该后台管理账号的状态
+  userName?: string; //账号
+  userId?: number; //
+  remark?: string; //备注
+  roleName?: string[];
+};
+//分页查询用户列表所需参数
+export type userQueryType = userType & QueryType;
+
 //树形选择器
 export type treeListType = {
   value: number;

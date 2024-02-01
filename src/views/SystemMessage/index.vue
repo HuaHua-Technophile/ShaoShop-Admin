@@ -2,8 +2,8 @@
   <div class="w-100 h-100 d-flex flex-column">
     <!-- 根据时间/是否已读 筛选消息 -->
     <el-form
-      :model="queryFromRef"
-      ref="queryFromRef"
+      :model="queryFormRef"
+      ref="queryFormRef"
       :rules="queryRules"
       class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-0 px-sm-1 px-md-2 px-lg-3">
       <el-form-item
@@ -12,7 +12,7 @@
         class="flex-grow-1 overflow-hidden">
         <el-config-provider :locale="locale">
           <el-date-picker
-            v-model="queryFrom.timePeriod"
+            v-model="queryForm.timePeriod"
             type="datetimerange"
             start-placeholder="初始时间"
             end-placeholder="截止时间"
@@ -28,7 +28,7 @@
         prop="status"
         class="flex-shrink-0 px-0 px-sm-1 px-md-2 px-lg-3">
         <el-select
-          v-model="queryFrom.read"
+          v-model="queryForm.read"
           placeholder="已读/未读"
           clearable
           style="width: 106px">
@@ -80,7 +80,7 @@
                   :bs="bs"
                   :tableItemHeight="tableItemHeight"
                   :tableHeaderHeight="tableHeaderHeight"
-                  :queryFrom="queryFrom"
+                  :queryForm="queryForm"
                   :defaultPageSize="defaultPageSize" />
               </template>
               <template #default="scope">
@@ -121,7 +121,7 @@
         :bs="bs"
         :tableItemHeight="tableItemHeight"
         :tableHeaderHeight="tableHeaderHeight"
-        :queryFrom="queryFrom"
+        :queryForm="queryForm"
         :defaultPageSize="defaultPageSize" />
     </Transition>
     <!-- 消息展示弹窗 -->
@@ -162,7 +162,7 @@
   let tableItemHeight: number; //每一项高度
   let tableHeaderHeight: number; //表头高度
   const loading = ref(false);
-  const queryFrom = reactive<messageQueryType>({
+  const queryForm = reactive<messageQueryType>({
     timePeriod: [], //发送时间
     read: undefined, //是否已读
     currentPage: 1, //页码
@@ -172,18 +172,18 @@
     let closePullUp;
     loading.value = true;
     const res = await getSystemMessage({
-      currentPage: queryFrom.currentPage,
-      pageSize: queryFrom.pageSize,
-      read: queryFrom.read,
-      startTime: queryFrom.timePeriod ? queryFrom.timePeriod[0] : undefined,
-      endTime: queryFrom.timePeriod ? queryFrom.timePeriod[1] : undefined,
+      currentPage: queryForm.currentPage,
+      pageSize: queryForm.pageSize,
+      read: queryForm.read,
+      startTime: queryForm.timePeriod ? queryForm.timePeriod[0] : undefined,
+      endTime: queryForm.timePeriod ? queryForm.timePeriod[1] : undefined,
     });
     //
     loading.value = false;
     console.log(
       `查询条件`,
-      queryFrom,
-      `\n第${queryFrom.currentPage}页消息(${res.data?.records?.length})=>`,
+      queryForm,
+      `\n第${queryForm.currentPage}页消息(${res.data?.records?.length})=>`,
       res
     );
     if (res.code == 200 && res.data.records.length > 0) {
@@ -232,8 +232,8 @@
       observeDOM: true,
     });
     bs.on("pullingUp", async () => {
-      queryFrom.currentPage++; //请求页码自增
-      console.log("触发了pullingUp,页码自增", queryFrom.currentPage);
+      queryForm.currentPage++; //请求页码自增
+      console.log("触发了pullingUp,页码自增", queryForm.currentPage);
       const { closePullUp } = await getFun();
       if (!closePullUp) bs!.finishPullUp();
     });
@@ -246,7 +246,7 @@
         // 滚动高度-表头高度=实际滚动内容
         nowPage.value = ceil(
           (-e.y - tableHeaderHeight! + bsWrapper.value.clientHeight) /
-            (tableItemHeight! * queryFrom.pageSize)
+            (tableItemHeight! * queryForm.pageSize)
         );
       }, 400)
     );
@@ -268,17 +268,17 @@
   };
 
   //查询消息-------------------------------------
-  const queryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const queryFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const queryRules = reactive({});
   const locale = zhCn;
   const disabledDate = (time: Date) => {
     return time.getTime() > Date.now();
   };
   const queryFun = async () => {
-    queryFromRef.value!.validate(async (valid, fields) => {
+    queryFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
         systemMessageList.value = [];
-        queryFrom.currentPage = 1;
+        queryForm.currentPage = 1;
         getFun();
       } else console.log("error submit!", fields);
     });

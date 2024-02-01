@@ -1,72 +1,14 @@
 <template>
   <div class="w-100 h-100 d-flex flex-column">
     <!-- 搜索用户 -->
-    <el-form
-      :model="queryFrom"
-      ref="queryFromRef"
+    <listQueryForm
+      ref="queryFormRef"
+      :form="queryForm"
       :rules="queryRules"
-      class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-0 px-sm-1 px-md-2 px-lg-3">
-      <el-form-item
-        label="账号"
-        prop="userName"
-        class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
-        <el-input
-          clearable
-          maxlength="12"
-          v-model.trim="queryFrom.userName"
-          placeholder="账号"
-          :prefix-icon="renderFontIcon('bi bi-person')" />
-      </el-form-item>
-      <el-form-item
-        label="昵称"
-        prop="nickName"
-        class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
-        <el-input
-          clearable
-          maxlength="12"
-          v-model.trim="queryFrom.nickName"
-          placeholder="昵称"
-          :prefix-icon="renderFontIcon('bi bi-people')" />
-      </el-form-item>
-      <el-form-item
-        label="邮箱"
-        prop="email"
-        class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
-        <el-input
-          clearable
-          maxlength="20"
-          v-model.trim="queryFrom.email"
-          placeholder="每个后台主体唯一邮箱"
-          :prefix-icon="renderFontIcon('bi bi-envelope')" />
-      </el-form-item>
-      <el-form-item
-        label="电话"
-        prop="phoneNumber"
-        class="flex-grow-1 overflow-hidden me-0 me-md-1 me-lg-2">
-        <el-input
-          clearable
-          maxlength="11"
-          v-model.trim="queryFrom.phoneNumber"
-          placeholder="每个后台主体唯一手机号"
-          :prefix-icon="renderFontIcon('bi bi-telephone')" />
-      </el-form-item>
-      <el-form-item
-        label="状态"
-        prop="status"
-        class="flex-shrink-0 me-0 me-md-1 me-lg-2">
-        <el-select
-          v-model="queryFrom.status"
-          placeholder="正常/停用"
-          clearable
-          style="width: 106px">
-          <el-option label="正常" :value="0" />
-          <el-option label="停用" :value="1" />
-        </el-select>
-      </el-form-item>
-      <el-form-item>
-        <el-button :loading="loading" @click="queryFun">查询</el-button>
-      </el-form-item>
-    </el-form>
+      :inputInfo="listQueryFormInput"
+      :selectInfo="listQueryFormSelect"
+      :loading="loading"
+      :requestFun="requestFun" />
     <!-- 用户列表模块 -->
     <div class="flex-grow-1 overflow-hidden p-0 p-sm-1 p-md-2 p-lg-3">
       <div
@@ -97,9 +39,9 @@
             <el-table-column prop="nickName" label="昵称" />
             <el-table-column prop="status" label="状态">
               <template #default="scope">
-                <el-tag :type="scope.row.status == 0 ? 'success' : 'danger'">{{
-                  scope.row.status == 0 ? "正常" : "停用"
-                }}</el-tag>
+                <el-tag :type="scope.row.status == 0 ? 'success' : 'danger'"
+                  >{ { scope.row.status == 0 ? "正常": "停用" } }</el-tag
+                >
               </template>
             </el-table-column>
             <el-table-column prop="email" label="邮箱" />
@@ -112,7 +54,7 @@
                   effect="light"
                   placement="left">
                   <el-text style="max-width: 100px" truncated>
-                    {{ scope.row.updateTime }}
+                    { { scope.row.updateTime } }
                   </el-text>
                 </el-tooltip>
               </template>
@@ -127,7 +69,7 @@
                   :bs="bs"
                   :tableItemHeight="tableItemHeight"
                   :tableHeaderHeight="tableHeaderHeight"
-                  :queryFrom="queryFrom"
+                  :queryForm="queryForm"
                   :defaultPageSize="defaultPageSize" />
               </template>
               <template #default="scope">
@@ -136,7 +78,7 @@
                   effect="light"
                   placement="left">
                   <el-text style="max-width: 80px" truncated>
-                    {{ scope.row.remark }}
+                    { { scope.row.remark } }
                   </el-text>
                 </el-tooltip>
               </template>
@@ -155,83 +97,25 @@
       </div>
     </div>
     <!-- 添加/修改用户弹窗 -->
-    <el-dialog
-      v-model="A_EVisible"
+    <A_EDialog
+      v-model:visible="A_EVisible"
+      v-model:loading="loading"
       :title="A_ETitle"
-      width="450px"
-      :before-close="closeConfirmFun"
-      class="rounded-4"
-      draggable
-      center>
-      <template #header>
-        <el-button @click="A_EFun" :loading="loading"
-          >确认{{ A_ETitle
-          }}<span v-if="!isAdd">ID: {{ A_EFrom.userId }}</span></el-button
-        >
-      </template>
+      :isAdd="isAdd"
+      :id="A_EFrom.userId"
+      :fromRef="A_EFromRef"
+      :addFun="addUser"
+      :editFun="editUser"
+      :from="A_EFrom"
+      :requestFun="requestFun">
       <el-form :model="A_EFrom" ref="A_EFromRef" :rules="A_ERules">
-        <el-form-item label="用户账号" prop="userName">
-          <el-input
-            :disabled="!isAdd"
-            clearable
-            maxlength="12"
-            v-model.trim="A_EFrom.userName"
-            placeholder="每个后台主体唯一名称"
-            :prefix-icon="renderFontIcon('bi bi-person')" />
-        </el-form-item>
-        <el-form-item label="用户昵称" prop="nickName">
-          <el-input
-            clearable
-            maxlength="12"
-            v-model.trim="A_EFrom.nickName"
-            placeholder="用户昵称"
-            :prefix-icon="renderFontIcon('bi bi-people')" />
-        </el-form-item>
-        <el-form-item label="绑定邮箱" prop="email">
-          <el-input
-            clearable
-            maxlength="20"
-            v-model.trim="A_EFrom.email"
-            placeholder="每个后台主体唯一邮箱"
-            :prefix-icon="renderFontIcon('bi bi-envelope')" />
-        </el-form-item>
-        <el-form-item label="绑定电话" prop="phoneNumber">
-          <el-input
-            clearable
-            maxlength="11"
-            v-model.trim="A_EFrom.phoneNumber"
-            placeholder="每个后台主体唯一手机号"
-            :prefix-icon="renderFontIcon('bi bi-telephone')" />
-        </el-form-item>
-        <el-form-item label="账号密码" prop="password" v-if="isAdd">
-          <el-input
-            clearable
-            maxlength="16"
-            v-model.trim="A_EFrom.password"
-            placeholder="6~16位密码,不能含有中文与空格"
-            :prefix-icon="renderFontIcon('bi-shield-lock')" />
-        </el-form-item>
-        <el-form-item label="商户(可空)" prop="businessId">
-          <el-input
-            clearable
-            maxlength="12"
-            v-model.trim="A_EFrom.businessId"
-            placeholder="填写以绑定对应商户"
-            :prefix-icon="renderFontIcon('bi bi-shop-window')" />
-        </el-form-item>
-        <el-form-item
-          label="用户备注"
-          prop="remark"
-          style="padding-left: 10.18px"
-          class="mb-0">
-          <el-input
-            clearable
-            v-model.trim="A_EFrom.remark"
-            placeholder="备注"
-            :prefix-icon="renderFontIcon('fa-solid fa-marker')" />
-        </el-form-item>
+        <A_EDialogFormItemInput
+          v-for="i in A_EFromInput"
+          :info="i"
+          :from="A_EFrom"
+          :isAdd="isAdd" />
       </el-form>
-    </el-dialog>
+    </A_EDialog>
     <!-- 右下角悬浮跳页按钮 -->
     <Transition
       appear
@@ -247,7 +131,7 @@
         :bs="bs"
         :tableItemHeight="tableItemHeight"
         :tableHeaderHeight="tableHeaderHeight"
-        :queryFrom="queryFrom"
+        :queryForm="queryForm"
         :defaultPageSize="defaultPageSize" />
     </Transition>
   </div>
@@ -259,14 +143,18 @@
     editUser,
     delUser,
   } from "@/api/UserManagementAPI.ts";
-  import { renderFontIcon } from "@/utils/fontIcon/renderFontIcon";
   import {
     phoneNumberValidator,
     emailValidator,
     passwordValidator,
   } from "@/utils/elFromValidator/elFromValidator";
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm/elMessageBoxConfirm";
-  import { userQueryType, userType } from "@/type/index";
+  import {
+    elInputItemInfoType,
+    elSelectItemInfoType,
+    userQueryType,
+    userType,
+  } from "@/type/index";
 
   import { ElMessage, FormInstance } from "element-plus";
   import { onMounted, reactive, ref, nextTick } from "vue";
@@ -286,7 +174,7 @@
   let tableItemHeight: number; //每一项高度
   let tableHeaderHeight: number; //表头高度
   const loading = ref(false);
-  const queryFrom = reactive<userQueryType>({
+  const queryForm = reactive<userQueryType>({
     userName: "", //账号
     email: "", //绑定邮箱
     phoneNumber: "", //绑定手机号
@@ -298,13 +186,7 @@
   const getFun = async (excessDataCount?: number) => {
     let closePullUp;
     loading.value = true;
-    const res = await getUserList(queryFrom);
-    console.log(
-      `查询条件`,
-      queryFrom,
-      `\n第${queryFrom.currentPage}页用户列表(${res.data?.records?.length})=>`,
-      res
-    );
+    const res = await getUserList(queryForm);
     if (res.code == 200 && res.data.records.length > 0) {
       if (excessDataCount) res.data.records.splice(0, excessDataCount);
       allUserList.value.push(...res.data.records);
@@ -352,8 +234,8 @@
       observeDOM: true,
     });
     bs.on("pullingUp", async () => {
-      queryFrom.currentPage++; //请求页码自增
-      console.log("触发了pullingUp,页码自增", queryFrom.currentPage);
+      queryForm.currentPage++; //请求页码自增
+      console.log("触发了pullingUp,页码自增", queryForm.currentPage);
       const { closePullUp } = await getFun();
       if (!closePullUp) bs!.finishPullUp();
     });
@@ -366,14 +248,14 @@
         // 滚动高度-表头高度=实际滚动内容
         nowPage.value = ceil(
           (-e.y - tableHeaderHeight! + bsWrapper.value.clientHeight) /
-            (tableItemHeight! * queryFrom.pageSize)
+            (tableItemHeight! * queryForm.pageSize)
         );
         /* console.log(
-            `视窗高${bsWrapper.value.clientHeight}px,表头高${
-              tableHeaderHeight
-            }px,单格高${tableItemHeight}px,滚动了=>${-e.y}px,`,
-            nowPage.value
-          ); */
+                  `视窗高${bsWrapper.value.clientHeight}px,表头高${
+                    tableHeaderHeight
+                  }px,单格高${tableItemHeight}px,滚动了=>${-e.y}px,`,
+                  nowPage.value
+                ); */
       }, 400)
     );
   });
@@ -392,6 +274,77 @@
   };
 
   //表单-----------------------
+  const isAdd = ref(true);
+  const userNameInput: elInputItemInfoType = {
+    disabledOnEdit: true,
+    label: "用户账号",
+    prop: "userName",
+    maxlength: 12,
+    placeholder: "账号",
+    prefixIcon: "fa-regular fa-id-card",
+  };
+  const nickNameInput: elInputItemInfoType = {
+    label: "用户昵称",
+    prop: "nickName",
+    maxlength: 12,
+    placeholder: "昵称",
+    prefixIcon: "bi bi-person",
+  };
+  const emailInput: elInputItemInfoType = {
+    label: "用户邮箱",
+    prop: "email",
+    maxlength: 20,
+    placeholder: "每个后台主体唯一邮箱",
+    prefixIcon: "bi bi-envelope",
+  };
+  const phoneNumberInput: elInputItemInfoType = {
+    label: "用户电话",
+    prop: "phoneNumber",
+    maxlength: 11,
+    placeholder: "每个后台主体唯一手机号",
+    prefixIcon: "bi bi-telephone",
+  };
+  const passwordInput: elInputItemInfoType = {
+    label: "账号密码",
+    prop: "password",
+    maxlength: 16,
+    placeholder: "6~16位密码,不能含有中文与空格",
+    prefixIcon: "bi-shield-lock",
+    hiddenOnEdit: true,
+  };
+  const businessIdInput: elInputItemInfoType = {
+    label: "商户(可空)",
+    prop: "businessId",
+    maxlength: 12,
+    placeholder: "填写以绑定对应商户",
+    prefixIcon: "bi bi-shop-window",
+  };
+  const remarkInput: elInputItemInfoType = {
+    label: "用户备注",
+    prop: "remark",
+    placeholder: "备注",
+    prefixIcon: "bi bi-shop-window",
+    notRequired: true,
+  };
+  const statusSelect: elSelectItemInfoType = {
+    prop: "status",
+    label: "状态",
+    placeholder: "正常/停用",
+    option: [
+      { label: "正常", value: 0 },
+      { label: "停用", value: 1 },
+    ],
+  };
+  const A_EFromInput: elInputItemInfoType[] = [
+    userNameInput,
+    nickNameInput,
+    emailInput,
+    phoneNumberInput,
+    passwordInput,
+    businessIdInput,
+    remarkInput,
+  ];
+
   const A_EFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const defaultA_EInfo: userType = {
     businessId: undefined, //商户id
@@ -430,13 +383,6 @@
   //dialog弹出框-----------------------
   const A_EVisible = ref(false);
   const A_ETitle = ref("添加用户");
-  const isAdd = ref(true);
-  const closeConfirmFun = (done: () => void) => {
-    elMessageBoxConfirm(`放弃${A_ETitle.value}`, () => {
-      done();
-      ElMessage.info(`放弃${A_ETitle.value}`);
-    });
-  };
 
   // 添加/修改用户--------------------------------
   const toAdd = () => {
@@ -451,40 +397,24 @@
     isAdd.value = false;
     A_ETitle.value = "修改用户";
   };
-  const A_EFun = async () => {
-    A_EFromRef.value!.validate(async (valid, fields) => {
-      if (valid) {
-        loading.value = true;
-        let res;
-        if (isAdd.value) res = await addUser(A_EFrom);
-        else res = await editUser(A_EFrom);
-        if (res.code === 200) {
-          allUserList.value = [];
-          queryFrom.currentPage = 1;
-          getFun(); //重新请求数据进行用户列表渲染
-          ElMessage.success(`${A_ETitle.value}成功`);
-          // dialogVisible.value = false; //隐藏弹出框
-        }
-        loading.value = false;
-      } else console.log("error submit!", fields);
-    });
+  const requestFun = async () => {
+    allUserList.value = [];
+    queryForm.currentPage = 1;
+    getFun(); //重新请求数据进行用户列表渲染
   };
 
   //查询用户-------------------------------------
-  const queryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
-  const queryRules = reactive({
+  const queryFormRef = ref<{ r: FormInstance }>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const queryRules = {
     phoneNumber: [{ validator: phoneNumberValidator, trigger: "change" }],
     email: [{ validator: emailValidator, trigger: "change" }],
-  });
-  const queryFun = async () => {
-    queryFromRef.value!.validate(async (valid, fields) => {
-      if (valid) {
-        allUserList.value = [];
-        queryFrom.currentPage = 1;
-        await getFun();
-      } else console.log("error submit!", fields);
-    });
   };
+  const listQueryFormInput: elInputItemInfoType[] = [
+    userNameInput,
+    emailInput,
+    phoneNumberInput,
+  ];
+  const listQueryFormSelect: elSelectItemInfoType[] = [statusSelect];
 
   //删除用户------------------------------------
   const tableRef = ref();
@@ -502,7 +432,7 @@
         if (res.code == 200) {
           ElMessage.success(`删除勾选的${userIdList.value.length}个用户成功`);
           allUserList.value = [];
-          queryFrom.currentPage = 1;
+          queryForm.currentPage = 1;
           getFun(); //重新请求数据进行用户列表渲染
         }
         loading.value = false;

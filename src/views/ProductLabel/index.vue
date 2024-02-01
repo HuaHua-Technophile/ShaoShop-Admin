@@ -2,8 +2,8 @@
   <div class="w-100 h-100 d-flex flex-column">
     <!-- 搜索标签 -->
     <el-form
-      :model="queryFrom"
-      ref="queryFromRef"
+      :model="queryForm"
+      ref="queryFormRef"
       :rules="queryRules"
       class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-0 px-sm-1 px-md-2 px-lg-3">
       <el-form-item
@@ -13,7 +13,7 @@
         <el-input
           clearable
           maxlength="12"
-          v-model.trim="queryFrom.labelName"
+          v-model.trim="queryForm.labelName"
           placeholder="商品标签名称"
           :prefix-icon="renderFontIcon('fa-solid fa-quote-left')" />
       </el-form-item>
@@ -29,7 +29,7 @@
           :bs="bs"
           :tableItemHeight="tableItemHeight"
           :tableHeaderHeight="tableHeaderHeight"
-          :queryFrom="queryFrom"
+          :queryForm="queryForm"
           :defaultPageSize="defaultPageSize" />
       </el-form-item>
     </el-form>
@@ -128,7 +128,7 @@
         :bs="bs"
         :tableItemHeight="tableItemHeight"
         :tableHeaderHeight="tableHeaderHeight"
-        :queryFrom="queryFrom"
+        :queryForm="queryForm"
         :defaultPageSize="defaultPageSize" />
     </Transition>
   </div>
@@ -156,7 +156,7 @@
   let tableItemHeight: number; //每一项高度
   let tableHeaderHeight: number; //表头高度
   const loading = ref(false);
-  const queryFrom = reactive<PLQueryType>({
+  const queryForm = reactive<PLQueryType>({
     labelName: "", //标签名称
     currentPage: 1, //请求的页码
     pageSize: defaultPageSize, //每页返回的数量
@@ -164,11 +164,11 @@
   const getFun = async (excessDataCount?: number) => {
     let closePullUp;
     loading.value = true;
-    const res = await getPLList(queryFrom);
+    const res = await getPLList(queryForm);
     console.log(
       `查询条件`,
-      queryFrom,
-      `\n第${queryFrom.currentPage}页商品标签(${res.data?.records?.length})=>`,
+      queryForm,
+      `\n第${queryForm.currentPage}页商品标签(${res.data?.records?.length})=>`,
       res
     );
     if (res.code == 200 && res.data.records.length > 0) {
@@ -218,8 +218,8 @@
       observeDOM: true,
     });
     bs.on("pullingUp", async () => {
-      queryFrom.currentPage++; //请求页码自增
-      console.log("触发了pullingUp,页码自增", queryFrom.currentPage);
+      queryForm.currentPage++; //请求页码自增
+      console.log("触发了pullingUp,页码自增", queryForm.currentPage);
       const { closePullUp } = await getFun();
       if (!closePullUp) bs!.finishPullUp();
     });
@@ -232,7 +232,7 @@
         // 滚动高度-表头高度=实际滚动内容
         nowPage.value = ceil(
           (-e.y - tableHeaderHeight! + bsWrapper.value.clientHeight) /
-            (tableItemHeight! * queryFrom.pageSize)
+            (tableItemHeight! * queryForm.pageSize)
         );
         /* console.log(
               `视窗高${bsWrapper.value.clientHeight}px,表头高${
@@ -300,7 +300,7 @@
         else res = await editPL(A_EFrom);
         if (res.code === 200) {
           allPLList.value = [];
-          queryFrom.currentPage = 1;
+          queryForm.currentPage = 1;
           getFun(); //重新请求数据进行用户列表渲染
           ElMessage.success("添加成功");
           // dialogVisible.value = false; //隐藏弹出框
@@ -311,13 +311,13 @@
   };
 
   //查询商品标签-------------------------------------
-  const queryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const queryFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const queryRules = reactive({});
   const queryFun = async () => {
-    queryFromRef.value!.validate(async (valid, fields) => {
+    queryFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
         allPLList.value = [];
-        queryFrom.currentPage = 1;
+        queryForm.currentPage = 1;
         await getFun();
       } else console.log("error submit!", fields);
     });
@@ -339,7 +339,7 @@
         if (res.code == 200) {
           ElMessage.success(`删除勾选的${PLIdList.value.length}个商品标签成功`);
           allPLList.value = [];
-          queryFrom.currentPage = 1;
+          queryForm.currentPage = 1;
           getFun(); //重新请求数据进行商品标签列表渲染
         }
         loading.value = false;

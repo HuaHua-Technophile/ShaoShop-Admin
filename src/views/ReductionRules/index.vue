@@ -121,7 +121,7 @@
   let tableItemHeight: number; //每一项高度
   let tableHeaderHeight: number; //表头高度
   const loading = ref(false);
-  const queryFrom = reactive<FRQueryType>({
+  const queryForm = reactive<FRQueryType>({
     id: undefined,
     name: undefined,
     minAmount: undefined,
@@ -136,11 +136,11 @@
   const getFun = async (excessDataCount?: number) => {
     let closePullUp;
     loading.value = true;
-    const res = await getFRList(queryFrom);
+    const res = await getFRList(queryForm);
     console.log(
       `查询条件`,
-      queryFrom,
-      `\n第${queryFrom.currentPage}页满减规则(${res.data?.records?.length})=>`,
+      queryForm,
+      `\n第${queryForm.currentPage}页满减规则(${res.data?.records?.length})=>`,
       res
     );
     if (res.code == 200 && res.data.records.length > 0) {
@@ -190,8 +190,8 @@
       observeDOM: true,
     });
     bs.on("pullingUp", async () => {
-      queryFrom.currentPage++; //请求页码自增
-      console.log("触发了pullingUp,页码自增", queryFrom.currentPage);
+      queryForm.currentPage++; //请求页码自增
+      console.log("触发了pullingUp,页码自增", queryForm.currentPage);
       const { closePullUp } = await getFun();
       if (!closePullUp) bs!.finishPullUp();
     });
@@ -204,7 +204,7 @@
         // 滚动高度-表头高度=实际滚动内容
         nowPage.value = ceil(
           (-e.y - tableHeaderHeight! + bsWrapper.value.clientHeight) /
-            (tableItemHeight! * queryFrom.pageSize)
+            (tableItemHeight! * queryForm.pageSize)
         );
         /* console.log(
             `视窗高${bsWrapper.value.clientHeight}px,表头高${
@@ -255,7 +255,7 @@
         else res = await editFR(A_EFrom);
         if (res.code === 200) {
           allFRList.value = [];
-          queryFrom.currentPage = 1;
+          queryForm.currentPage = 1;
           getFun(); //重新请求数据进行满减规则渲染
           ElMessage.success(`${A_ETitle.value}成功`);
           // dialogVisible.value = false; //隐藏弹出框

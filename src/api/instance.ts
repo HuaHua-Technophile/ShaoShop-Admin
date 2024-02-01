@@ -25,7 +25,7 @@ interface AxiosResponse<T = any, D = any> {
   config: InternalAxiosRequestConfig<D>;
   request?: any;
 }
-interface AxiosInstance extends Axios {
+export interface AxiosInstance extends Axios {
   <T = any, R = AxiosResponse<T>, D = any>(
     config: AxiosRequestConfig<D>
   ): Promise<R>;

@@ -7,6 +7,8 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    A_EDialog: typeof import('./src/components/A_EDialog/A_EDialog.vue')['default']
+    A_EDialogFormItemInput: typeof import('./src/components/A_EDialog/A_EDialogFormItemInput.vue')['default']
     BsWrapper: typeof import('./src/components/bsWrapper/bsWrapper.vue')['default']
     BSWrapper: typeof import('./src/components/BSWrapper/BSWrapper.vue')['default']
     DarkIcon: typeof import("./src/components/darkThemeSwitch/DarkIcon.vue")["default"]
@@ -63,6 +65,9 @@ declare module 'vue' {
     JumpPageBtn: typeof import('./src/components/jumpPageBtn/jumpPageBtn.vue')['default']
     JumpPageHoverBtn: typeof import('./src/components/jumpPageBtn/jumpPageHoverBtn.vue')['default']
     LightIcon: typeof import("./src/components/darkThemeSwitch/lightIcon.vue")["default"]
+    ListQueryForm: typeof import('./src/components/listQueryForm/listQueryForm.vue')['default']
+    ListQueryFormContainer: typeof import('./src/components/listQueryForm/listQueryFormContainer.vue')['default']
+    ListQueryFormItemInput: typeof import('./src/components/listQueryForm/listQueryFormItemInput.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

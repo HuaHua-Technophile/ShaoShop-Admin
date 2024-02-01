@@ -1,7 +1,6 @@
 {
   "recommendations": [
     "sdras.vue-vscode-snippets",
-    "vue.volar",
     "vscode-icons-team.vscode-icons",
     "stylelint.vscode-stylelint",
     "esbenp.prettier-vscode",
@@ -21,6 +20,7 @@
     "formulahendry.auto-rename-tag",
     "formulahendry.auto-complete-tag",
     "formulahendry.auto-close-tag",
-    "xuedao.super-comprehensive"
+    "xuedao.super-comprehensive",
+    "vue.vscode-typescript-vue-plugin"
   ]
 }

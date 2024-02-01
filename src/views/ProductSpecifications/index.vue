@@ -2,8 +2,8 @@
   <div class="w-100 h-100 d-flex flex-column">
     <!-- 根据规格名称搜索 -->
     <el-form
-      :model="queryFrom"
-      ref="queryFromRef"
+      :model="queryForm"
+      ref="queryFormRef"
       :rules="queryRules"
       class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-0 px-sm-1 px-md-2 px-lg-3">
       <el-form-item
@@ -13,7 +13,7 @@
         <el-input
           clearable
           maxlength="10"
-          v-model.trim="queryFrom.productSpec"
+          v-model.trim="queryForm.productSpec"
           placeholder="商品规格名称"
           :prefix-icon="renderFontIcon('fa-solid fa-ruler-combined')" />
       </el-form-item>
@@ -29,7 +29,7 @@
           :bs="bs"
           :tableItemHeight="tableItemHeight"
           :tableHeaderHeight="tableHeaderHeight"
-          :queryFrom="queryFrom"
+          :queryForm="queryForm"
           :defaultPageSize="defaultPageSize" />
       </el-form-item>
     </el-form>
@@ -229,7 +229,7 @@
         :bs="bs"
         :tableItemHeight="tableItemHeight"
         :tableHeaderHeight="tableHeaderHeight"
-        :queryFrom="queryFrom"
+        :queryForm="queryForm"
         :defaultPageSize="defaultPageSize" />
     </Transition>
   </div>
@@ -264,7 +264,7 @@
   const defaultPageSize = 20;
   let tableItemHeight: number; //每一项高度
   let tableHeaderHeight: number; //表头高度
-  const queryFrom = reactive<PSNQueryType>({
+  const queryForm = reactive<PSNQueryType>({
     productSpec: "", //商品规格名称
     currentPage: 1, //请求的页码
     pageSize: defaultPageSize, //每页返回的数量
@@ -273,11 +273,11 @@
   const getFun = async (excessDataCount?: number) => {
     let closePullUp;
     loading.value = true;
-    const res = await getPSNList(queryFrom);
+    const res = await getPSNList(queryForm);
     console.log(
       `查询条件`,
-      queryFrom,
-      `\n第${queryFrom.currentPage}页商品规格(${res.data?.records?.length})=>`,
+      queryForm,
+      `\n第${queryForm.currentPage}页商品规格(${res.data?.records?.length})=>`,
       res
     );
     if (res.code == 200 && res.data.records.length > 0) {
@@ -354,8 +354,8 @@
       observeDOM: true,
     });
     bs.on("pullingUp", async () => {
-      queryFrom.currentPage++; //请求页码自增
-      console.log("触发了pullingUp,页码自增", queryFrom.currentPage);
+      queryForm.currentPage++; //请求页码自增
+      console.log("触发了pullingUp,页码自增", queryForm.currentPage);
       const { closePullUp } = await getFun();
       if (!closePullUp) bs!.finishPullUp();
     });
@@ -368,7 +368,7 @@
         // 滚动高度-表头高度=实际滚动内容
         nowPage.value = ceil(
           (-e.y - tableHeaderHeight! + bsWrapper.value.clientHeight) /
-            (tableItemHeight! * queryFrom.pageSize)
+            (tableItemHeight! * queryForm.pageSize)
         );
         /* console.log(
               `视窗高${PSNListWrapper.value.clientHeight}px,表头高${
@@ -542,7 +542,7 @@
           if (res.code === 200) {
             ElMessage.success(`${A_ETitle.value}成功`);
             allPSNList.value = [];
-            queryFrom.currentPage = 1;
+            queryForm.currentPage = 1;
             getFun(); //重新请求数据进行商品规格列表渲染
             // dialogVisible.value = false; //隐藏弹出框
           }
@@ -553,12 +553,12 @@
   };
 
   //查询商品规格------------------------------
-  const queryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const queryFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const queryFun = async () => {
-    queryFromRef.value?.validate(async (valid, fields) => {
+    queryFormRef.value?.validate(async (valid, fields) => {
       if (valid) {
         allPSNList.value = [];
-        queryFrom.currentPage = 1;
+        queryForm.currentPage = 1;
         getFun(); //重新请求数据进行商品规格列表渲染
       } else console.log("error submit!", fields);
     });
@@ -572,7 +572,7 @@
       if (res.code === 200) {
         ElMessage.success(`删除规格'${PSN.specName}'成功`);
         allPSNList.value = [];
-        queryFrom.currentPage = 1;
+        queryForm.currentPage = 1;
         getFun(); //重新请求数据进行商品规格列表渲染
       }
       loading.value = false;

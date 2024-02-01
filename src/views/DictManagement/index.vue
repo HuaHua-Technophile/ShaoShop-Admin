@@ -2,8 +2,8 @@
   <div class="w-100 h-100 d-flex flex-column">
     <!-- 搜索字典 -->
     <el-form
-      :model="queryFrom"
-      ref="queryFromRef"
+      :model="queryForm"
+      ref="queryFormRef"
       class="bg-body flex-shrink-0 d-flex flex-nowrap align-items-center px-0 px-sm-1 px-md-2 px-lg-3">
       <el-form-item
         label="字典名称"
@@ -12,7 +12,7 @@
         <el-input
           clearable
           maxlength="10"
-          v-model.trim="queryFrom.dictName"
+          v-model.trim="queryForm.dictName"
           placeholder="字典名称"
           :prefix-icon="renderFontIcon('fa-solid fa-quote-left')" />
       </el-form-item>
@@ -23,7 +23,7 @@
         <el-input
           clearable
           maxlength="20"
-          v-model.trim="queryFrom.dictType"
+          v-model.trim="queryForm.dictType"
           placeholder="字典类型"
           :prefix-icon="renderFontIcon('fa-solid fa-code')" />
       </el-form-item>
@@ -32,7 +32,7 @@
         prop="status"
         class="flex-shrink-0 me-0 me-sm-1 me-md-2 me-lg-3">
         <el-select
-          v-model="queryFrom.status"
+          v-model="queryForm.status"
           placeholder="正常/停用"
           clearable
           style="width: 106px">
@@ -367,7 +367,7 @@
   // 不传参数的情况下，就是获取所有字典。传参数的情况下可用作搜索
   const allDictList = ref<dictType[]>([]);
   const loading = ref(false);
-  const queryFrom = reactive({
+  const queryForm = reactive({
     dictName: "",
     dictType: "",
     status: undefined,
@@ -375,8 +375,8 @@
   const getFun = async () => {
     loading.value = true;
     allDictList.value = [];
-    console.log("字典查询条件=>", queryFrom);
-    const res = await getDictList(queryFrom);
+    console.log("字典查询条件=>", queryForm);
+    const res = await getDictList(queryForm);
     console.log("字典查询结果=>", res);
     if (res.code === 200) {
       ElMessage.success("字典查询成功");
@@ -523,9 +523,9 @@
   };
 
   //查询用户-------------------------------------
-  const queryFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const queryFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const queryFun = async () => {
-    queryFromRef.value!.validate((valid, fields) => {
+    queryFormRef.value!.validate((valid, fields) => {
       if (valid) getFun();
       else console.log("error submit!", fields);
     });
