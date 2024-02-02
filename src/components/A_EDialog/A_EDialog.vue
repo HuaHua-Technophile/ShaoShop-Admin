@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="visible"
-    :title="title"
+    :title="A_ETitle"
     :width="width"
     :before-close="closeConfirmFun"
     class="rounded-4"
@@ -9,64 +9,86 @@
     center>
     <template #header>
       <el-button @click="A_EFun" :loading="loading"
-        >确认{{ title }}<span v-if="!isAdd">ID: {{ id }}</span></el-button
+        >确认{{ A_ETitle }}<span v-if="!isAdd">ID: {{ id }}</span></el-button
       >
     </template>
-    <slot></slot>
+    <el-form :model="A_EFrom" ref="A_EFromRef" :rules="A_ERules">
+      <div v-for="i in A_EFromInput" class="A_EDialogFormItem">
+        <el-form-item
+          :label="i.label"
+          :prop="i.prop"
+          :style="i.notRequired ? 'padding-left: 10.18px' : ''"
+          v-if="!(i.hiddenOnEdit && !isAdd)">
+          <el-input
+            :disabled="i.disabledOnEdit && !isAdd"
+            clearable
+            :maxlength="i.maxlength"
+            v-model.trim="A_EFrom[i.prop]"
+            :placeholder="i.placeholder"
+            :prefix-icon="renderFontIcon(i.prefixIcon)" />
+        </el-form-item>
+      </div>
+
+      <slot></slot>
+    </el-form>
   </el-dialog>
 </template>
 <script lang="ts" setup>
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm/elMessageBoxConfirm";
-  import { AxiosInstance } from "@/api/instance";
+  import { renderFontIcon } from "@/utils/fontIcon/renderFontIcon";
+  import { addFun, editFun } from "@/api/instance";
   import { ElMessage, FormInstance } from "element-plus";
+  import { ref } from "vue";
+  import { elInputItemInfoType } from "@/type";
 
   const visible = defineModel<boolean>("visible");
   const loading = defineModel<boolean>("loading");
   const props = withDefaults(
     defineProps<{
-      // visible: boolean;
-      // loading: boolean;
-      title: string;
+      A_ETitle: string;
       isAdd: boolean;
       id?: number;
+      A_EFrom: { [key: string]: string };
+      A_ERules?: object;
+      A_EFromInput: elInputItemInfoType[];
+      addFun: ReturnType<typeof addFun>;
+      editFun: ReturnType<typeof editFun>;
+      reQueryFun: () => void;
       width?: string;
-      fromRef: FormInstance | undefined; //页面加载完毕前可能传入undefined
-      addFun: AxiosInstance;
-      editFun: AxiosInstance;
-      from: object;
-      requestFun: () => void;
     }>(),
     {
       width: "485px",
     }
   );
   /* 不使用defineModel的方法:
-  const v = ref(false);
-  watchEffect(() => {
-    v.value = props.visible;
-  });
-  const emit = defineEmits<{
-    "update:visible": [arg: boolean];
-  }>(); */
+    const v = ref(false);
+    watchEffect(() => {
+      v.value = props.visible;
+    });
+    const emit = defineEmits<{
+      "update:visible": [arg: boolean];
+    }>(); */
 
   const closeConfirmFun = (done: () => void) => {
-    elMessageBoxConfirm(`放弃${props.title}`, () => {
+    elMessageBoxConfirm(`放弃${props.A_ETitle}`, () => {
       done();
       // emit("update:visible", false); 不使用defineModel的方法
-      ElMessage.info(`放弃${props.title}`);
+      ElMessage.info(`放弃${props.A_ETitle}`);
     });
   };
 
+  const A_EFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+
   const A_EFun = async () => {
-    props.fromRef?.validate(async (valid, fields) => {
+    A_EFromRef.value?.validate(async (valid, fields) => {
       if (valid) {
         loading.value = true;
         let res;
-        if (props.isAdd) res = await props.addFun(props.from);
-        else res = await props.editFun(props.from);
+        if (props.isAdd) res = await props.addFun(props.A_EFrom);
+        else res = await props.editFun(props.A_EFrom);
         if (res.code === 200) {
-          props.requestFun();
-          ElMessage.success(`${props.title}成功`);
+          props.reQueryFun();
+          ElMessage.success(`${props.A_ETitle}成功`);
         }
         visible.value = false; //隐藏弹出框
         loading.value = false;
@@ -74,3 +96,12 @@
     });
   };
 </script>
+
+<style lang="scss">
+  .A_EDialogFormItem:last-child {
+    margin-bottom: 0 !important;
+    & > .el-form-item {
+      margin-bottom: 0 !important;
+    }
+  }
+</style>

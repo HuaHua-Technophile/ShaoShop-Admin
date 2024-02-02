@@ -40,7 +40,7 @@
 </template>
 <script lang="ts" setup>
   import { renderFontIcon } from "@/utils/fontIcon/renderFontIcon";
-  import { elInputItemInfoType } from "@/type";
+  import { elInputItemInfoType, elSelectItemInfoType } from "@/type";
   import { ElMessage, FormInstance } from "element-plus";
   import { ref } from "vue";
 
@@ -51,13 +51,14 @@
     selectInfo?: elSelectItemInfoType[];
     form: { [key: string]: string };
     loading: boolean;
-    requestFun: () => void;
+    reQueryFun: () => void;
   }>();
+
   const formRef = ref<FormInstance>();
   const queryFun = async () => {
     formRef.value?.validate(async (valid, fields) => {
       if (valid) {
-        props.requestFun();
+        props.reQueryFun();
         ElMessage.success(`查询成功`);
       } else console.log("error submit!", fields);
     });

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useUserInfoStore } from "@/stores/userInfo";
 import { addMenuRouter } from "@/utils/addMenuRouter/addMenuRouter";
 import { ElMessage } from "element-plus";
+import { toRaw } from "vue";
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -52,7 +53,7 @@ const router = createRouter({
         ) {
           console.log(
             "页面刷新后vue丢失router,重新写入用户信息中存储的路由=>",
-            userInfoStore.authMenuList
+            toRaw(userInfoStore.authMenuList)
           );
           let { hasTargetRouter } = addMenuRouter(
             userInfoStore.authMenuList,

@@ -11,6 +11,7 @@ declare module 'vue' {
     A_EDialogFormItemInput: typeof import('./src/components/A_EDialog/A_EDialogFormItemInput.vue')['default']
     BsWrapper: typeof import('./src/components/bsWrapper/bsWrapper.vue')['default']
     BSWrapper: typeof import('./src/components/BSWrapper/BSWrapper.vue')['default']
+    CustomTable: typeof import('./src/components/customTable/customTable.vue')['default']
     DarkIcon: typeof import("./src/components/darkThemeSwitch/DarkIcon.vue")["default"]
     DarkThemeSwitch: typeof import('./src/components/darkThemeSwitch/darkThemeSwitch.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']

@@ -13,6 +13,7 @@ import {
   InternalAxiosRequestConfig,
 } from "axios";
 import { ElMessage } from "element-plus";
+import { toRaw } from "vue";
 
 // 重写接口-----------------------
 interface AxiosResponse<T = any, D = any> {
@@ -84,7 +85,7 @@ export const addFun = <dataType, resType = any>(
   addStr: string
 ) => {
   return (data?: dataType) => {
-    console.log(`准备添加${addStr}=>`, data);
+    console.log(`准备添加${addStr}=>`, toRaw(data));
     return instance<resType>({
       url,
       method: "POST",
@@ -94,7 +95,7 @@ export const addFun = <dataType, resType = any>(
 };
 export const delFun = <delType>(url: string, delStr: string) => {
   return (data: delType) => {
-    console.log(`准备删除${delStr}=>`, data);
+    console.log(`准备删除${delStr}=>`, toRaw(data));
     return instance({
       url: url + "/" + data,
       method: "DELETE",
@@ -103,7 +104,7 @@ export const delFun = <delType>(url: string, delStr: string) => {
 };
 export const delFun_data = <delType>(url: string, delStr: string) => {
   return (data?: delType) => {
-    console.log(`准备删除${delStr}=>`, data);
+    console.log(`准备删除${delStr}=>`, toRaw(data));
     return instance({
       url,
       method: "DELETE",
@@ -113,7 +114,7 @@ export const delFun_data = <delType>(url: string, delStr: string) => {
 };
 export const editFun = <dataType>(url: string, editStr: string) => {
   return (data: dataType) => {
-    console.log(`准备修改${editStr}=>`, data);
+    console.log(`准备修改${editStr}=>`, toRaw(data));
     return instance({
       url,
       method: "PUT",
@@ -125,8 +126,8 @@ export const getListFun = <resType, paramsType = undefined>(
   url: string,
   queryStr: string
 ) => {
-  return (params: paramsType) => {
-    if (params) console.log(`查询${queryStr}列表条件=>`, params);
+  return (params?: paramsType) => {
+    if (params) console.log(`查询${queryStr}列表条件=>`, toRaw(params));
     return instance<{ records: resType[]; total: number }>({
       url,
       method: "GET",
@@ -139,7 +140,7 @@ export const getFun = <resType, paramsType = undefined>(
   queryStr: string
 ) => {
   return (params?: paramsType) => {
-    if (params) console.log(`获取`, params, `的${queryStr}↓`);
+    if (params) console.log(`获取`, toRaw(params), `的${queryStr}↓`);
     else console.log(`准备获取${queryStr}↓`);
     return instance<resType>({
       url: params ? url + "/" + params : url,
