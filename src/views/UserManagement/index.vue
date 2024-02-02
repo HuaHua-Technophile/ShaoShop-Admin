@@ -62,7 +62,7 @@
     </bsWrapper>
     <!-- 添加/修改用户弹窗 -->
     <A_EDialog
-      v-model:visible="A_EVisible"
+      v-model:A_EVisible="A_EVisible"
       v-model:loading="loading"
       :A_ETitle="A_ETitle"
       :isAdd="isAdd"

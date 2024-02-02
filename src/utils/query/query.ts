@@ -40,10 +40,10 @@ export const query = ({
         loading = false;
       }
     : async (excessDataCount?: number) => {
-        let closePullUp;
+        let loadFinish;
         loading = true;
         const res = await queryListFun!(queryForm);
-        // 如果加载的数据量大于一条
+        // 如果加载的数据量大于0条
         if (res.code == 200 && res.data.records.length > 0) {
           console.log(`${queryStr}(${res.data.records.length})=>`, res);
 
@@ -79,12 +79,12 @@ export const query = ({
           // 如果已有数据量大于返回值中注明的总数据量
           if (data.value.length >= res.data.total) {
             bs?.closePullUp();
-            closePullUp = true;
+            loadFinish = true;
           }
         }
         // 否则加载数据量为0,则关闭上拉加载
         else bs?.closePullUp();
         loading = false;
-        return { closePullUp };
+        return { loadFinish };
       };
 };

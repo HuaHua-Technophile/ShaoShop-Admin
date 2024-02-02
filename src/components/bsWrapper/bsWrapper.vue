@@ -55,15 +55,9 @@
         console.log("触发pullingUp,页码", props.form!.currentPage);
         const result = await props.queryFun!();
         if (result) {
-          const { closePullUp } = result;
-          if (!closePullUp) bs.value!.finishPullUp();
+          const { loadFinish } = result;
+          if (!loadFinish) bs.value!.finishPullUp();
         }
-        /* console.log(
-          "触发pullingUp,页码",
-          props.form!.currentPage,
-          "closePullUp",
-          closePullUp
-        ); */
       });
     if (props.scroll)
       bs.value.on(

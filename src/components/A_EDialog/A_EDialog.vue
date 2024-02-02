@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="visible"
+    v-model="A_EVisible"
     :title="A_ETitle"
     :width="width"
     :before-close="closeConfirmFun"
@@ -41,7 +41,7 @@
   import { ref } from "vue";
   import { elInputItemInfoType } from "@/type";
 
-  const visible = defineModel<boolean>("visible");
+  const A_EVisible = defineModel<boolean>("A_EVisible");
   const loading = defineModel<boolean>("loading");
   const props = withDefaults(
     defineProps<{
@@ -90,7 +90,7 @@
           props.reQueryFun();
           ElMessage.success(`${props.A_ETitle}成功`);
         }
-        visible.value = false; //隐藏弹出框
+        // A_EVisible.value = false; //隐藏弹出框
         loading.value = false;
       } else console.log("error submit!", fields);
     });

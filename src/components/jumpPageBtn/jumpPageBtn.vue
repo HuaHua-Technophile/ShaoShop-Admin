@@ -27,7 +27,6 @@
   const props = withDefaults(
     defineProps<{
       allPageCount: number;
-      // nowPage: number;
       visible: boolean;
       bs: BScrollConstructor<{}> | undefined; //组件放置的位置在bsWrapper之前,因此会在bs实例化之前就传入undefined
       tableItemHeight: number;
@@ -63,6 +62,7 @@
 
     // 如果已经请求的页码小于跳转的页码,则先请求一次,然后再跳转。
     const skipPage = son_nowPage.value - props.queryForm.currentPage;
+    let loadFinish: boolean | undefined;
     // 如果通过直接输入目标页码跳转,则有可能一次跳转多页,需要一次性请求更多数据(若有多余则剔除)
     if (skipPage > 1) {
       let excessDataCount: number;
@@ -82,7 +82,8 @@
       excessDataCount =
         props.queryForm.pageSize - props.defaultPageSize * skipPage;
 
-      await props.queryFun(excessDataCount);
+      const result = await props.queryFun(excessDataCount);
+      if (result) loadFinish = result.loadFinish;
       await nextTick();
 
       // 恢复默认
@@ -109,7 +110,9 @@
         500
       );
     };
-    if (skipPage > 0) props.bs?.once("refresh", bsScroll);
+
+    if (!loadFinish && skipPage > 0) props.bs?.once("refresh", bsScroll);
+    //↑需要等待新数据被ObserveDOM自动重新渲染BS
     else bsScroll();
   };
 
