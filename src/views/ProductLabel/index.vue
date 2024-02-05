@@ -99,15 +99,15 @@
       <template #header>
         <el-button @click="A_EFun" :loading="loading"
           >确认{{ A_ETitle
-          }}<span v-if="!isAdd">ID: {{ A_EFrom.id }}</span></el-button
+          }}<span v-if="!isAdd">ID: {{ A_EForm.id }}</span></el-button
         >
       </template>
-      <el-form :model="A_EFrom" ref="A_EFromRef" :rules="A_ERules">
+      <el-form :model="A_EForm" ref="A_EFormRef" :rules="A_ERules">
         <el-form-item label="商品标签名称" prop="labelName">
           <el-input
             clearable
             maxlength="12"
-            v-model.trim="A_EFrom.labelName"
+            v-model.trim="A_EForm.labelName"
             placeholder="商品标签名称"
             :prefix-icon="renderFontIcon('fa-solid fa-quote-left')" />
         </el-form-item>
@@ -258,11 +258,11 @@
   };
 
   //表单-----------------------
-  const A_EFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const A_EFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const defaultA_EInfo: PLType = {
     labelName: "",
   };
-  let A_EFrom = reactive(defaultA_EInfo);
+  let A_EForm = reactive(defaultA_EInfo);
   const A_ERules = reactive({
     labelName: [{ required: true, message: "请输入商品标签", trigger: "blur" }],
   });
@@ -280,24 +280,24 @@
 
   // 添加/修改商品标签--------------------------------
   const toAdd = () => {
-    A_EFrom = reactive(cloneDeep(defaultA_EInfo));
+    A_EForm = reactive(cloneDeep(defaultA_EInfo));
     A_EVisible.value = true;
     isAdd.value = true;
     A_ETitle.value = "添加商品标签";
   };
   const toEdit = (PL: PLType) => {
-    A_EFrom = reactive(cloneDeep(PL));
+    A_EForm = reactive(cloneDeep(PL));
     A_EVisible.value = true;
     isAdd.value = false;
     A_ETitle.value = "修改商品标签";
   };
   const A_EFun = async () => {
-    A_EFromRef.value!.validate(async (valid, fields) => {
+    A_EFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
         loading.value = true;
         let res;
-        if (isAdd.value) res = await addPL(A_EFrom);
-        else res = await editPL(A_EFrom);
+        if (isAdd.value) res = await addPL(A_EForm);
+        else res = await editPL(A_EForm);
         if (res.code === 200) {
           allPLList.value = [];
           queryForm.currentPage = 1;

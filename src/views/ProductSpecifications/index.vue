@@ -129,16 +129,16 @@
         <el-button @click="A_EFun" :loading="loading"
           >确认{{ A_ETitle
           }}<span v-if="!isAdd"
-            >ID: {{ A_EFrom.specificationsId }}</span
+            >ID: {{ A_EForm.specificationsId }}</span
           ></el-button
         >
       </template>
-      <el-form :model="A_EFrom" ref="A_EFromRef" :rules="A_ERules">
+      <el-form :model="A_EForm" ref="A_EFormRef" :rules="A_ERules">
         <el-form-item label="商品规格名称" prop="specName">
           <el-input
             clearable
             maxlength="10"
-            v-model.trim="A_EFrom.specName"
+            v-model.trim="A_EForm.specName"
             placeholder="商品规格名称"
             :prefix-icon="renderFontIcon('fa-solid fa-pen-ruler')">
           </el-input>
@@ -155,9 +155,9 @@
         </el-form-item>
         <el-collapse
           class="w-100"
-          v-if="A_EFrom.productSpecificationsList?.length! > 0">
+          v-if="A_EForm.productSpecificationsList?.length! > 0">
           <el-collapse-item
-            v-for="(i, index) in A_EFrom.productSpecificationsList"
+            v-for="(i, index) in A_EForm.productSpecificationsList"
             :name="i.keyName">
             <template #title>
               <Transition
@@ -420,12 +420,12 @@
   };
 
   //dialog弹出框表单-----------------------
-  const A_EFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
-  const defaultA_EFrom: PSNType = {
+  const A_EFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const defaultA_EForm: PSNType = {
     productSpecificationsList: [],
     specName: "",
   };
-  let A_EFrom = reactive(defaultA_EFrom);
+  let A_EForm = reactive(defaultA_EForm);
   const keyName = ref("");
   const A_ERules = reactive({
     specName: [
@@ -439,8 +439,8 @@
   const closeConfirmFun = (done: () => void) => {
     elMessageBoxConfirm(`放弃${A_ETitle.value}`, () => {
       done();
-      A_EFromRef.value?.resetFields();
-      A_EFromRef.value?.clearValidate();
+      A_EFormRef.value?.resetFields();
+      A_EFormRef.value?.clearValidate();
       ElMessage.info(`放弃${A_ETitle.value}`);
     });
   };
@@ -448,14 +448,14 @@
     // 添加二级规格
     if (e.key === "Enter" && ind === undefined) {
       if (
-        A_EFrom.productSpecificationsList?.some(
+        A_EForm.productSpecificationsList?.some(
           (i) => i.keyName == keyName.value
         )
       )
         ElMessage.error(`已存在二级规格:'${keyName.value}'`);
       else if (keyName.value == "") ElMessage.error(`不可为空`);
       else {
-        A_EFrom.productSpecificationsList?.push({
+        A_EForm.productSpecificationsList?.push({
           keyName: keyName.value,
           valueList: [],
         });
@@ -465,51 +465,51 @@
     // 修改二级规格或添加三级规格
     if (e.key === "Enter" && ind !== undefined) {
       // 如果是编辑状态,说明是修改二级规格
-      if (A_EFrom.productSpecificationsList![ind].editStatus) {
-        if (A_EFrom.productSpecificationsList![ind].keyName == "")
+      if (A_EForm.productSpecificationsList![ind].editStatus) {
+        if (A_EForm.productSpecificationsList![ind].keyName == "")
           ElMessage.error(`不可为空`);
-        else delete A_EFrom.productSpecificationsList![ind].editStatus; //直接删除临时属性
+        else delete A_EForm.productSpecificationsList![ind].editStatus; //直接删除临时属性
       }
       // 不在编辑状态,说明是添加三级规格
       else {
         if (
-          A_EFrom.productSpecificationsList![ind].valueList.some(
-            (i) => i == A_EFrom.productSpecificationsList![ind].tag
+          A_EForm.productSpecificationsList![ind].valueList.some(
+            (i) => i == A_EForm.productSpecificationsList![ind].tag
           )
         )
           ElMessage.error(
             `'${
-              A_EFrom.productSpecificationsList![ind].keyName
-            }'上已存在规格值:'${A_EFrom.productSpecificationsList![ind].tag}'`
+              A_EForm.productSpecificationsList![ind].keyName
+            }'上已存在规格值:'${A_EForm.productSpecificationsList![ind].tag}'`
           );
         else if (
-          A_EFrom.productSpecificationsList![ind].tag == "" ||
-          A_EFrom.productSpecificationsList![ind].tag == undefined
+          A_EForm.productSpecificationsList![ind].tag == "" ||
+          A_EForm.productSpecificationsList![ind].tag == undefined
         )
           ElMessage.error(`不可为空`);
         else {
-          A_EFrom.productSpecificationsList![ind].valueList.push(
-            A_EFrom.productSpecificationsList![ind].tag!
+          A_EForm.productSpecificationsList![ind].valueList.push(
+            A_EForm.productSpecificationsList![ind].tag!
           );
-          delete A_EFrom.productSpecificationsList![ind].tag; //直接删除临时属性,避免传参时出错
+          delete A_EForm.productSpecificationsList![ind].tag; //直接删除临时属性,避免传参时出错
         }
       }
     }
   };
   const editCollapse = (ind: number) => {
-    A_EFrom.productSpecificationsList![ind].editStatus = true;
+    A_EForm.productSpecificationsList![ind].editStatus = true;
   };
   const delCollapse = (keyName: string) => {
     elMessageBoxConfirm(`删除二级规格:'${keyName}'`, () => {
-      A_EFrom.productSpecificationsList =
-        A_EFrom.productSpecificationsList?.filter((i) => i.keyName != keyName);
+      A_EForm.productSpecificationsList =
+        A_EForm.productSpecificationsList?.filter((i) => i.keyName != keyName);
       ElMessage.success(`删除二级规格:'${keyName}'`);
     });
   };
   const delTag = (tag: string, ind: number) => {
     elMessageBoxConfirm(`删除规格值:'${tag}'`, () => {
-      A_EFrom.productSpecificationsList![ind].valueList =
-        A_EFrom.productSpecificationsList![ind].valueList.filter(
+      A_EForm.productSpecificationsList![ind].valueList =
+        A_EForm.productSpecificationsList![ind].valueList.filter(
           (i) => i != tag
         );
       ElMessage.success(`删除规格值:'${tag}'`);
@@ -518,27 +518,27 @@
 
   //添加/修改商品规格----------------
   const toAdd = () => {
-    A_EFrom = reactive(cloneDeep(defaultA_EFrom));
+    A_EForm = reactive(cloneDeep(defaultA_EForm));
     isAdd.value = true;
     A_ETitle.value = "添加商品规格";
     A_EVisible.value = true;
   };
   const toEdit = async (id: number, dontLoad: boolean) => {
     const index = await getPSNificationListFun(id, dontLoad);
-    A_EFrom = reactive(cloneDeep(allPSNList.value[index!]));
+    A_EForm = reactive(cloneDeep(allPSNList.value[index!]));
     isAdd.value = false;
     A_ETitle.value = "修改商品规格";
     A_EVisible.value = true;
   };
   const A_EFun = () => {
-    A_EFromRef.value?.validate(async (valid, fields) => {
+    A_EFormRef.value?.validate(async (valid, fields) => {
       if (valid) {
         // 验证二级规格名称是否有空值
-        if (!A_EFrom.productSpecificationsList?.some((i) => i.keyName == "")) {
+        if (!A_EForm.productSpecificationsList?.some((i) => i.keyName == "")) {
           loading.value = true;
           let res;
-          if (isAdd.value) res = await addPSN(A_EFrom);
-          else res = await editPSN(A_EFrom);
+          if (isAdd.value) res = await addPSN(A_EForm);
+          else res = await editPSN(A_EForm);
           if (res.code === 200) {
             ElMessage.success(`${A_ETitle.value}成功`);
             allPSNList.value = [];

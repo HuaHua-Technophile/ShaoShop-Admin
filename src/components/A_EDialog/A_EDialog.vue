@@ -12,8 +12,8 @@
         >确认{{ A_ETitle }}<span v-if="!isAdd">ID: {{ id }}</span></el-button
       >
     </template>
-    <el-form :model="A_EFrom" ref="A_EFromRef" :rules="A_ERules">
-      <div v-for="i in A_EFromInput" class="A_EDialogFormItem">
+    <el-form :model="A_EForm" ref="A_EFormRef" :rules="A_ERules">
+      <div v-for="i in A_EFormInput" class="A_EDialogFormItem">
         <el-form-item
           :label="i.label"
           :prop="i.prop"
@@ -23,7 +23,7 @@
             :disabled="i.disabledOnEdit && !isAdd"
             clearable
             :maxlength="i.maxlength"
-            v-model.trim="A_EFrom[i.prop]"
+            v-model.trim="A_EForm[i.prop]"
             :placeholder="i.placeholder"
             :prefix-icon="renderFontIcon(i.prefixIcon)" />
         </el-form-item>
@@ -48,9 +48,9 @@
       A_ETitle: string;
       isAdd: boolean;
       id?: number;
-      A_EFrom: { [key: string]: string };
+      A_EForm: { [key: string]: string };
       A_ERules?: object;
-      A_EFromInput: elInputItemInfoType[];
+      A_EFormInput: elInputItemInfoType[];
       addFun: ReturnType<typeof addFun>;
       editFun: ReturnType<typeof editFun>;
       reQueryFun: () => void;
@@ -77,15 +77,15 @@
     });
   };
 
-  const A_EFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const A_EFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
 
   const A_EFun = async () => {
-    A_EFromRef.value?.validate(async (valid, fields) => {
+    A_EFormRef.value?.validate(async (valid, fields) => {
       if (valid) {
         loading.value = true;
         let res;
-        if (props.isAdd) res = await props.addFun(props.A_EFrom);
-        else res = await props.editFun(props.A_EFrom);
+        if (props.isAdd) res = await props.addFun(props.A_EForm);
+        else res = await props.editFun(props.A_EForm);
         if (res.code === 200) {
           props.reQueryFun();
           ElMessage.success(`${props.A_ETitle}成功`);

@@ -4,10 +4,20 @@
     ref="tableRef"
     :data="data"
     table-layout="auto"
-    :class="level == 1 ? 'bg-body rounded-4' : level == 2 ? '' : ''"
-    header-cell-class-name="text-center"
+    class="bg-body rounded-4"
+    :class="level == 1 ? '' : 'border-start border-end'"
+    :header-cell-class-name="
+      level == 1 ? 'text-center' : 'text-center text-body'
+    "
+    :header-cell-style="
+      level == 1
+        ? {}
+        : { background: 'rgba(var(--bs-ShaoShop-rgb),0.4) !important' }
+    "
     :row-key="rowKey"
-    :row-class-name="level == 1 ? 'bg-body' : level == 2 ? '' : ''"
+    :row-class-name="
+      level == 1 ? 'bg-body' : darkTheme ? 'bg-black' : 'bg-body-secondary'
+    "
     cell-class-name="text-center"
     :empty-text="emptyText"
     @cell-click="cellClick"
@@ -52,7 +62,9 @@
     <!-- 添加/编辑/删除 -->
     <el-table-column v-if="!hiddenA_E">
       <template #header>
-        <el-button @click="toAdd" size="small">添加账号</el-button>
+        <el-button @click="toAdd" size="small"
+          >添加{{ A_E_Dkeyword }}</el-button
+        >
       </template>
       <template #default>
         <fontIcon icon="bi bi-pencil-square  fs-6 me-2" role="button" />
@@ -63,33 +75,40 @@
 </template>
 <script lang="ts" setup>
   import { elMessageBoxConfirm } from "@/utils/elMessageBoxConfirm/elMessageBoxConfirm";
+  import { useDarkThemeStore } from "@/stores/colorTheme";
   import { delFun } from "@/api/instance";
   import { ElMessage, TableInstance } from "element-plus";
   import { ref } from "vue";
+  import { storeToRefs } from "pinia";
+
+  const { darkTheme } = storeToRefs(useDarkThemeStore());
 
   const A_EVisible = defineModel<boolean>("A_EVisible");
   const isAdd = defineModel<boolean>("isAdd");
   const A_ETitle = defineModel<string>("A_ETitle");
   const loading = defineModel<boolean>("loading");
 
-  const props = defineProps<{
-    level: 1 | 2;
-    // loading: boolean;
-    data: any[];
-    rowKey: string;
-    emptyText: string;
-    hasSelection?: boolean; //是否开启复选框
-    delId?: string; //多选删除时,写入批量删除的唯一标识符
-    hasSerialNum?: boolean; //是否开启序号
-    hasStatus?: boolean; //是否开启序号
-    hasUpdateBy?: boolean; //是否开启更新者
-    hasUpdateTime?: boolean; //是否开启更新时间
-    hasRemark?: boolean; //是否开启备注
-    hiddenA_E?: boolean; //是否隐藏最后一列编辑/删除数据的按钮
-    A_E_Dkeyword?: string; //删除/添加/编辑时的关键词
-    delFun?: ReturnType<typeof delFun>;
-    reQueryFun?: () => void;
-  }>();
+  const props = withDefaults(
+    defineProps<{
+      level?: 1 | 2;
+      data: any[];
+      rowKey: string;
+      emptyText: string;
+      hasSelection?: boolean; //是否开启复选框
+      delId?: string; //多选删除时,写入批量删除的唯一标识符|单选删除时,填入删除方法的传参
+      hasSerialNum?: boolean; //是否开启序号
+      hasStatus?: boolean; //是否开启序号
+      hasUpdateBy?: boolean; //是否开启更新者
+      hasUpdateTime?: boolean; //是否开启更新时间
+      hasRemark?: boolean; //是否开启备注
+      hiddenA_E?: boolean; //是否隐藏最后一列编辑/删除数据的按钮
+      A_E_Dkeyword?: string; //删除/添加/编辑时的关键词
+      delFun?: ReturnType<typeof delFun>;
+      delName?: string;
+      reQueryFun?: () => void;
+    }>(),
+    { level: 1, emptyText: "表单查询异常" }
+  );
   // 3.3+：另一种更简洁的语法 具名元组语法
   const emit = defineEmits<{
     toAdd: [];
@@ -129,7 +148,7 @@
     : () => {};
 
   const tableRef = ref<TableInstance>();
-  const toDel = (row: object) => {
+  const toDel = (row: { [key: string]: any }) => {
     // 如果具有复选框,说明可以多选删除
     if (props.hasSelection) {
       tableRef.value?.toggleRowSelection(row, true);
@@ -152,6 +171,32 @@
     }
     // 否则是单个删除
     else {
+      console.log(row);
+      elMessageBoxConfirm(
+        `删除ID为 ${row[props.delId!]} 的${props.A_E_Dkeyword} "${
+          row[props.delName!]
+        }"`,
+        async () => {
+          loading.value = true;
+          let res = await props.delFun!(row[props.delId!]);
+
+          if (res.code == 200) {
+            ElMessage.success(
+              `删除ID为 ${row[props.delId!]} 的${props.A_E_Dkeyword}"${
+                row[props.delName!]
+              }"成功`
+            );
+            if (props.reQueryFun) props.reQueryFun(); //重新请求数据进行用户列表渲染
+          }
+          loading.value = false;
+        }
+      );
     }
   };
 </script>
+
+<style lang="scss">
+  .el-table__placeholder {
+    display: none !important; //消除element表格中奇怪的占位元素，导致ID那一栏被挤向右侧
+  }
+</style>

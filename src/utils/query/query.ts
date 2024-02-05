@@ -1,9 +1,27 @@
 import { getListFun, getFun } from "@/api/instance";
 import { QueryType } from "@/type";
+import { EitherOr } from "@/type/EitherOr";
 import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
 import { ceil } from "lodash";
 import { Ref, nextTick } from "vue";
 // ReturnType用于提取函数类型的返回值类型 https://jkchao.github.io/typescript-book-chinese/tips/infer.html#%E4%BB%8B%E7%BB%8D
+type paramsType = EitherOr<
+  {
+    loading: boolean;
+    queryStr: string;
+    data: Ref<object[]>;
+    queryForm?: QueryType;
+    allPageCount?: Ref<number>;
+    defaultPageSize?: number;
+    tableItemHeight?: Ref<number | undefined>;
+    tableHeaderHeight?: Ref<number | undefined>;
+    bs?: BScrollConstructor<{}>;
+    queryFun: ReturnType<typeof getFun<any[]>>;
+    queryListFun: ReturnType<typeof getListFun<any, any>>;
+  },
+  "queryFun",
+  "queryListFun"
+>;
 export const query = ({
   loading,
   queryStr,
@@ -16,19 +34,7 @@ export const query = ({
   bs,
   queryFun,
   queryListFun,
-}: {
-  loading: boolean;
-  queryStr: string;
-  data: Ref<object[]>;
-  queryForm?: QueryType;
-  allPageCount?: Ref<number>;
-  defaultPageSize?: number;
-  tableItemHeight?: Ref<number | undefined>;
-  tableHeaderHeight?: Ref<number | undefined>;
-  bs?: BScrollConstructor<{}>;
-  queryFun?: ReturnType<typeof getFun<any[]>>;
-  queryListFun?: ReturnType<typeof getListFun<any, any>>;
-}) => {
+}: paramsType) => {
   return queryFun
     ? async () => {
         loading = true;

@@ -90,10 +90,10 @@
       <template #header>
         <el-button @click="A_EFun" :loading="loading"
           >确认{{ A_ETitle
-          }}<span v-if="!isAdd">ID: {{ A_EFrom.userId }}</span></el-button
+          }}<span v-if="!isAdd">ID: {{ A_EForm.userId }}</span></el-button
         >
       </template>
-      <el-form :model="A_EFrom" ref="A_EFromRef" :rules="A_ERules"> </el-form>
+      <el-form :model="A_EForm" ref="A_EFormRef" :rules="A_ERules"> </el-form>
     </el-dialog>
   </div>
 </template>
@@ -217,9 +217,9 @@
   });
 
   //表单-----------------------
-  const A_EFromRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
+  const A_EFormRef = ref<FormInstance>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
   const defaultA_EInfo: FRType = {};
-  let A_EFrom = reactive(defaultA_EInfo);
+  let A_EForm = reactive(defaultA_EInfo);
   const A_ERules = reactive({});
 
   //dialog弹出框-----------------------
@@ -235,24 +235,24 @@
 
   // 添加/修改满减规则------------------------
   const toAdd = () => {
-    A_EFrom = reactive(cloneDeep(defaultA_EInfo));
+    A_EForm = reactive(cloneDeep(defaultA_EInfo));
     A_EVisible.value = true;
     isAdd.value = true;
     A_ETitle.value = "添加满减规则";
   };
   const toEdit = (FR: FRType) => {
-    A_EFrom = reactive(cloneDeep(FR));
+    A_EForm = reactive(cloneDeep(FR));
     A_EVisible.value = true;
     isAdd.value = false;
     A_ETitle.value = "修改满减规则";
   };
   const A_EFun = async () => {
-    A_EFromRef.value!.validate(async (valid, fields) => {
+    A_EFormRef.value!.validate(async (valid, fields) => {
       if (valid) {
         loading.value = true;
         let res;
-        if (isAdd.value) res = await addFR(A_EFrom);
-        else res = await editFR(A_EFrom);
+        if (isAdd.value) res = await addFR(A_EForm);
+        else res = await editFR(A_EForm);
         if (res.code === 200) {
           allFRList.value = [];
           queryForm.currentPage = 1;

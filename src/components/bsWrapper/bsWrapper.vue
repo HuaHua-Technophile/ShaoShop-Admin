@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-hidden p-0 p-sm-1 p-md-2 p-lg-3">
+  <div class="h-100 overflow-hidden p-0 p-sm-1 p-md-2 p-lg-3">
     <div
       ref="r"
       class="bsWrapper position-relative w-100 h-100 overflow-hidden rounded-4">

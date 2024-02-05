@@ -33,7 +33,6 @@
       :tableItemHeight="tableItemHeight"
       v-model:nowPage="nowPage">
       <customTable
-        :level="1"
         v-model:loading="loading"
         :data="allUserList"
         rowKey="userId"
@@ -69,7 +68,7 @@
       :id="A_EFrom.userId"
       :A_EFrom="A_EFrom"
       :A_ERules="A_ERules"
-      :A_EFromInput="A_EFromInput"
+      :A_EFormInput="A_EFormInput"
       :addFun="addUser"
       :editFun="editUser"
       :reQueryFun="reQueryFun">
@@ -94,12 +93,12 @@
     userQueryType,
     userType,
   } from "@/type/index";
+  import { query } from "@/utils/query/query";
 
   import { FormInstance } from "element-plus";
   import { reactive, ref } from "vue";
   import { cloneDeep } from "lodash"; //lodash按需引入减少打包体积(_.ceil(number, [precision=0])根据 precision（精度） 向上舍入 number。（注： precision（精度）可以理解为保留几位小数。）)
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
-  import { query } from "@/utils/query/query";
 
   // 不传参数的情况下，就是获取所有用户。传参数的情况下可用作搜索
   const bsRef = ref<{ r: HTMLElement; bs: BScrollConstructor }>();
@@ -190,16 +189,7 @@
     prefixIcon: "bi bi-shop-window",
     notRequired: true,
   };
-  const statusSelect: elSelectItemInfoType = {
-    prop: "status",
-    label: "状态",
-    placeholder: "正常/停用",
-    option: [
-      { label: "正常", value: 0 },
-      { label: "停用", value: 1 },
-    ],
-  };
-  const A_EFromInput: elInputItemInfoType[] = [
+  const A_EFormInput: elInputItemInfoType[] = [
     userNameInput,
     nickNameInput,
     emailInput,
@@ -256,9 +246,14 @@
 
   //查询用户-------------------------------------
   const queryFormRef = ref<{ r: FormInstance }>(); //表单实例,在验证表单规则时,需调用实例内的validate方法
-  const queryRules = {
-    phoneNumber: [{ validator: phoneNumberValidator, trigger: "change" }],
-    email: [{ validator: emailValidator, trigger: "change" }],
+  const statusSelect: elSelectItemInfoType = {
+    prop: "status",
+    label: "状态",
+    placeholder: "正常/停用",
+    option: [
+      { label: "正常", value: 0 },
+      { label: "停用", value: 1 },
+    ],
   };
   const listQueryFormInput: elInputItemInfoType[] = [
     userNameInput,
@@ -266,4 +261,8 @@
     phoneNumberInput,
   ];
   const listQueryFormSelect: elSelectItemInfoType[] = [statusSelect];
+  const queryRules = {
+    phoneNumber: [{ validator: phoneNumberValidator, trigger: "change" }],
+    email: [{ validator: emailValidator, trigger: "change" }],
+  };
 </script>
