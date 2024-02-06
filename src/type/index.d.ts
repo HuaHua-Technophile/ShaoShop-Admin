@@ -76,6 +76,15 @@ export type elSelectInfoType = {
   option: { label: string; value: string | number }[];
 };
 export type elSelectItemInfoType = elSelectInfoType & elFormItemType;
+export type elRadioInfoType = {
+  radio: { l: string | number; v: string }[];
+};
+export type elRadioItemInfoType = elRadioInfoType & elFormItemType;
+export type elInputNumInfoType = {
+  min?: number;
+  max?: number;
+};
+export type elInputNumItemInfoType = elInputNumInfoType & elFormItemType;
 
 export type QueryType = {
   pageSize: number; //每页条数

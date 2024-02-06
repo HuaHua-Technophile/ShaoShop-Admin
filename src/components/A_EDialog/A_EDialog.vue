@@ -13,23 +13,47 @@
       >
     </template>
     <el-form :model="A_EForm" ref="A_EFormRef" :rules="A_ERules">
-      <div v-for="i in A_EFormInput" class="A_EDialogFormItem">
-        <el-form-item
-          :label="i.label"
-          :prop="i.prop"
-          :style="i.notRequired ? 'padding-left: 10.18px' : ''"
-          v-if="!(i.hiddenOnEdit && !isAdd)">
-          <el-input
-            :disabled="i.disabledOnEdit && !isAdd"
-            clearable
-            :maxlength="i.maxlength"
-            v-model.trim="A_EForm[i.prop]"
-            :placeholder="i.placeholder"
-            :prefix-icon="renderFontIcon(i.prefixIcon)" />
-        </el-form-item>
-      </div>
+      <!-- input文本输入框 -->
+      <el-form-item
+        :label="i.label"
+        :prop="i.prop"
+        :style="i.notRequired ? 'padding-left: 10.18px' : ''"
+        v-for="i in A_EFormInput"
+        class="A_EDialogFormItem">
+        <el-input
+          v-if="!(i.hiddenOnEdit && !isAdd)"
+          :disabled="i.disabledOnEdit && !isAdd"
+          clearable
+          :maxlength="i.maxlength"
+          v-model.trim="A_EForm[i.prop]"
+          :placeholder="i.placeholder"
+          :prefix-icon="renderFontIcon(i.prefixIcon)" />
+      </el-form-item>
 
       <slot></slot>
+      <!-- inputNumber数值输入框 -->
+      <el-form-item
+        v-for="i in A_EFormInputNum"
+        :label="i.label"
+        :prop="A_EForm[i.prop]"
+        style="padding-left: 10.18px"
+        class="A_EDialogFormItem">
+        <el-input-number
+          v-model="A_EForm[i.prop]"
+          :min="i.min || 0"
+          :max="i.max || 999" />
+      </el-form-item>
+      <!-- radio单选 -->
+      <el-form-item
+        v-for="i in A_EFormRadio"
+        :label="i.label"
+        :prop="A_EForm[i.prop]"
+        style="padding-left: 10.18px"
+        class="A_EDialogFormItem">
+        <el-radio-group v-model="A_EForm[i.prop]">
+          <el-radio v-for="j in i.radio" :label="j.l">{{ j.v }}</el-radio>
+        </el-radio-group>
+      </el-form-item>
     </el-form>
   </el-dialog>
 </template>
@@ -39,7 +63,11 @@
   import { addFun, editFun } from "@/api/instance";
   import { ElMessage, FormInstance } from "element-plus";
   import { ref } from "vue";
-  import { elInputItemInfoType } from "@/type";
+  import {
+    elInputItemInfoType,
+    elInputNumItemInfoType,
+    elRadioItemInfoType,
+  } from "@/type";
 
   const A_EVisible = defineModel<boolean>("A_EVisible");
   const loading = defineModel<boolean>("loading");
@@ -51,6 +79,8 @@
       A_EForm: { [key: string]: string };
       A_ERules?: object;
       A_EFormInput: elInputItemInfoType[];
+      A_EFormRadio?: elRadioItemInfoType[];
+      A_EFormInputNum?: elInputNumItemInfoType[];
       addFun: ReturnType<typeof addFun>;
       editFun: ReturnType<typeof editFun>;
       reQueryFun: () => void;

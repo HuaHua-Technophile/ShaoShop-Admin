@@ -71,58 +71,11 @@
       :A_EForm="A_EForm"
       :A_ERules="A_ERules"
       :A_EFormInput="A_EFormInput"
+      :A_EFormInputNum="A_EFormInputNum"
+      :A_EFormRadio="A_EFormRadio"
       :addFun="addMenu"
       :editFun="editMenu"
-      :reQueryFun="queryFun">
-      <el-form-item
-        label="菜单排序"
-        prop="orderNum"
-        style="padding-left: 10.18px"
-        class="mb-0">
-        <el-input-number v-model="A_EForm.orderNum" :min="0" :max="999" />
-      </el-form-item>
-      <el-form-item
-        label="菜单类型"
-        prop="menuType"
-        class="d-flex align-items-center mb-0"
-        style="padding-left: 10.18px">
-        <el-radio-group v-model="A_EForm.menuType">
-          <el-radio label="M" size="large">目录</el-radio>
-          <el-radio label="C" size="large">菜单</el-radio>
-          <el-radio label="F" size="large">按钮</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item
-        label="菜单状态"
-        prop="status"
-        class="d-flex align-items-center mb-0"
-        style="padding-left: 10.18px">
-        <el-radio-group v-model="A_EForm.status">
-          <el-radio :label="0" size="large">正常</el-radio>
-          <el-radio :label="1" size="large">停用</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item
-        label="菜单显隐"
-        prop="visible"
-        class="d-flex align-items-center mb-0"
-        style="padding-left: 10.18px">
-        <el-radio-group v-model="A_EForm.visible">
-          <el-radio :label="0" size="large">显示</el-radio>
-          <el-radio :label="1" size="large">隐藏</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item
-        label="是否外链"
-        prop="isFrame"
-        class="d-flex align-items-center mb-0"
-        style="padding-left: 10.18px">
-        <el-radio-group v-model="A_EForm.isFrame">
-          <el-radio :label="0" size="large">是</el-radio>
-          <el-radio :label="1" size="large">否</el-radio>
-        </el-radio-group>
-      </el-form-item>
-    </A_EDialog>
+      :reQueryFun="queryFun" />
   </div>
 </template>
 <script lang="ts" setup>
@@ -132,7 +85,12 @@
     editMenu,
     delMenu,
   } from "@/api/MenuManagementAPI";
-  import { elInputItemInfoType, roleMenuType } from "@/type/index";
+  import {
+    elInputItemInfoType,
+    elInputNumItemInfoType,
+    elRadioItemInfoType,
+    roleMenuType,
+  } from "@/type/index";
   import { reactive, ref } from "vue";
   import { cloneDeep } from "lodash";
   import { query } from "@/utils/query/query";
@@ -185,6 +143,50 @@
     pathInput,
     parentIdInput,
     iconInput,
+  ];
+  const orderNumInputNum: elInputNumItemInfoType = {
+    label: "菜单排序",
+    prop: "orderNum",
+  };
+  const A_EFormInputNum: elInputNumItemInfoType[] = [orderNumInputNum];
+  const menuTypeRadio: elRadioItemInfoType = {
+    label: "菜单类型",
+    prop: "menuType",
+    radio: [
+      { l: "M", v: "目录" },
+      { l: "C", v: "菜单" },
+      { l: "F", v: "按钮" },
+    ],
+  };
+  const statusRadio: elRadioItemInfoType = {
+    label: "菜单状态",
+    prop: "status",
+    radio: [
+      { l: 0, v: "正常" },
+      { l: 1, v: "停用" },
+    ],
+  };
+  const visibleRadio: elRadioItemInfoType = {
+    label: "菜单显隐",
+    prop: "visible",
+    radio: [
+      { l: 0, v: "显示" },
+      { l: 1, v: "隐藏" },
+    ],
+  };
+  const isFrameRadio: elRadioItemInfoType = {
+    label: "是否外链",
+    prop: "isFrame",
+    radio: [
+      { l: 0, v: "是" },
+      { l: 1, v: "否" },
+    ],
+  };
+  const A_EFormRadio: elRadioItemInfoType[] = [
+    menuTypeRadio,
+    statusRadio,
+    visibleRadio,
+    isFrameRadio,
   ];
   const defaultA_EInfo: roleMenuType = {
     icon: "", // 菜单图标

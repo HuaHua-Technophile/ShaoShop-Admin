@@ -65,8 +65,8 @@
       v-model:loading="loading"
       :A_ETitle="A_ETitle"
       :isAdd="isAdd"
-      :id="A_EFrom.userId"
-      :A_EFrom="A_EFrom"
+      :id="A_EForm.userId"
+      :A_EForm="A_EForm"
       :A_ERules="A_ERules"
       :A_EFormInput="A_EFormInput"
       :addFun="addUser"
@@ -208,7 +208,7 @@
     userId: undefined,
     remark: "", //备注
   };
-  let A_EFrom = reactive(defaultA_EInfo);
+  let A_EForm = reactive(defaultA_EInfo);
   const A_ERules = {
     userName: [{ required: true, message: "请输入账号", trigger: "blur" }],
     email: [
@@ -238,10 +238,10 @@
 
   // 添加/修改用户--------------------------------
   const toAdd = () => {
-    A_EFrom = reactive(cloneDeep(defaultA_EInfo));
+    A_EForm = reactive(cloneDeep(defaultA_EInfo));
   };
   const toEdit = (user: userType) => {
-    A_EFrom = reactive(cloneDeep(user));
+    A_EForm = reactive(cloneDeep(user));
   };
 
   //查询用户-------------------------------------
