@@ -119,13 +119,13 @@
     pageSize: defaultPageSize, //每页返回的数量
   });
   const queryFun = query({
-    loading: loading.value,
+    loading,
     queryStr: "用户列表",
     data: allUserList,
-    queryForm: queryForm,
-    allPageCount: allPageCount,
-    tableItemHeight: tableItemHeight,
-    tableHeaderHeight: tableHeaderHeight,
+    queryForm,
+    allPageCount,
+    tableItemHeight,
+    tableHeaderHeight,
     bs: bsRef.value?.bs,
     queryListFun: getUserList,
   });
