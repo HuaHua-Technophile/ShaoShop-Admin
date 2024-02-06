@@ -7,7 +7,7 @@ import { Ref, nextTick } from "vue";
 // ReturnType用于提取函数类型的返回值类型 https://jkchao.github.io/typescript-book-chinese/tips/infer.html#%E4%BB%8B%E7%BB%8D
 type paramsType = EitherOr<
   {
-    loading: boolean;
+    loading: Ref<boolean>;
     queryStr: string;
     data: Ref<object[]>;
     queryForm?: QueryType;
@@ -37,17 +37,17 @@ export const query = ({
 }: paramsType) => {
   return queryFun
     ? async () => {
-        loading = true;
+        loading.value = true;
         const res = await queryFun();
         if (res.code === 200) {
           console.log(`获取${queryStr}=>`, res);
           data.value = res.data;
         }
-        loading = false;
+        loading.value = false;
       }
     : async (excessDataCount?: number) => {
         let loadFinish;
-        loading = true;
+        loading.value = true;
         const res = await queryListFun!(queryForm);
         // 如果加载的数据量大于0条
         if (res.code == 200 && res.data.records.length > 0) {
@@ -90,7 +90,7 @@ export const query = ({
         }
         // 否则加载数据量为0,则关闭上拉加载
         else bs?.closePullUp();
-        loading = false;
+        loading.value = false;
         return { loadFinish };
       };
 };

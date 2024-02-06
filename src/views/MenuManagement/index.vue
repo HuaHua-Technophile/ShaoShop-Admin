@@ -101,7 +101,7 @@
   const loading = ref(false);
   const menuList = ref<roleMenuType[]>([]);
   const queryFun = query({
-    loading: loading.value,
+    loading,
     queryStr: "菜单",
     data: menuList,
     queryFun: getMenuList,
