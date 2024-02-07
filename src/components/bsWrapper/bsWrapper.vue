@@ -1,8 +1,12 @@
 <template>
-  <div class="h-100 overflow-hidden p-0 p-sm-1 p-md-2 p-lg-3">
+  <div
+    class="overflow-hidden"
+    :class="bsInner ? '' : 'h-100 p-0 p-sm-1 p-md-2 p-lg-3'">
     <div
       ref="r"
-      class="bsWrapper position-relative w-100 h-100 overflow-hidden rounded-4">
+      class="bsWrapper position-relative w-100 overflow-hidden rounded-4"
+      :class="bsInner ? '' : 'h-100'"
+      :style="maxHeight ? `max-height:${maxHeight} !important` : ''">
       <div
         style="
           min-height: calc(100% + 1px) !important;
@@ -20,17 +24,22 @@
   import ScrollBar from "@better-scroll/scroll-bar"; //滚动条
   import MouseWheel from "@better-scroll/mouse-wheel"; //鼠标滚轮
   import ObserveDOM from "@better-scroll/observe-dom"; //自动重载
+  import NestedScroll from "@better-scroll/nested-scroll"; //嵌套滚动
+
   import { BScrollConstructor } from "@better-scroll/core/dist/types/BScroll";
   import { ceil, throttle } from "lodash";
   import { QueryType } from "@/type";
   import { query } from "@/utils/query/query";
   const props = defineProps<{
+    bsInner?: boolean; //表明是不是嵌套Better scroll中的内层,因此可能需要对样式进行调整
+    maxHeight?: string; //最大高度
     pullingUp?: boolean;
     scroll?: boolean;
     form?: QueryType;
     tableHeaderHeight?: number;
     tableItemHeight?: number;
     queryFun?: ReturnType<typeof query>;
+    nestedScroll?: string | number; //嵌套滚动的组ID
   }>();
   const jumpPageBtnVisible = defineModel<boolean>("jumpPageBtnVisible");
   const nowPage = defineModel<number>("nowPage");
@@ -39,6 +48,8 @@
   BScroll.use(ScrollBar);
   BScroll.use(MouseWheel);
   BScroll.use(ObserveDOM);
+  if (props.nestedScroll) BScroll.use(NestedScroll);
+
   const r = ref<HTMLElement>();
   const bs = ref<BScrollConstructor<{}>>(); //此处若不使用ref包裹,则不可通过defineExpose暴露属性
   onMounted(() => {
@@ -47,6 +58,11 @@
       scrollbar: true,
       mouseWheel: true,
       observeDOM: true,
+      nestedScroll: props.nestedScroll
+        ? {
+            groupId: props.nestedScroll, // string or number
+          }
+        : undefined,
     });
     console.log("实例化BS完毕", toRaw(bs.value));
     if (props.pullingUp)

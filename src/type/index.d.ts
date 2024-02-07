@@ -77,7 +77,7 @@ export type elSelectInfoType = {
 };
 export type elSelectItemInfoType = elSelectInfoType & elFormItemType;
 export type elRadioInfoType = {
-  radio: { l: string | number; v: string }[];
+  radio: { l: string | number | boolean; v: string }[];
 };
 export type elRadioItemInfoType = elRadioInfoType & elFormItemType;
 export type elInputNumInfoType = {
@@ -138,7 +138,7 @@ export type roleType = {
   menuIds?: number[]; //菜单id集合
   menuTreeList?: treeListType[]; //菜单树形结构集合
   userList?: userType[]; //用户集合
-  selectList?: (number | undefined)[]; //选中用户id集合,用于取消授权
+  selectList?: number[]; //选中用户id集合,用于取消授权
 } & TimeType;
 // 字典类型-类型
 export type dictType = {

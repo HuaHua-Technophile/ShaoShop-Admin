@@ -38,7 +38,7 @@
         rowKey="userId"
         emptyText="暂无符合查询条件的系统账户"
         :hasSelection="true"
-        delId="userId"
+        selectionId="userId"
         :hasSerialNum="true"
         :hasStatus="true"
         :hasUpdateBy="true"
@@ -237,11 +237,13 @@
   const A_ETitle = ref("添加用户");
 
   // 添加/修改用户--------------------------------
-  const toAdd = () => {
+  const toAdd = (cb: () => void) => {
     A_EForm = reactive(cloneDeep(defaultA_EInfo));
+    cb();
   };
-  const toEdit = (user: userType) => {
+  const toEdit = (user: userType, cb: () => void) => {
     A_EForm = reactive(cloneDeep(user));
+    cb();
   };
 
   //查询用户-------------------------------------

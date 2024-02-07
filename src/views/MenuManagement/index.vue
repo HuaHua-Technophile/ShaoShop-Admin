@@ -18,7 +18,7 @@
         @toEdit="toEdit"
         :delFun="delMenu"
         delName="menuName"
-        delId="menuId"
+        selectionId="menuId"
         :reQueryFun="queryFun">
         <!-- 外层表格扩展 -->
         <el-table-column type="expand">
@@ -44,7 +44,7 @@
                   @toAdd="toAdd"
                   @toEdit="toEdit"
                   :delFun="delMenu"
-                  delId="menuId"
+                  selectionId="menuId"
                   delName="menuName">
                   <!-- 内层表格扩展 -->
                   <el-table-column type="expand">
@@ -217,10 +217,12 @@
   const A_ETitle = ref("添加菜单");
 
   //添加/修改菜单------------------------
-  const toAdd = () => {
+  const toAdd = (cb: () => void) => {
     A_EForm = reactive(cloneDeep(defaultA_EInfo));
+    cb();
   };
-  const toEdit = (menu: roleMenuType) => {
+  const toEdit = (menu: roleMenuType, cb: () => void) => {
     A_EForm = reactive(cloneDeep(menu));
+    cb();
   };
 </script>
