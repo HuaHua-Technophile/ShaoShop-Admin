@@ -2,9 +2,7 @@
   "recommendations": [
     "sdras.vue-vscode-snippets",
     "vscode-icons-team.vscode-icons",
-    "stylelint.vscode-stylelint",
     "esbenp.prettier-vscode",
-    "csstools.postcss",
     "christian-kohler.path-intellisense",
     "xabikos.javascriptsnippets",
     "visualstudioexptteam.intellicode-api-usage-examples",
@@ -15,7 +13,6 @@
     "vincaslt.highlight-matching-tag",
     "dbaeumer.vscode-eslint",
     "pranaygp.vscode-css-peek",
-    "sourcegraph.cody-ai",
     "mrmlnc.vscode-autoprefixer",
     "formulahendry.auto-rename-tag",
     "formulahendry.auto-complete-tag",
