@@ -1,4 +1,4 @@
-# ShaoShop-Admin - 商城后台管理系统
+# ShaoShop-Admin - 韶商会 商城后台管理系统
 
 ## 简介
 
